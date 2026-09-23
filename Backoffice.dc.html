@@ -394,7 +394,7 @@
                 <p role="alert" style="margin:0;font-size:13px;color:rgb(155,24,33)">La pièce n'a pas été enregistrée : corrigez les champs signalés.</p>
               </sc-if>
               <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:6px;flex-wrap:wrap">
-                <x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="primary" dc-props="{{ btnUpperSm }}" hint-size="auto,56px">Enregistrer la pièce</x-import>
+                <x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="primary" dc-props="{{ btnUpperSm }}" hint-size="auto,46px">Enregistrer la pièce</x-import>
                 <sc-if value="{{ isEditing }}">
                   <button type="button" onClick="{{ deletePiece }}" style="background:none;border:0;padding:0;color:rgb(155,24,33);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(155,24,33)">Supprimer cette pièce</button>
                 </sc-if>
@@ -1030,7 +1030,7 @@ class Component extends DCLogic {
   renderVals(){
     const s = this.state;
     const btnBlock = {style:{width:'100%', textTransform:'uppercase', letterSpacing:'.1em', fontSize:14}};
-    const btnUpperSm = {style:{textTransform:'uppercase', letterSpacing:'.08em', fontSize:13}};
+    const btnUpperSm = {style:{textTransform:'uppercase', letterSpacing:'.08em', fontSize:13, padding:'0 22px', height:46, whiteSpace:'nowrap'}};
     const btnUpperSmModal = {style:{textTransform:'uppercase', letterSpacing:'.08em', fontSize:13, padding:'0 22px', height:46}};
     const btnUpperSmDanger = {style:{textTransform:'uppercase', letterSpacing:'.08em', fontSize:13, padding:'0 22px', height:46, backgroundColor:'rgb(155,24,33)'}};
     const me = this._me();
