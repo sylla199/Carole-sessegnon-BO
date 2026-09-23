@@ -733,12 +733,8 @@ class Component extends DCLogic {
 
   submitLogin(e){
     e.preventDefault();
-    const f = e.target.elements;
-    if (f.user.value.trim()==='maison' && f.pass.value==='sessegnon') {
-      this.setState({authed:true, loginErr:'', loginInfo:''});
-    } else {
-      this.setState({loginErr:'Identifiant ou mot de passe incorrect.', loginInfo:''});
-    }
+    // Démonstration : aucun champ n'est obligatoire, toute saisie (même vide) ouvre l'espace.
+    this.setState({authed:true, loginErr:'', loginInfo:''});
   }
 
   downloadCsv(filename, rows){
