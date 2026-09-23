@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/carole-sessegnon-design-system-d86b2cd7-6c83-493c-afcb-c3661a83e17a/tokens/fig-tokens.css">
+<link rel="stylesheet" href="_ds/carole-sessegnon-design-system-d86b2cd7-6c83-493c-afcb-c3661a83e17a/tokens/colors.css">
+<link rel="stylesheet" href="_ds/carole-sessegnon-design-system-d86b2cd7-6c83-493c-afcb-c3661a83e17a/tokens/typography.css">
+<link rel="stylesheet" href="_ds/carole-sessegnon-design-system-d86b2cd7-6c83-493c-afcb-c3661a83e17a/tokens/spacing.css">
+<link rel="stylesheet" href="_ds/carole-sessegnon-design-system-d86b2cd7-6c83-493c-afcb-c3661a83e17a/components/fig-assets.css">
+<link rel="stylesheet" href="_ds/carole-sessegnon-design-system-d86b2cd7-6c83-493c-afcb-c3661a83e17a/styles.css">
+<script src="_ds/carole-sessegnon-design-system-d86b2cd7-6c83-493c-afcb-c3661a83e17a/_ds_bundle.js"></script>
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:rgb(252,249,248)}
+  a{color:rgb(71,29,27);text-decoration:none}
+  a:hover{color:rgb(129,53,50)}
+  input,select,textarea,button{font-family:var(--font-body);font-size:15px}
+  input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible,tr:focus-visible{outline:1px solid rgb(71,29,27);outline-offset:2px}
+  @keyframes bo-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  ::-webkit-scrollbar{width:8px;height:8px}
+  ::-webkit-scrollbar-thumb{background:rgba(71,29,27,.18)}
+
+  /* Barre latérale : collée à l'écran sur bureau, tiroir sur mobile */
+  .bo-aside{position:sticky;top:0;height:100vh}
+  .bo-menu-btn,.bo-scrim{display:none}
+  @media (max-width:900px){
+    .bo-shell{grid-template-columns:1fr !important}
+    .bo-aside{position:fixed;left:0;top:0;bottom:0;width:280px;z-index:60;transform:translateX(-100%);transition:transform .25s ease}
+    .bo-aside.is-open{transform:none;box-shadow:0 0 0 100vmax rgba(0,0,0,.4)}
+    .bo-scrim{display:block;position:fixed;inset:0;z-index:55}
+    .bo-menu-btn{display:flex}
+    .bo-collapse,.bo-hide-mobile{display:none !important}
+    .bo-header{padding:16px 20px !important}
+
+    /* Tableaux → cartes empilées */
+    .bo-table{min-width:0 !important}
+    .bo-table thead{display:none}
+    .bo-table tr{display:block;padding:12px 16px;border-bottom:1px solid rgba(0,0,0,.08)}
+    .bo-table td{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:6px 0 !important;border:0 !important;text-align:right !important}
+    .bo-table td[data-label]::before{content:attr(data-label);flex:0 0 auto;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);text-align:left}
+  }
+</style>
+</helmet>
+
+<sc-if value="{{ isLogin }}" hint-placeholder-val="{{ true }}">
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:rgb(71,29,27);padding:20px">
+    <div style="width:100%;max-width:400px;background:rgb(255,255,255);padding:clamp(32px,6vw,52px);font-family:var(--font-body)">
+      <img src="assets/CS-LOGOMARK.svg" alt="Carole Sessegnon" style="width:40px;height:auto;display:block;margin:0 auto 22px">
+      <p style="margin:0 0 6px;text-align:center;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:rgb(94,94,94)">Administration</p>
+      <h1 style="margin:0 0 30px;text-align:center;font-family:var(--font-display);font-weight:400;font-size:28px;color:rgb(71,29,27)">Espace Maison</h1>
+      <form onSubmit="{{ submitLogin }}" style="display:flex;flex-direction:column;gap:16px">
+        <label style="display:block;font-size:13px;letter-spacing:.06em;color:rgb(70,70,70)">Identifiant
+          <input name="user" required autocomplete="username" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+        </label>
+        <label style="display:block;font-size:13px;letter-spacing:.06em;color:rgb(70,70,70)">Mot de passe
+          <input name="pass" type="password" required autocomplete="current-password" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+        </label>
+        <sc-if value="{{ loginErr }}">
+          <p role="alert" style="margin:0;font-size:13px;color:rgb(155,24,33)">{{ loginErr }}</p>
+        </sc-if>
+        <x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="primary" dc-props="{{ btnBlock }}" style="margin-top:6px" hint-size="100%,58px">Se connecter</x-import>
+        <button type="button" onClick="{{ forgotPassword }}" style="align-self:center;background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27)">Mot de passe oublié&nbsp;?</button>
+        <sc-if value="{{ loginInfo }}">
+          <p role="status" style="margin:0;font-size:13px;color:rgb(70,70,70);text-align:center">{{ loginInfo }}</p>
+        </sc-if>
+        <p style="margin:6px 0 0;font-size:12px;color:rgb(94,94,94);text-align:center">Démonstration — identifiant "maison", mot de passe "sessegnon".</p>
+      </form>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ isApp }}">
+  <div class="bo-shell" style="min-height:100vh;display:grid;grid-template-columns:{{ sidebarCols }};background:rgb(252,249,248);font-family:var(--font-body);color:rgb(0,0,0)">
+
+    <sc-if value="{{ navOpen }}">
+      <div class="bo-scrim" onClick="{{ closeNav }}"></div>
+    </sc-if>
+
+    <aside id="bo-nav" class="{{ asideClass }}" style="background:rgb(71,29,27);color:rgb(255,255,255);display:flex;flex-direction:column;overflow:hidden">
+      <div style="padding:28px 24px;display:flex;align-items:center;gap:12px">
+        <img src="assets/CS-LOGOMARK.svg" alt="" style="width:26px;height:auto;flex:0 0 auto;filter:brightness(0) invert(1)">
+        <sc-if value="{{ sidebarWide }}">
+          <span style="font-family:var(--font-display);font-size:16px;letter-spacing:.04em;white-space:nowrap">Administration</span>
+        </sc-if>
+      </div>
+      <nav aria-label="Navigation principale" style="display:flex;flex-direction:column;gap:2px;padding:8px 12px;flex:1">
+        <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="4">
+          <button type="button" onClick="{{ n.go }}" aria-label="{{ n.label }}" aria-current="{{ n.current }}" title="{{ n.title }}" style="display:flex;align-items:center;gap:14px;padding:13px 12px;background:{{ n.bg }};border:0;color:rgb(255,255,255);cursor:pointer;text-align:left;transition-property:background-color;transition-duration:.15s" style-hover="background:rgba(255,255,255,.08)">
+            <span aria-hidden="true" style="flex:0 0 auto;width:20px;height:20px;display:flex;align-items:center;justify-content:center;opacity:{{ n.iconOpacity }}" dangerouslySetInnerHTML="{{ n.iconHtml }}"></span>
+            <sc-if value="{{ sidebarWide }}">
+              <span style="font-size:14px;white-space:nowrap">{{ n.label }}</span>
+            </sc-if>
+          </button>
+        </sc-for>
+      </nav>
+      <div style="padding:12px">
+        <button type="button" class="bo-collapse" onClick="{{ toggleSidebar }}" aria-label="{{ collapseLabel }}" aria-expanded="{{ sidebarWide }}" aria-controls="bo-nav" title="{{ collapseLabel }}" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:12px;background:none;border:0;color:rgba(255,255,255,.7);cursor:pointer;font-size:13px">
+          <svg aria-hidden="true" width="16" height="14" viewBox="0 0 16 14" fill="none" stroke="currentColor" stroke-width="1" style="transform:{{ collapseIconRot }}"><path d="M15 1H1M15 7H5M15 13H1"></path></svg>
+          <sc-if value="{{ sidebarWide }}"><span style="white-space:nowrap">Réduire le menu</span></sc-if>
+        </button>
+        <button type="button" onClick="{{ logout }}" aria-label="Déconnexion" title="Déconnexion" style="width:100%;display:flex;align-items:center;gap:14px;padding:13px 12px;background:none;border:0;color:rgba(255,255,255,.75);cursor:pointer;text-align:left">
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1" style="flex:0 0 auto"><path d="M7 15H3.5A1.5 1.5 0 0 1 2 13.5v-9A1.5 1.5 0 0 1 3.5 3H7M12 12.5 16 9l-4-3.5M16 9H7"></path></svg>
+          <sc-if value="{{ sidebarWide }}"><span style="font-size:14px;white-space:nowrap">Déconnexion</span></sc-if>
+        </button>
+      </div>
+    </aside>
+
+    <main style="min-width:0">
+      <header class="bo-header" style="position:sticky;top:0;z-index:10;background:rgba(252,249,248,.92);backdrop-filter:blur(20px);padding:22px clamp(20px,3vw,44px);display:flex;align-items:center;justify-content:space-between;gap:20px;box-shadow:inset 0 -1px 0 rgba(0,0,0,.08)">
+        <div style="display:flex;align-items:center;gap:14px;min-width:0">
+          <button type="button" class="bo-menu-btn" onClick="{{ openNav }}" aria-label="Ouvrir le menu" aria-expanded="{{ navOpen }}" aria-controls="bo-nav" style="flex:0 0 auto;width:44px;height:44px;align-items:center;justify-content:center;background:none;border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);color:rgb(71,29,27);cursor:pointer">
+            <svg aria-hidden="true" width="18" height="14" viewBox="0 0 18 14" fill="none" stroke="currentColor" stroke-width="1"><path d="M17 1H1M17 7H1M17 13H1"></path></svg>
+          </button>
+          <div style="min-width:0">
+            <sc-if value="{{ crumb }}">
+              <button type="button" onClick="{{ crumbGo }}" style="margin:0 0 4px;padding:0;background:none;border:0;cursor:pointer;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:rgb(94,94,94)">{{ crumb }}</button>
+            </sc-if>
+            <h1 style="margin:0;font-family:var(--font-display);font-weight:400;font-size:clamp(22px,3vw,30px);color:rgb(71,29,27)">{{ pageTitle }}</h1>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;flex:0 0 auto">
+          <div class="bo-hide-mobile" style="text-align:right">
+            <p style="margin:0;font-size:14px;color:rgb(0,0,0)">{{ me.nom }}</p>
+            <p style="margin:2px 0 0;font-size:12px;color:rgb(94,94,94)">{{ me.roleLabel }}</p>
+          </div>
+          <div aria-hidden="true" style="width:38px;height:38px;border-radius:50%;background:rgba(71,29,27,.1);color:rgb(71,29,27);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:14px">CS</div>
+        </div>
+      </header>
+
+      <div style="padding:clamp(20px,3vw,44px)">
+
+        <sc-if value="{{ flash }}">
+          <div role="status" style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin:0 0 20px;padding:14px 18px;background:rgb(255,255,255);box-shadow:inset 3px 0 0 rgb(71,29,27),inset 0 0 0 1px rgba(0,0,0,.08);font-size:14px;color:rgb(71,29,27);animation:bo-in .2s ease">
+            <span>{{ flash }}</span>
+            <button type="button" onClick="{{ closeFlash }}" aria-label="Fermer le message" style="flex:0 0 auto;background:none;border:0;padding:0 2px;cursor:pointer;color:rgb(94,94,94);font-size:18px;line-height:1">×</button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isDashboard }}" hint-placeholder-val="{{ true }}">
+          <p style="margin:0 0 14px;font-size:13px;color:rgb(94,94,94)">Cumul depuis l'ouverture des ventes. Les comparaisons par période apparaîtront quand l'historique le permettra.</p>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:16px;margin-bottom:32px">
+            <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4">
+              <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:22px">
+                <p style="margin:0 0 10px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">{{ k.label }}</p>
+                <p style="margin:0;font-family:var(--font-display);font-size:clamp(26px,2.4vw,32px);color:rgb(71,29,27);white-space:nowrap">{{ k.value }}<span style="margin-left:6px;font-family:var(--font-body);font-size:13px;letter-spacing:.06em;color:rgb(94,94,94)">{{ k.unit }}</span></p>
+                <p style="margin:8px 0 0;font-size:12px;color:rgb(94,94,94)">{{ k.hint }}</p>
+              </div>
+            </sc-for>
+          </div>
+
+          <sc-if value="{{ geoRepartition.length }}">
+            <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:24px;margin-bottom:20px">
+              <p style="margin:0 0 16px;font-family:var(--font-display);font-size:19px;color:rgb(71,29,27)">Répartition géographique des activations</p>
+              <div style="display:flex;flex-direction:column;gap:12px">
+                <sc-for list="{{ geoRepartition }}" as="g" hint-placeholder-count="3">
+                  <div>
+                    <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px;color:rgb(70,70,70)"><span>{{ g.pays }}</span><span>{{ g.label }}</span></div>
+                    <div style="height:6px;background:rgba(0,0,0,.06)"><div style="height:100%;width:{{ g.pct }}%;background:rgb(71,29,27)"></div></div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr));gap:20px">
+            <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:24px">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+                <p style="margin:0;font-family:var(--font-display);font-size:19px;color:rgb(71,29,27)">Pièces récemment ajoutées</p>
+                <button type="button" onClick="{{ goPieces }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27)">Tout voir</button>
+              </div>
+              <sc-for list="{{ recentPieces }}" as="p" hint-placeholder-count="4">
+                <button type="button" onClick="{{ p.open }}" style="display:flex;width:100%;align-items:center;gap:14px;padding:12px 0;border-top:1px solid rgba(0,0,0,.08);background:none;border-left:0;border-right:0;border-bottom:0;text-align:left;cursor:pointer;font-family:inherit" style-hover="opacity:.7">
+                  <div style="flex:0 0 44px;width:44px;height:44px;border-radius:50%;overflow:hidden;outline:1px solid oklch(0 0 0 / 0.1);outline-offset:-1px">
+                    <image-slot id="{{ p.slot }}" shape="circle" placeholder="Photo"></image-slot>
+                  </div>
+                  <div style="flex:1;min-width:0">
+                    <p style="margin:0;font-size:14px;color:rgb(0,0,0)">{{ p.modele }}</p>
+                    <p style="margin:3px 0 0;font-size:12px;color:rgb(94,94,94);font-variant-numeric:tabular-nums">{{ p.serie }}</p>
+                  </div>
+                  <span style="flex:0 0 auto;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ p.statutBg }};color:{{ p.statutFg }};box-shadow:{{ p.statutShadow }}">{{ p.statutLabel }}</span>
+                </button>
+              </sc-for>
+            </div>
+            <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:24px">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+                <p style="margin:0;font-family:var(--font-display);font-size:19px;color:rgb(71,29,27)">Commandes récentes</p>
+                <button type="button" onClick="{{ goCommandes }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27)">Tout voir</button>
+              </div>
+              <sc-for list="{{ recentOrders }}" as="o" hint-placeholder-count="4">
+                <button type="button" onClick="{{ o.open }}" style="display:flex;width:100%;justify-content:space-between;gap:14px;padding:12px 0;border-top:1px solid rgba(0,0,0,.08);background:none;border-left:0;border-right:0;border-bottom:0;text-align:left;cursor:pointer;font-family:inherit" style-hover="opacity:.7">
+                  <div>
+                    <p style="margin:0;font-size:14px;color:rgb(0,0,0)">{{ o.no }}</p>
+                    <p style="margin:3px 0 0;font-size:12px;color:rgb(94,94,94)">{{ o.client }}</p>
+                  </div>
+                  <span style="flex:0 0 auto;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ o.statutBg }};color:{{ o.statutFg }};box-shadow:{{ o.statutShadow }};align-self:flex-start">{{ o.statutLabel }}</span>
+                </button>
+              </sc-for>
+            </div>
+            <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:24px">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+                <p style="margin:0;font-family:var(--font-display);font-size:19px;color:rgb(71,29,27)">Associations récentes</p>
+                <button type="button" onClick="{{ goProprietaires }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27)">Tout voir</button>
+              </div>
+              <sc-for list="{{ recentOwners }}" as="o" hint-placeholder-count="3">
+                <div style="padding:12px 0;border-top:1px solid rgba(0,0,0,.08)">
+                  <p style="margin:0;font-size:14px;color:rgb(0,0,0)">{{ o.owner }}</p>
+                  <p style="margin:3px 0 0;font-size:12px;color:rgb(94,94,94)">{{ o.piece }} — {{ o.date }}</p>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isPieces }}">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:20px">
+            <div style="display:flex;gap:10px;flex-wrap:wrap;flex:1 1 420px;min-width:0">
+              <input type="search" aria-label="Rechercher une pièce" value="{{ search }}" onChange="{{ setSearch }}" placeholder="Rechercher un modèle, un n° de série…" style="flex:1 1 240px;min-width:0;height:46px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);color:rgb(0,0,0);font-size:14px">
+              <select aria-label="Filtrer par statut" value="{{ statutFilter }}" onChange="{{ setStatutFilter }}" style="flex:1 1 160px;height:46px;padding:0 12px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);color:rgb(0,0,0);font-size:14px">
+                <option value="tous">Tous les statuts</option>
+                <option value="disponible">Disponible</option>
+                <option value="vendue">Vendue</option>
+                <option value="bientot">Bientôt disponible</option>
+              </select>
+              <select aria-label="Trier les pièces" value="{{ sortBy }}" onChange="{{ setSortBy }}" style="flex:1 1 180px;height:46px;padding:0 12px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);color:rgb(0,0,0);font-size:14px">
+                <option value="recent">Plus récentes d'abord</option>
+                <option value="ancien">Plus anciennes d'abord</option>
+                <option value="serie">Par n° de série</option>
+              </select>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <div data-registre style="position:relative">
+                <button type="button" onClick="{{ toggleRegistre }}" aria-haspopup="true" aria-expanded="{{ registreOpen }}" aria-controls="bo-registre-menu" style="height:46px;padding:0 20px;display:flex;align-items:center;gap:10px;background:transparent;border:0;box-shadow:inset 0 0 0 2px rgb(71,29,27);color:rgb(71,29,27);cursor:pointer;font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase">
+                  Registre
+                  <svg aria-hidden="true" width="10" height="6" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.2" style="transform:{{ registreChevron }}"><path d="M1 1l4 4 4-4"></path></svg>
+                </button>
+                <sc-if value="{{ registreOpen }}">
+                  <div id="bo-registre-menu" role="menu" style="position:absolute;right:0;top:calc(100% + 6px);z-index:20;min-width:240px;background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.12),0 12px 24px -8px rgba(0,0,0,.12);padding:6px 0;animation:bo-in .15s ease">
+                    <sc-for list="{{ registreItems }}" as="m" hint-placeholder-count="3">
+                      <button type="button" role="menuitem" onClick="{{ m.run }}" style="display:block;width:100%;padding:12px 18px;background:none;border:0;text-align:left;cursor:pointer;font-size:14px;color:rgb(0,0,0)" style-hover="background:rgb(255,251,248)">{{ m.label }}</button>
+                    </sc-for>
+                  </div>
+                </sc-if>
+              </div>
+              <x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="primary" onClick="{{ newPiece }}" dc-props="{{ btnUpperSm }}" hint-size="auto,46px">Ajouter une pièce</x-import>
+            </div>
+          </div>
+
+          <p style="margin:0 0 10px;font-size:13px;color:rgb(94,94,94)">{{ piecesCount }}</p>
+          <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);overflow:auto">
+            <table class="bo-table" style="width:100%;border-collapse:collapse;min-width:760px">
+              <thead>
+                <tr style="text-align:left">
+                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Pièce</th>
+                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">N° de série</th>
+                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Matière</th>
+                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Fabrication</th>
+                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Statut</th>
+                  <th style="padding:14px 18px;border-bottom:1px solid rgba(0,0,0,.1)"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Actions</span></th>
+                </tr>
+              </thead>
+              <tbody>
+                <sc-for list="{{ filteredPieces }}" as="p" hint-placeholder-count="6">
+                  <tr onClick="{{ p.open }}" style="cursor:pointer;transition:background-color .15s" style-hover="background:rgb(255,251,248)">
+                    <td style="padding:14px 18px;border-bottom:1px solid rgba(0,0,0,.06)">
+                      <div style="display:flex;align-items:center;gap:12px">
+                        <div style="flex:0 0 36px;width:36px;height:36px;border-radius:50%;overflow:hidden;outline:1px solid oklch(0 0 0 / 0.1);outline-offset:-1px">
+                          <image-slot id="{{ p.slot }}" shape="circle" placeholder="Photo"></image-slot>
+                        </div>
+                        <span style="font-size:14px;color:rgb(0,0,0)">{{ p.modele }}</span>
+                      </div>
+                    </td>
+                    <td data-label="N° de série" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);font-variant-numeric:tabular-nums;border-bottom:1px solid rgba(0,0,0,.06)">{{ p.serie }}</td>
+                    <td data-label="Matière" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)">{{ p.matiere }}</td>
+                    <td data-label="Fabrication" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)">{{ p.dateFabLabel }}</td>
+                    <td data-label="Statut" style="padding:14px 18px;border-bottom:1px solid rgba(0,0,0,.06)">
+                      <span style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ p.statutBg }};color:{{ p.statutFg }};box-shadow:{{ p.statutShadow }}">{{ p.statutLabel }}</span>
+                    </td>
+                    <td style="padding:14px 18px;text-align:right;border-bottom:1px solid rgba(0,0,0,.06)">
+                      <button type="button" onClick="{{ p.open }}" aria-label="{{ p.editLabel }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27)">Modifier</button>
+                    </td>
+                  </tr>
+                </sc-for>
+              </tbody>
+            </table>
+            <sc-if value="{{ noPieces }}">
+              <p style="margin:0;padding:40px;text-align:center;font-size:14px;color:rgb(94,94,94)">Aucune pièce ne correspond à cette recherche.</p>
+            </sc-if>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isPieceForm }}">
+          <button type="button" onClick="{{ goPieces }}" style="background:none;border:0;padding:0;margin-bottom:22px;color:rgb(94,94,94);cursor:pointer;font-size:13px">← Retour aux pièces</button>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:24px;align-items:start;max-width:1000px">
+            <form onSubmit="{{ savePiece }}" noValidate style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:clamp(22px,3vw,32px);display:flex;flex-direction:column;gap:18px">
+              <p style="margin:0;font-size:12px;color:rgb(94,94,94)"><span aria-hidden="true">*</span> Champs obligatoires</p>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:16px">
+                <label style="display:block;font-size:13px;color:rgb(70,70,70)">Modèle <span aria-hidden="true" style="color:rgb(155,24,33)">*</span>
+                  <input value="{{ form.modele }}" onChange="{{ setF.modele }}" required aria-invalid="{{ fieldInvalid.modele }}" aria-describedby="err-modele" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:{{ fieldShadow.modele }};color:rgb(0,0,0)">
+                  <sc-if value="{{ fieldErr.modele }}"><span id="err-modele" style="display:block;margin-top:6px;font-size:12px;color:rgb(155,24,33)">{{ fieldErr.modele }}</span></sc-if>
+                </label>
+                <label style="display:block;font-size:13px;color:rgb(70,70,70)">Coloris
+                  <input value="{{ form.coloris }}" onChange="{{ setF.coloris }}" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+                </label>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:16px">
+                <label style="display:block;font-size:13px;color:rgb(70,70,70)">Numéro de série <span aria-hidden="true" style="color:rgb(155,24,33)">*</span>
+                  <input value="{{ form.serie }}" onChange="{{ setF.serie }}" required placeholder="CS-0000-2026" aria-invalid="{{ fieldInvalid.serie }}" aria-describedby="err-serie" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:{{ fieldShadow.serie }};color:rgb(0,0,0);letter-spacing:.06em">
+                  <sc-if value="{{ fieldErr.serie }}"><span id="err-serie" style="display:block;margin-top:6px;font-size:12px;color:rgb(155,24,33)">{{ fieldErr.serie }}</span></sc-if>
+                </label>
+                <div style="font-size:13px;color:rgb(70,70,70)">
+                  <div style="display:flex;justify-content:space-between;gap:10px">
+                    <label for="bo-code">Code d'activation privé <span aria-hidden="true" style="color:rgb(155,24,33)">*</span></label>
+                    <sc-if value="{{ isEditing }}">
+                      <button type="button" onClick="{{ toggleCode }}" aria-controls="bo-code" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:12px;border-bottom:1px solid rgb(71,29,27)">{{ codeToggleLabel }}</button>
+                    </sc-if>
+                  </div>
+                  <input id="bo-code" type="{{ codeType }}" autocomplete="off" value="{{ form.code }}" onChange="{{ setF.code }}" required placeholder="8F3K-22QD" aria-invalid="{{ fieldInvalid.code }}" aria-describedby="err-code" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:{{ fieldShadow.code }};color:rgb(0,0,0);letter-spacing:.06em">
+                  <sc-if value="{{ fieldErr.code }}"><span id="err-code" style="display:block;margin-top:6px;font-size:12px;color:rgb(155,24,33)">{{ fieldErr.code }}</span></sc-if>
+                  <sc-if value="{{ isEditing }}"><span style="display:block;margin-top:6px;font-size:12px;color:rgb(94,94,94)">Chaque affichage du code est inscrit au journal d'audit.</span></sc-if>
+                </div>
+              </div>
+              <label style="display:block;font-size:13px;color:rgb(70,70,70)">Matière
+                <input value="{{ form.matiere }}" onChange="{{ setF.matiere }}" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+              </label>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:16px">
+                <label style="display:block;font-size:13px;color:rgb(70,70,70)">Date de fabrication
+                  <input type="date" value="{{ form.dateFab }}" onChange="{{ setF.dateFab }}" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+                </label>
+                <label style="display:block;font-size:13px;color:rgb(70,70,70)">Statut
+                  <select value="{{ form.statut }}" onChange="{{ setF.statut }}" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+                    <option value="disponible">Disponible</option>
+                    <option value="vendue">Vendue</option>
+                    <option value="bientot">Bientôt disponible</option>
+                  </select>
+                </label>
+              </div>
+              <sc-if value="{{ hasFieldErr }}">
+                <p role="alert" style="margin:0;font-size:13px;color:rgb(155,24,33)">La pièce n'a pas été enregistrée : corrigez les champs signalés.</p>
+              </sc-if>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:6px;flex-wrap:wrap">
+                <x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="primary" dc-props="{{ btnUpperSm }}" hint-size="auto,56px">Enregistrer la pièce</x-import>
+                <sc-if value="{{ isEditing }}">
+                  <button type="button" onClick="{{ deletePiece }}" style="background:none;border:0;padding:0;color:rgb(155,24,33);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(155,24,33)">Supprimer cette pièce</button>
+                </sc-if>
+              </div>
+            </form>
+
+            <div>
+              <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:clamp(22px,3vw,32px);margin-bottom:20px">
+                <p style="margin:0 0 16px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">Aperçu du certificat</p>
+                <div style="position:relative;aspect-ratio:.9;max-width:220px;margin:0 auto;overflow:hidden;border-radius:50%;outline:1px solid oklch(0 0 0 / 0.1);outline-offset:-1px">
+                  <image-slot id="{{ formSlot }}" shape="circle" placeholder="Photo de la pièce"></image-slot>
+                </div>
+                <p style="margin:16px 0 0;text-align:center;font-family:var(--font-display);font-size:18px;color:rgb(71,29,27)">{{ form.modele }}</p>
+                <p style="margin:6px 0 0;text-align:center;font-size:12px;color:rgb(94,94,94);font-variant-numeric:tabular-nums">{{ form.serie }}</p>
+              </div>
+
+              <sc-if value="{{ isEditing }}">
+                <div style="background:rgb(255,251,248);padding:clamp(22px,3vw,32px)">
+                  <p style="margin:0 0 14px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">Propriétaire</p>
+                  <sc-if value="{{ hasOwnerForForm }}">
+                    <p style="margin:0;font-size:14px;color:rgb(0,0,0)">{{ formOwner.owner }}</p>
+                    <p style="margin:6px 0 0;font-size:13px;color:rgb(94,94,94)">{{ formOwner.email }}</p>
+                    <p style="margin:6px 0 0;font-size:13px;color:rgb(94,94,94)">Associée le {{ formOwner.date }}</p>
+                  </sc-if>
+                  <sc-if value="{{ noOwnerForForm }}">
+                    <p style="margin:0;font-size:14px;color:rgb(94,94,94)">Pièce non encore associée à un propriétaire.</p>
+                  </sc-if>
+                </div>
+              </sc-if>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isCommandes }}">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:20px">
+            <div style="display:flex;gap:10px;flex-wrap:wrap;flex:1 1 420px;min-width:0">
+              <input type="search" aria-label="Rechercher une commande" value="{{ orderSearch }}" onChange="{{ setOrderSearch }}" placeholder="Rechercher un client, un n° de commande…" style="flex:1 1 240px;min-width:0;height:46px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);color:rgb(0,0,0);font-size:14px">
+              <select aria-label="Filtrer par statut" value="{{ orderStatutFilter }}" onChange="{{ setOrderStatutFilter }}" style="flex:1 1 180px;height:46px;padding:0 12px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);color:rgb(0,0,0);font-size:14px">
+                <option value="tous">Tous les statuts</option>
+                <option value="preparation">En préparation</option>
+                <option value="expediee">Expédiée</option>
+                <option value="livree">Livrée</option>
+                <option value="annulee">Annulée</option>
+              </select>
+            </div>
+            <x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="secondary" onClick="{{ exportOrdersCsv }}" dc-props="{{ btnUpperSm }}" hint-size="auto,46px">Exporter</x-import>
+          </div>
+          <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);overflow:auto">
+            <table class="bo-table" style="width:100%;border-collapse:collapse;min-width:820px">
+              <thead>
+                <tr style="text-align:left">
+                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">N° de commande</th>
+                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Client</th>
+                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Articles</th>
+                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Total</th>
+                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Date</th>
+                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Statut</th>
+                  <th style="padding:14px 18px;border-bottom:1px solid rgba(0,0,0,.1)"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Actions</span></th>
+                </tr>
+              </thead>
+              <tbody>
+                <sc-for list="{{ filteredOrders }}" as="o" hint-placeholder-count="4">
+                  <tr onClick="{{ o.open }}" style="cursor:pointer;transition:background-color .15s" style-hover="background:rgb(255,251,248)">
+                    <td style="padding:14px 18px;font-size:14px;color:rgb(0,0,0);font-variant-numeric:tabular-nums;border-bottom:1px solid rgba(0,0,0,.06)">{{ o.no }}</td>
+                    <td data-label="Client" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)">{{ o.client }}</td>
+                    <td data-label="Articles" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)">{{ o.items }}</td>
+                    <td data-label="Total" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);font-variant-numeric:tabular-nums;border-bottom:1px solid rgba(0,0,0,.06)">{{ o.totalLabel }}</td>
+                    <td data-label="Date" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)">{{ o.date }}</td>
+                    <td data-label="Statut" style="padding:14px 18px;border-bottom:1px solid rgba(0,0,0,.06)">
+                      <span style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ o.statutBg }};color:{{ o.statutFg }};box-shadow:{{ o.statutShadow }}">{{ o.statutLabel }}</span>
+                    </td>
+                    <td style="padding:14px 18px;text-align:right;border-bottom:1px solid rgba(0,0,0,.06)">
+                      <button type="button" onClick="{{ o.open }}" aria-label="{{ o.detailLabel }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27)">Détail</button>
+                    </td>
+                  </tr>
+                </sc-for>
+              </tbody>
+            </table>
+            <sc-if value="{{ noOrders }}">
+              <p style="margin:0;padding:40px;text-align:center;font-size:14px;color:rgb(94,94,94)">Aucune commande ne correspond à cette recherche.</p>
+            </sc-if>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isCommandeDetail }}">
+          <button type="button" onClick="{{ goCommandes }}" style="background:none;border:0;padding:0;margin-bottom:22px;color:rgb(94,94,94);cursor:pointer;font-size:13px">← Retour aux commandes</button>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:24px;align-items:start;max-width:1000px">
+            <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:clamp(22px,3vw,32px)">
+              <p style="margin:0 0 4px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">Commande</p>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 22px">
+                <p style="margin:0;font-family:var(--font-display);font-size:24px;color:rgb(71,29,27)">{{ viewOrder.no }}</p>
+                <span style="flex:0 0 auto;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ viewOrder.statutBg }};color:{{ viewOrder.statutFg }};box-shadow:{{ viewOrder.statutShadow }}">{{ viewOrder.statutLabel }}</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Client</span><span>{{ viewOrder.client }}</span></div>
+              <div style="display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">E-mail</span><span style="overflow-wrap:anywhere;text-align:right">{{ viewOrder.email }}</span></div>
+              <div style="display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Articles</span><span style="text-align:right">{{ viewOrder.items }}</span></div>
+              <div style="display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Total</span><span style="font-variant-numeric:tabular-nums">{{ viewOrder.totalLabel }}</span></div>
+              <div style="display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Date</span><span>{{ viewOrder.date }}</span></div>
+              <div style="display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Réception</span><span style="text-align:right">{{ viewOrder.mode }}</span></div>
+              <div style="display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px;border-bottom:1px solid rgba(0,0,0,.08)"><span style="color:rgb(94,94,94)">Code de suivi</span><span style="text-align:right;letter-spacing:.04em">{{ viewOrder.trackingLabel }}</span></div>
+            </div>
+            <form onSubmit="{{ saveOrder }}" style="background:rgb(255,251,248);padding:clamp(22px,3vw,32px);display:flex;flex-direction:column;gap:18px">
+              <p style="margin:0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">Suivi de la commande</p>
+              <label for="bo-order-statut" style="display:block;font-size:13px;color:rgb(70,70,70)">Statut
+                <select id="bo-order-statut" value="{{ orderDraft.statut }}" onChange="{{ setDraft.statut }}" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+                  <option value="preparation">En préparation</option>
+                  <option value="expediee">Expédiée</option>
+                  <option value="livree">Livrée</option>
+                  <option value="annulee">Annulée</option>
+                </select>
+              </label>
+              <label style="display:block;font-size:13px;color:rgb(70,70,70)">Code de suivi du transporteur
+                <input value="{{ orderDraft.tracking }}" onChange="{{ setDraft.tracking }}" placeholder="Ex. EXP-4471-CI" autocomplete="off" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0);letter-spacing:.04em">
+              </label>
+              <sc-if value="{{ orderDirty }}">
+                <p style="margin:0;font-size:12px;color:rgb(94,94,94)">Modifications non enregistrées.</p>
+              </sc-if>
+              <x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="primary" disabled="{{ orderUnchanged }}" dc-props="{{ btnBlock }}" hint-size="100%,58px">Mettre à jour</x-import>
+            </form>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isEquipe }}">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:24px">
+            <p style="margin:0;font-size:14px;color:rgb(70,70,70);max-width:56ch">Chaque collaborateur reçoit un accès restreint par rôle — un compte ne peut pas voir plus que ce que son rôle autorise.</p>
+            <x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="primary" onClick="{{ inviteTeam }}" dc-props="{{ btnUpperSm }}" hint-size="auto,46px">Inviter un collaborateur</x-import>
+          </div>
+
+          <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);overflow:auto;margin-bottom:28px">
+            <table class="bo-table" style="width:100%;border-collapse:collapse;min-width:680px">
+              <thead>
+                <tr style="text-align:left">
+                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Collaborateur</th>
+                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Rôle</th>
+                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Statut</th>
+                  <th style="padding:14px 18px;border-bottom:1px solid rgba(0,0,0,.1)"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Actions</span></th>
+                </tr>
+              </thead>
+              <tbody>
+                <sc-for list="{{ team }}" as="t" hint-placeholder-count="4">
+                  <tr style="transition:background-color .15s" style-hover="background:rgb(255,251,248)">
+                    <td style="padding:14px 18px;border-bottom:1px solid rgba(0,0,0,.06);text-align:left">
+                      <div>
+                        <p style="margin:0;font-size:14px;color:rgb(0,0,0)">{{ t.nom }}</p>
+                        <p style="margin:3px 0 0;font-size:12px;color:rgb(94,94,94);overflow-wrap:anywhere">{{ t.email }}</p>
+                      </div>
+                    </td>
+                    <td data-label="Rôle" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)">{{ t.roleLabel }}</td>
+                    <td data-label="Statut" style="padding:14px 18px;border-bottom:1px solid rgba(0,0,0,.06)">
+                      <span style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ t.statutBg }};color:{{ t.statutFg }};box-shadow:{{ t.statutShadow }}">{{ t.statutLabel }}</span>
+                    </td>
+                    <td style="padding:14px 18px;text-align:right;border-bottom:1px solid rgba(0,0,0,.06)">
+                      <sc-if value="{{ t.canToggle }}">
+                        <button type="button" onClick="{{ t.toggle }}" aria-label="{{ t.toggleAria }}" style="background:none;border:0;padding:0;color:rgb(70,70,70);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(70,70,70)">{{ t.toggleLabel }}</button>
+                      </sc-if>
+                      <sc-if value="{{ t.lockedLabel }}">
+                        <span style="font-size:12px;color:rgb(94,94,94)">{{ t.lockedLabel }}</span>
+                      </sc-if>
+                    </td>
+                  </tr>
+                </sc-for>
+              </tbody>
+            </table>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr));gap:20px">
+            <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:24px">
+              <p style="margin:0 0 16px;font-family:var(--font-display);font-size:19px;color:rgb(71,29,27)">Rôles et accès</p>
+              <sc-for list="{{ roles }}" as="r" hint-placeholder-count="6">
+                <div style="padding:12px 0;border-top:1px solid rgba(0,0,0,.08)">
+                  <p style="margin:0 0 4px;font-size:14px;color:rgb(0,0,0)">{{ r.label }}</p>
+                  <p style="margin:0;font-size:12px;color:rgb(94,94,94)">Voit : {{ r.acces }}</p>
+                  <p style="margin:4px 0 0;font-size:12px;color:rgb(94,94,94)">Ne voit pas : {{ r.neVoitPas }}</p>
+                </div>
+              </sc-for>
+            </div>
+            <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:24px">
+              <p style="margin:0 0 16px;font-family:var(--font-display);font-size:19px;color:rgb(71,29,27)">Journal d'audit</p>
+              <sc-for list="{{ audit }}" as="a" hint-placeholder-count="4">
+                <div style="padding:12px 0;border-top:1px solid rgba(0,0,0,.08)">
+                  <p style="margin:0;font-size:13px;color:rgb(0,0,0)">{{ a.action }}</p>
+                  <p style="margin:4px 0 0;font-size:12px;color:rgb(94,94,94)">{{ a.auteur }} — {{ a.date }}</p>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isProprietaires }}">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:20px">
+            <input type="search" aria-label="Rechercher un propriétaire" value="{{ ownerSearch }}" onChange="{{ setOwnerSearch }}" placeholder="Rechercher un propriétaire, une pièce…" style="flex:1 1 240px;max-width:420px;min-width:0;height:46px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);color:rgb(0,0,0);font-size:14px">
+            <x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="secondary" onClick="{{ exportOwnersCsv }}" dc-props="{{ btnUpperSm }}" hint-size="auto,46px">Exporter</x-import>
+          </div>
+          <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);overflow:auto">
+            <table class="bo-table" style="width:100%;border-collapse:collapse;min-width:760px">
+              <thead>
+                <tr style="text-align:left">
+                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Pièce</th>
+                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Propriétaire</th>
+                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">E-mail</th>
+                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Pays</th>
+                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Date d'association</th>
+                </tr>
+              </thead>
+              <tbody>
+                <sc-for list="{{ filteredOwners }}" as="o" hint-placeholder-count="4">
+                  <tr style="transition:background-color .15s" style-hover="background:rgb(255,251,248)">
+                    <td style="padding:14px 18px;font-size:14px;color:rgb(0,0,0);border-bottom:1px solid rgba(0,0,0,.06);text-align:left">{{ o.piece }}</td>
+                    <td data-label="Propriétaire" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)">{{ o.owner }}</td>
+                    <td data-label="E-mail" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);overflow-wrap:anywhere">{{ o.email }}</td>
+                    <td data-label="Pays" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)">{{ o.pays }}</td>
+                    <td data-label="Association" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);font-variant-numeric:tabular-nums;border-bottom:1px solid rgba(0,0,0,.06)">{{ o.date }}</td>
+                  </tr>
+                </sc-for>
+              </tbody>
+            </table>
+            <sc-if value="{{ noOwners }}">
+              <p style="margin:0;padding:40px;text-align:center;font-size:14px;color:rgb(94,94,94)">Aucune association ne correspond à cette recherche.</p>
+            </sc-if>
+          </div>
+        </sc-if>
+
+      </div>
+    </main>
+
+    <sc-if value="{{ hasConfirm }}">
+      <div onClick="{{ confirmCancel }}" style="position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;padding:20px">
+        <div role="dialog" aria-modal="true" aria-labelledby="bo-confirm-title" aria-describedby="bo-confirm-body" onClick="{{ stopClick }}" style="width:100%;max-width:460px;background:rgb(255,255,255);padding:clamp(24px,4vw,36px);animation:bo-in .2s ease">
+          <p id="bo-confirm-title" style="margin:0 0 12px;font-family:var(--font-display);font-size:22px;color:rgb(71,29,27)">{{ confirm.title }}</p>
+          <p id="bo-confirm-body" style="margin:0 0 26px;font-size:14px;line-height:22px;color:rgb(70,70,70)">{{ confirm.body }}</p>
+          <div style="display:flex;justify-content:flex-end;gap:12px;flex-wrap:wrap">
+            <button type="button" data-confirm-cancel onClick="{{ confirmCancel }}" style="height:46px;padding:0 20px;background:transparent;border:0;box-shadow:inset 0 0 0 2px rgb(71,29,27);color:rgb(71,29,27);cursor:pointer;font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase">{{ confirm.cancelLabel }}</button>
+            <sc-if value="{{ confirm.okLabel }}">
+              <x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="primary" onClick="{{ confirmOk }}" dc-props="{{ btnUpperSmDanger }}" hint-size="auto,46px">{{ confirm.okLabel }}</x-import>
+            </sc-if>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+  </div>
+</sc-if>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}">
+const ICONS = {
+  dashboard: '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1"><rect x="1" y="1" width="8" height="8"></rect><rect x="11" y="1" width="8" height="5"></rect><rect x="11" y="8" width="8" height="11"></rect><rect x="1" y="11" width="8" height="8"></rect></svg>',
+  pieces: '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1"><circle cx="10" cy="10" r="8.5"></circle><path d="M6 12.5 8.5 15 14 6"></path></svg>',
+  owners: '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1"><circle cx="10" cy="6.5" r="4"></circle><path d="M2.5 18c0-4.1 3.4-6.3 7.5-6.3s7.5 2.2 7.5 6.3"></path></svg>',
+  orders: '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1"><path d="M2 6h16l-1.4 11H3.4L2 6Z"></path><path d="M6.5 6V4a3.5 3.5 0 0 1 7 0v2"></path></svg>',
+  team: '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1"><circle cx="7" cy="6" r="3"></circle><circle cx="15" cy="7" r="2.4"></circle><path d="M1.5 17c0-3.3 2.5-5.2 5.5-5.2s5.5 1.9 5.5 5.2M13 12.5c2.4.2 4 1.7 4 4.5"></path></svg>'
+};
+const SEED_PIECES = [
+  {id:'p1', modele:'Huperano', coloris:'Cuir naturel & bordeaux', serie:'CS-0042-2026', code:'8F3K-22QD', matiere:'Cuir de vachette, tannage végétal', dateFab:'2026-03-12', statut:'vendue'},
+  {id:'p2', modele:'Radah', coloris:'Bordeaux', serie:'CS-0043-2026', code:'2LK9-77RT', matiere:'Cuir bordeaux, doublure daim', dateFab:'2026-03-20', statut:'disponible'},
+  {id:'p3', modele:'Nafi', coloris:'Cuir naturel', serie:'CS-0044-2026', code:'9QW1-40MZ', matiere:'Cuir naturel patiné à la main', dateFab:'2026-04-02', statut:'disponible'},
+  {id:'p4', modele:'Sikadi', coloris:'Cuir grainé', serie:'CS-0045-2026', code:'5TY6-88XP', matiere:'Cuir grainé, ferrures bronze', dateFab:'2026-04-15', statut:'disponible'},
+  {id:'p5', modele:'Ayaba', coloris:'Cuir tressé', serie:'CS-0046-2026', code:'3JH2-19CV', matiere:'Cuir tressé, pièce d\'atelier', dateFab:'2026-05-01', statut:'bientot'},
+  {id:'p6', modele:'Wèlè', coloris:'Cuir souple', serie:'CS-0047-2026', code:'6RF8-33NB', matiere:'Cuir souple, fermoir aimanté', dateFab:'2026-05-10', statut:'disponible'}
+];
+const SEED_ORDERS = [
+  {id:'o1', no:'#CS-2026-9482', client:'Awa Koné', email:'awa.kone@exemple.ci', items:'Huperano ×1', total:420000, date:'2 septembre 2026', mode:'Retrait boutique — Riviéra CIAD', statut:'livree', tracking:''},
+  {id:'o2', no:'#CS-2026-9120', client:'Marie Lefèvre', email:'marie.lefevre@exemple.fr', items:'Radah ×1, Nafi ×1', total:680000, date:'14 juillet 2026', mode:'Livraison à domicile', statut:'preparation', tracking:''},
+  {id:'o3', no:'#CS-2026-9051', client:'Fatou Diop', email:'fatou.diop@exemple.sn', items:'Sikadi ×1', total:510000, date:'2 juillet 2026', mode:'Livraison à domicile', statut:'expediee', tracking:'EXP-4471-SN'},
+  {id:'o4', no:'#CS-2026-8990', client:'Julien Petit', email:'julien.petit@exemple.fr', items:'Wèlè ×1', total:340000, date:'20 juin 2026', mode:'Retrait boutique — Cocody Angré', statut:'annulee', tracking:''}
+];
+const ROLES = [
+  {key:'direction', label:'Direction', acces:'Accès complet, création des comptes et paramètres généraux', neVoitPas:'—'},
+  {key:'commandes', label:'Commandes et clientèle', acces:'Commandes, clients, remboursements, exports', neVoitPas:'Codes d\'activation, registre des pièces'},
+  {key:'logistique', label:'Logistique', acces:'Commandes payées à expédier, saisie du code de suivi, confirmation de livraison', neVoitPas:'Données financières, coordonnées clients complètes'},
+  {key:'atelier', label:'Atelier et registre', acces:'Création et modification des pièces, génération des codes et des QR codes', neVoitPas:'Commandes, clients'},
+  {key:'contenu', label:'Contenu', acces:'Pages, textes, traductions, photographies, lettre d\'information', neVoitPas:'Toute donnée client'},
+  {key:'comptabilite', label:'Comptabilité', acces:'Consultation et export du chiffre d\'affaires et des factures', neVoitPas:'Aucune modification possible'}
+];
+const SEED_TEAM = [
+  {id:'t1', nom:'Carole Sessegnon', email:'carole@carolesessegnon.com', role:'direction', statut:'actif'},
+  {id:'t2', nom:'Aya Bamba', email:'aya.bamba@carolesessegnon.com', role:'commandes', statut:'actif'},
+  {id:'t3', nom:'Issa Traoré', email:'issa.traore@carolesessegnon.com', role:'logistique', statut:'actif'},
+  {id:'t4', nom:'Michelle Kouassi', email:'michelle.kouassi@carolesessegnon.com', role:'atelier', statut:'invite'}
+];
+// Compte connecté dans cette démonstration (identifiant « maison »).
+const ME_ID = 't1';
+const SEED_AUDIT = [
+  {date:'21 sept. 2026 — 09:12', auteur:'Carole Sessegnon', action:'Consultation du code d\'activation — CS-0042-2026'},
+  {date:'20 sept. 2026 — 17:40', auteur:'Issa Traoré', action:'Code de suivi saisi — commande #CS-2026-9051'},
+  {date:'19 sept. 2026 — 11:05', auteur:'Michelle Kouassi', action:'Pièce créée — Wèlè, CS-0047-2026'},
+  {date:'18 sept. 2026 — 08:50', auteur:'Aya Bamba', action:'Remboursement initié — commande #CS-2026-8990'}
+];
+const SEED_OWNERS = [
+  {pieceId:'p1', piece:'Huperano — CS-0042-2026', owner:'Awa Koné', email:'awa.kone@exemple.ci', pays:"Côte d'Ivoire", date:'2 septembre 2026'},
+  {pieceId:'p7', piece:'Sikadi — CS-0038-2026', owner:'Marie Lefèvre', email:'marie.lefevre@exemple.fr', pays:'France', date:'28 août 2026'},
+  {pieceId:'p8', piece:'Nafi — CS-0031-2026', owner:'Fatou Diop', email:'fatou.diop@exemple.sn', pays:'Sénégal', date:'19 août 2026'}
+];
+
+// Un seul jeu de badges pour tout le back-office :
+// neutre (en attente) · en cours (contour) · terminé (fond bordeaux clair) · alerte.
+const BADGE = {
+  neutral:  {statutBg:'rgba(0,0,0,.06)',       statutFg:'rgb(70,70,70)',   statutShadow:'none'},
+  progress: {statutBg:'rgb(255,255,255)',      statutFg:'rgb(71,29,27)',   statutShadow:'inset 0 0 0 1px rgb(71,29,27)'},
+  done:     {statutBg:'rgba(71,29,27,.1)',     statutFg:'rgb(71,29,27)',   statutShadow:'none'},
+  alert:    {statutBg:'rgba(155,24,33,.08)',   statutFg:'rgb(155,24,33)',  statutShadow:'none'}
+};
+const STATUT_LABEL = {disponible:'Disponible', vendue:'Vendue', bientot:'Bientôt disponible'};
+const STATUT_KIND = {disponible:'progress', vendue:'done', bientot:'neutral'};
+const ORDER_STATUT_LABEL = {preparation:'En préparation', expediee:'Expédiée', livree:'Livrée', annulee:'Annulée'};
+const ORDER_STATUT_KIND = {preparation:'neutral', expediee:'progress', livree:'done', annulee:'alert'};
+const TEAM_STATUT_LABEL = {actif:'Actif', invite:'Invitation envoyée', desactive:'Désactivé'};
+const TEAM_STATUT_KIND = {actif:'done', invite:'neutral', desactive:'neutral'};
+
+const SERIE_RE = /^CS-\d{4}-\d{4}$/;
+const CODE_RE = /^[A-Z0-9]{4}-[A-Z0-9]{4}$/;
+const FIELD_OK = 'inset 0 0 0 1px rgba(0,0,0,.2)';
+const FIELD_ERR = 'inset 0 0 0 2px rgb(155,24,33)';
+const MQ_MOBILE = '(max-width: 900px)';
+
+const fmtNumber = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g,' ');
+const fmtIsoDate = iso => {
+  if (!iso) return '—';
+  const [y,m,d] = iso.split('-').map(Number);
+  return new Date(y, m-1, d).toLocaleDateString('fr-FR', {day:'numeric', month:'long', year:'numeric'});
+};
+const nowLabel = () => {
+  const d = new Date();
+  return d.toLocaleDateString('fr-FR', {day:'numeric', month:'short', year:'numeric'}) + ' — ' +
+    d.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
+};
+
+class Component extends DCLogic {
+  state = {
+    authed:false, loginErr:'', loginInfo:'', route:'dashboard',
+    sidebarWide:true, isMobile:false, navOpen:false,
+    pieces:SEED_PIECES, owners:SEED_OWNERS, orders:SEED_ORDERS, team:SEED_TEAM, audit:SEED_AUDIT,
+    search:'', statutFilter:'tous', sortBy:'recent', registreOpen:false,
+    ownerSearch:'', orderSearch:'', orderStatutFilter:'tous',
+    viewOrderId:null, orderDraft:{statut:'', tracking:''},
+    editId:null, form:this._emptyForm(), fieldErr:{}, codeRevealed:false,
+    flash:'', confirm:null
+  };
+
+  componentDidMount(){
+    try {
+      this._mq = window.matchMedia(MQ_MOBILE);
+      this._onMq = () => this.setState({isMobile:this._mq.matches, navOpen:false});
+      this._onMq();
+      this._mq.addEventListener('change', this._onMq);
+    } catch(e) {}
+    this._onKey = e => {
+      if (e.key !== 'Escape') return;
+      if (this.state.confirm) this.setState({confirm:null});
+      else if (this.state.registreOpen) this.setState({registreOpen:false});
+      else if (this.state.navOpen) this.setState({navOpen:false});
+    };
+    this._onDown = e => {
+      if (this.state.registreOpen && !(e.target.closest && e.target.closest('[data-registre]'))) this.setState({registreOpen:false});
+    };
+    document.addEventListener('keydown', this._onKey);
+    document.addEventListener('mousedown', this._onDown);
+  }
+
+  componentWillUnmount(){
+    try { this._mq.removeEventListener('change', this._onMq); } catch(e) {}
+    document.removeEventListener('keydown', this._onKey);
+    document.removeEventListener('mousedown', this._onDown);
+    clearTimeout(this._flashT);
+  }
+
+  _emptyForm(){ return {modele:'', coloris:'', serie:'', code:'', matiere:'', dateFab:'', statut:'disponible'}; }
+
+  go(route, extra){
+    this.setState(Object.assign({route, navOpen:false, registreOpen:false}, extra||{}));
+    try{window.scrollTo(0,0);}catch(e){}
+  }
+
+  showFlash(msg, ms){
+    clearTimeout(this._flashT);
+    this.setState({flash:msg});
+    this._flashT = setTimeout(() => this.setState({flash:''}), ms || 5000);
+  }
+
+  logAudit(action){
+    this.setState(st => ({audit:[{date:nowLabel(), auteur:this._me().nom, action}].concat(st.audit)}));
+  }
+
+  _me(){ return this.state.team.find(t => t.id===ME_ID) || SEED_TEAM[0]; }
+
+  askConfirm(c){
+    this.setState({confirm:Object.assign({cancelLabel:'Annuler', okLabel:''}, c)});
+    setTimeout(() => { try { document.querySelector('[data-confirm-cancel]').focus(); } catch(e){} }, 30);
+  }
+
+  submitLogin(e){
+    e.preventDefault();
+    const f = e.target.elements;
+    if (f.user.value.trim()==='maison' && f.pass.value==='sessegnon') {
+      this.setState({authed:true, loginErr:'', loginInfo:''});
+    } else {
+      this.setState({loginErr:'Identifiant ou mot de passe incorrect.', loginInfo:''});
+    }
+  }
+
+  downloadCsv(filename, rows){
+    const csv = rows.map(r => r.map(c => '"' + String(c).replace(/"/g,'""') + '"').join(',')).join('\n');
+    const blob = new Blob(['﻿' + csv], {type:'text/csv;charset=utf-8;'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename; document.body.appendChild(a); a.click();
+    setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+  }
+
+  validatePiece(f){
+    const err = {};
+    if (!f.modele.trim()) err.modele = 'Indiquez le nom du modèle.';
+    if (!f.serie.trim()) err.serie = 'Indiquez le numéro de série.';
+    else if (!SERIE_RE.test(f.serie.trim())) err.serie = 'Format attendu : CS-0000-2026.';
+    else if (this.state.pieces.some(p => p.serie===f.serie.trim() && p.id!==this.state.editId)) err.serie = 'Ce numéro de série est déjà attribué à une autre pièce.';
+    if (!f.code.trim()) err.code = 'Indiquez le code d\'activation.';
+    else if (!CODE_RE.test(f.code.trim().toUpperCase())) err.code = 'Format attendu : 4 caractères, un tiret, 4 caractères (ex. 8F3K-22QD).';
+    return err;
+  }
+
+  renderVals(){
+    const s = this.state;
+    const btnBlock = {style:{width:'100%', textTransform:'uppercase', letterSpacing:'.1em', fontSize:14}};
+    const btnUpperSm = {style:{textTransform:'uppercase', letterSpacing:'.08em', fontSize:13}};
+    const btnUpperSmDanger = {style:{textTransform:'uppercase', letterSpacing:'.08em', fontSize:13, padding:'0 22px', height:46, backgroundColor:'rgb(155,24,33)'}};
+    const me = this._me();
+    const sidebarWide = s.isMobile || s.sidebarWide;
+
+    // Pièces
+    const ownerOf = id => s.owners.find(o => o.pieceId===id);
+    const decPieces = s.pieces.map(p => ({
+      ...p, slot:'bo-p-' + p.id, ...BADGE[STATUT_KIND[p.statut]],
+      statutLabel:STATUT_LABEL[p.statut], dateFabLabel:fmtIsoDate(p.dateFab),
+      editLabel:'Modifier ' + p.modele + ' ' + p.serie,
+      open: () => this.go('piece-form', {editId:p.id, form:Object.assign({}, p), fieldErr:{}, codeRevealed:false})
+    }));
+    const q = s.search.trim().toLowerCase();
+    let filteredPieces = decPieces.filter(p =>
+      (!q || (p.modele+' '+p.serie+' '+p.matiere).toLowerCase().includes(q)) &&
+      (s.statutFilter==='tous' || p.statut===s.statutFilter));
+    filteredPieces = filteredPieces.slice().sort((a,b) =>
+      s.sortBy==='serie' ? a.serie.localeCompare(b.serie) :
+      s.sortBy==='ancien' ? (a.dateFab||'').localeCompare(b.dateFab||'') :
+      (b.dateFab||'').localeCompare(a.dateFab||''));
+
+    const isEditing = !!s.editId;
+    const ownerForForm = isEditing ? ownerOf(s.editId) : null;
+    const fieldErr = s.fieldErr || {};
+    const fieldKeys = ['modele','serie','code'];
+    const fieldShadow = {}, fieldInvalid = {};
+    fieldKeys.forEach(k => { fieldShadow[k] = fieldErr[k] ? FIELD_ERR : FIELD_OK; fieldInvalid[k] = !!fieldErr[k]; });
+
+    // Propriétaires
+    const oq = s.ownerSearch.trim().toLowerCase();
+    const filteredOwners = oq ? s.owners.filter(o => (o.owner+' '+o.piece+' '+o.email).toLowerCase().includes(oq)) : s.owners;
+
+    // Commandes
+    const decOrders = s.orders.map(o => ({
+      ...o, ...BADGE[ORDER_STATUT_KIND[o.statut]], statutLabel:ORDER_STATUT_LABEL[o.statut],
+      totalLabel: fmtNumber(o.total) + ' FCFA',
+      trackingLabel: o.tracking || '—',
+      detailLabel: 'Détail de la commande ' + o.no,
+      open: () => this.go('commande-detail', {viewOrderId:o.id, orderDraft:{statut:o.statut, tracking:o.tracking||''}})
+    }));
+    const oSq = s.orderSearch.trim().toLowerCase();
+    const filteredOrders = decOrders.filter(o =>
+      (!oSq || (o.no+' '+o.client+' '+o.items).toLowerCase().includes(oSq)) &&
+      (s.orderStatutFilter==='tous' || o.statut===s.orderStatutFilter));
+    const viewOrder = decOrders.find(o => o.id===s.viewOrderId);
+    const orderDirty = !!viewOrder && (s.orderDraft.statut!==viewOrder.statut || s.orderDraft.tracking.trim()!==(viewOrder.tracking||''));
+
+    const navKeys = [
+      {key:'dashboard', label:'Tableau de bord', icon:'dashboard'},
+      {key:'pieces', label:'Pièces', icon:'pieces'},
+      {key:'commandes', label:'Commandes', icon:'orders'},
+      {key:'proprietaires', label:'Propriétaires', icon:'owners'},
+      {key:'equipe', label:'Équipe', icon:'team'}
+    ];
+    const activeNav = s.route==='piece-form' ? 'pieces' : (s.route==='commande-detail' ? 'commandes' : s.route);
+
+    const activeDirection = s.team.filter(t => t.role==='direction' && t.statut==='actif').length;
+
+    return {
+      isLogin: !s.authed, isApp: s.authed,
+      loginErr: s.loginErr, loginInfo: s.loginInfo,
+      submitLogin: e => this.submitLogin(e),
+      forgotPassword: () => this.setState({loginErr:'', loginInfo:"Demandez à la Direction de réinitialiser votre accès depuis l'espace Équipe."}),
+      btnBlock, btnUpperSm, btnUpperSmDanger,
+      me: {nom:me.nom, roleLabel:(ROLES.find(r => r.key===me.role)||ROLES[0]).label},
+
+      sidebarWide,
+      sidebarCols: s.sidebarWide ? '240px 1fr' : '76px 1fr',
+      collapseIconRot: s.sidebarWide ? 'none' : 'rotate(180deg)',
+      collapseLabel: s.sidebarWide ? 'Réduire le menu' : 'Déplier le menu',
+      toggleSidebar: () => this.setState(st => ({sidebarWide:!st.sidebarWide})),
+      asideClass: 'bo-aside' + (s.navOpen ? ' is-open' : ''),
+      navOpen: s.navOpen,
+      openNav: () => this.setState({navOpen:true}),
+      closeNav: () => this.setState({navOpen:false}),
+      logout: () => this.setState({authed:false, route:'dashboard', navOpen:false, confirm:null, flash:''}),
+
+      navItems: navKeys.map(n => ({
+        label:n.label, iconHtml:{__html:ICONS[n.icon]},
+        title: sidebarWide ? undefined : n.label,
+        current: activeNav===n.key ? 'page' : undefined,
+        bg: activeNav===n.key ? 'rgba(255,255,255,.12)' : 'transparent',
+        iconOpacity: activeNav===n.key ? 1 : .75,
+        go: () => this.go(n.key)
+      })),
+
+      flash: s.flash, closeFlash: () => { clearTimeout(this._flashT); this.setState({flash:''}); },
+
+      hasConfirm: !!s.confirm, confirm: s.confirm || {},
+      confirmCancel: () => this.setState({confirm:null}),
+      confirmOk: () => { const c = s.confirm; this.setState({confirm:null}); if (c && c.onOk) c.onOk(); },
+      stopClick: e => e.stopPropagation(),
+
+      isDashboard: s.route==='dashboard',
+      isPieces: s.route==='pieces',
+      isPieceForm: s.route==='piece-form',
+      isProprietaires: s.route==='proprietaires',
+      isCommandes: s.route==='commandes',
+      isCommandeDetail: s.route==='commande-detail',
+      isEquipe: s.route==='equipe',
+      goPieces: () => this.go('pieces'),
+      goCommandes: () => this.go('commandes'),
+      goProprietaires: () => this.go('proprietaires'),
+
+      crumb: s.route==='piece-form' ? 'Pièces' : (s.route==='commande-detail' ? 'Commandes' : ''),
+      crumbGo: () => this.go(s.route==='piece-form' ? 'pieces' : 'commandes'),
+      pageTitle: s.route==='dashboard' ? 'Tableau de bord' : (s.route==='pieces' ? 'Pièces' : (s.route==='piece-form' ? (isEditing ? 'Modifier la pièce' : 'Ajouter une pièce') : (s.route==='commandes' ? 'Commandes' : (s.route==='commande-detail' ? (viewOrder ? viewOrder.no : 'Commande') : (s.route==='equipe' ? 'Équipe et accès' : 'Propriétaires'))))),
+
+      // Équipe
+      team: s.team.map(t => {
+        const r = ROLES.find(r => r.key===t.role) || ROLES[0];
+        const isSelf = t.id===ME_ID;
+        const isLastDirection = t.role==='direction' && t.statut==='actif' && activeDirection<=1;
+        const isDisabled = t.statut==='desactive';
+        return {...t, roleLabel:r.label, ...BADGE[TEAM_STATUT_KIND[t.statut]], statutLabel:TEAM_STATUT_LABEL[t.statut],
+          canToggle: !isSelf && !isLastDirection,
+          lockedLabel: isSelf ? 'Votre compte' : (isLastDirection ? 'Seul compte Direction' : ''),
+          toggleLabel: isDisabled ? 'Réactiver' : 'Désactiver',
+          toggleAria: (isDisabled ? 'Réactiver ' : 'Désactiver ') + t.nom,
+          toggle: () => {
+            const apply = next => {
+              this.setState(st => ({team: st.team.map(x => x.id===t.id ? Object.assign({}, x, {statut:next}) : x)}));
+              this.logAudit((next==='desactive' ? 'Compte désactivé — ' : 'Compte réactivé — ') + t.nom);
+              this.showFlash((next==='desactive' ? 'Accès de ' : 'Accès rétabli pour ') + t.nom + (next==='desactive' ? ' désactivé.' : '.'));
+            };
+            if (isDisabled) { apply('actif'); return; }
+            this.askConfirm({
+              title:'Désactiver ' + t.nom + '\u00a0?',
+              body: t.nom + ' (' + r.label + ') ne pourra plus se connecter. Ses actions restent visibles dans le journal d\'audit, et vous pourrez réactiver le compte à tout moment.',
+              okLabel:'Désactiver',
+              onOk: () => apply('desactive')
+            });
+          }
+        };
+      }),
+      roles: ROLES,
+      audit: s.audit,
+      inviteTeam: () => this.showFlash("Démonstration — l'invitation par e-mail (le collaborateur définit lui-même son mot de passe) n'est pas branchée ici.", 7000),
+
+      // Commandes
+      orderSearch: s.orderSearch, setOrderSearch: e => this.setState({orderSearch:e.target.value}),
+      orderStatutFilter: s.orderStatutFilter, setOrderStatutFilter: e => this.setState({orderStatutFilter:e.target.value}),
+      filteredOrders, noOrders: filteredOrders.length===0,
+      exportOrdersCsv: () => this.downloadCsv('commandes-carole-sessegnon.csv',
+        [['N° de commande','Client','E-mail','Articles','Total','Date','Mode de réception','Code de suivi','Statut']]
+          .concat(s.orders.map(o => [o.no,o.client,o.email,o.items,o.total,o.date,o.mode,o.tracking||'',ORDER_STATUT_LABEL[o.statut]]))),
+      viewOrder: viewOrder || {},
+      orderDraft: s.orderDraft,
+      orderDirty, orderUnchanged: !orderDirty,
+      // Le moteur de template ne lit que des chemins ({{ a.b }}) : un handler par champ, pas d'appel setDraft('x').
+      setDraft: Object.fromEntries(['statut','tracking'].map(key => [key, e => {
+        const v = e.target.value; this.setState(st => ({orderDraft:Object.assign({}, st.orderDraft, {[key]:v})}));
+      }])),
+      saveOrder: e => {
+        e.preventDefault();
+        if (!orderDirty) return;
+        const d = {statut:s.orderDraft.statut, tracking:s.orderDraft.tracking.trim()};
+        const o = viewOrder;
+        const apply = () => {
+          this.setState(st => ({orders: st.orders.map(x => x.id===o.id ? Object.assign({}, x, d) : x)}));
+          if (d.statut!==o.statut) this.logAudit('Statut modifié — commande ' + o.no + ' : ' + ORDER_STATUT_LABEL[o.statut] + ' → ' + ORDER_STATUT_LABEL[d.statut]);
+          if (d.tracking!==(o.tracking||'')) this.logAudit('Code de suivi saisi — commande ' + o.no);
+          this.showFlash('Commande ' + o.no + ' mise à jour.');
+        };
+        if (d.statut==='annulee' && o.statut!=='annulee') {
+          this.askConfirm({
+            title:'Annuler cette commande\u00a0?',
+            body:'La commande ' + o.no + ' de ' + o.client + ' (' + o.totalLabel + ') passera en « Annulée ». Le remboursement éventuel reste à initier séparément.',
+            okLabel:'Annuler la commande', cancelLabel:'Retour',
+            onOk: apply
+          });
+          return;
+        }
+        apply();
+      },
+
+      // Tableau de bord
+      kpis: (() => {
+        const paidOrders = s.orders.filter(o => o.statut!=='annulee');
+        const ca = paidOrders.reduce((t,o) => t+o.total, 0);
+        const panierMoyen = paidOrders.length ? Math.round(ca/paidOrders.length) : 0;
+        return [
+          {label:"Chiffre d'affaires", value: fmtNumber(ca), unit:'FCFA', hint: paidOrders.length + ' commandes, hors annulations'},
+          {label:'Panier moyen', value: fmtNumber(panierMoyen), unit:'FCFA', hint:'Par commande, hors annulations'},
+          {label:'Pièces vendues', value:String(s.pieces.filter(p=>p.statut==='vendue').length), unit:'', hint:'Sur ' + s.pieces.length + ' pièces au registre'},
+          {label:'Activations passeport', value:String(s.owners.length), unit:'', hint:'Pièces associées à un propriétaire'}
+        ];
+      })(),
+      geoRepartition: (() => {
+        const counts = {};
+        s.owners.forEach(o => { counts[o.pays] = (counts[o.pays]||0)+1; });
+        const total = Object.values(counts).reduce((a,b)=>a+b,0) || 1;
+        return Object.entries(counts).sort((a,b) => b[1]-a[1]).map(([pays,n]) => {
+          const pct = Math.round(n/total*100);
+          return {pays, pct, label: n + (n>1 ? ' activations' : ' activation') + ' · ' + pct + ' %'};
+        });
+      })(),
+      recentPieces: decPieces.slice().sort((a,b) => (b.dateFab||'').localeCompare(a.dateFab||'')).slice(0,4),
+      recentOwners: s.owners.slice(0,3),
+      recentOrders: decOrders.slice(0,4),
+
+      // Liste des pièces
+      search: s.search, setSearch: e => this.setState({search:e.target.value}),
+      statutFilter: s.statutFilter, setStatutFilter: e => this.setState({statutFilter:e.target.value}),
+      sortBy: s.sortBy, setSortBy: e => this.setState({sortBy:e.target.value}),
+      filteredPieces, noPieces: filteredPieces.length===0,
+      piecesCount: filteredPieces.length===s.pieces.length
+        ? s.pieces.length + ' pièces au registre'
+        : filteredPieces.length + ' sur ' + s.pieces.length + ' pièces',
+      newPiece: () => this.go('piece-form', {editId:null, form:this._emptyForm(), fieldErr:{}, codeRevealed:true}),
+      registreOpen: s.registreOpen,
+      registreChevron: s.registreOpen ? 'rotate(180deg)' : 'none',
+      toggleRegistre: () => this.setState(st => ({registreOpen:!st.registreOpen})),
+      registreItems: [
+        {label:'Importer le registre (Excel)', run: () => { this.setState({registreOpen:false}); this.showFlash('Démonstration — import du registre Excel (numéros de série et codes d\'activation existants) non branché ici.', 7000); }},
+        {label:'Générer la planche de QR codes', run: () => { this.setState({registreOpen:false}); this.showFlash('Démonstration — génération de la planche de QR codes prête pour l\'imprimeur non branchée ici.', 7000); }},
+        {label:'Exporter la liste (CSV)', run: () => {
+          this.setState({registreOpen:false});
+          // Les codes d'activation restent hors de l'export : ils ne quittent pas le back-office.
+          this.downloadCsv('pieces-carole-sessegnon.csv',
+            [['Modèle','Coloris','Numéro de série','Matière','Date de fabrication','Statut']]
+              .concat(s.pieces.map(p => [p.modele,p.coloris,p.serie,p.matiere,p.dateFab,STATUT_LABEL[p.statut]])));
+        }}
+      ],
+
+      // Formulaire pièce
+      form: s.form, isEditing,
+      fieldErr, fieldShadow, fieldInvalid, hasFieldErr: Object.keys(fieldErr).length>0,
+      formSlot: isEditing ? 'bo-p-' + s.editId : 'bo-p-new',
+      codeType: s.codeRevealed ? 'text' : 'password',
+      codeToggleLabel: s.codeRevealed ? 'Masquer' : 'Afficher',
+      toggleCode: () => {
+        if (!s.codeRevealed) this.logAudit('Consultation du code d\'activation — ' + (s.form.serie || 'pièce sans numéro'));
+        this.setState({codeRevealed:!s.codeRevealed});
+      },
+      setF: Object.fromEntries(Object.keys(this._emptyForm()).map(key => [key, e => {
+        const v = e.target.value;
+        this.setState(st => {
+          const fe = Object.assign({}, st.fieldErr); delete fe[key];
+          return {form: Object.assign({}, st.form, {[key]: v}), fieldErr: fe};
+        });
+      }])),
+      hasOwnerForForm: !!ownerForForm, noOwnerForForm: isEditing && !ownerForForm,
+      formOwner: ownerForForm || {},
+      savePiece: e => {
+        e.preventDefault();
+        const f = Object.assign({}, this.state.form, {
+          modele: this.state.form.modele.trim(), serie: this.state.form.serie.trim(), code: this.state.form.code.trim().toUpperCase()
+        });
+        const err = this.validatePiece(f);
+        if (Object.keys(err).length) { this.setState({fieldErr:err}); return; }
+        const editing = !!this.state.editId;
+        this.setState(st => editing
+          ? {pieces: st.pieces.map(p => p.id===st.editId ? Object.assign({id:st.editId}, f) : p), route:'pieces', fieldErr:{}}
+          : {pieces: st.pieces.concat([Object.assign({id:'p' + Date.now()}, f)]), route:'pieces', fieldErr:{}});
+        this.logAudit((editing ? 'Pièce modifiée — ' : 'Pièce créée — ') + f.modele + ', ' + f.serie);
+        this.showFlash('Pièce « ' + f.modele + ' » ' + (editing ? 'enregistrée.' : 'ajoutée au registre.'));
+      },
+      deletePiece: () => {
+        const p = s.pieces.find(x => x.id===s.editId);
+        if (!p) return;
+        const owner = ownerOf(p.id);
+        if (owner) {
+          this.askConfirm({
+            title:'Suppression impossible',
+            body:'« ' + p.modele + ' » (' + p.serie + ') est associée au passeport de ' + owner.owner + '. La supprimer rendrait son certificat invérifiable. Pour la retirer de la vente, changez plutôt son statut.',
+            cancelLabel:'Compris'
+          });
+          return;
+        }
+        this.askConfirm({
+          title:'Supprimer « ' + p.modele + ' »\u00a0?',
+          body:'La pièce ' + p.serie + ' et son code d\'activation seront retirés du registre. Cette action est définitive.',
+          okLabel:'Supprimer la pièce',
+          onOk: () => {
+            this.setState(st => ({pieces: st.pieces.filter(x => x.id!==p.id), route:'pieces'}));
+            this.logAudit('Pièce supprimée — ' + p.modele + ', ' + p.serie);
+            this.showFlash('Pièce « ' + p.modele + ' » supprimée du registre.');
+          }
+        });
+      },
+
+      // Propriétaires
+      ownerSearch: s.ownerSearch, setOwnerSearch: e => this.setState({ownerSearch:e.target.value}),
+      filteredOwners, noOwners: filteredOwners.length===0,
+      exportOwnersCsv: () => this.downloadCsv('proprietaires-carole-sessegnon.csv',
+        [['Pièce','Propriétaire','E-mail','Pays','Date d\'association']]
+          .concat(s.owners.map(o => [o.piece,o.owner,o.email,o.pays,o.date])))
+    };
+  }
+}
+
+</script>
+</body>
+</html>

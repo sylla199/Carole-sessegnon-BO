@@ -1,0 +1,4 @@
+.DS_Store
+# Celias est une police commerciale : ne pas la redistribuer dans un dépôt public.
+# Déposer les fichiers Celias-*.ttf localement dans ce dossier pour retrouver le rendu exact.
+_ds/*/assets/fonts/Celias-*.ttf
