@@ -43,10 +43,63 @@
     .bo-table thead{display:none}
     .bo-table tr{display:block;padding:12px 16px;border-bottom:1px solid rgba(0,0,0,.08)}
     .bo-table td{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:6px 0 !important;border:0 !important;text-align:right !important}
+    .bo-modal-actions{flex-direction:column-reverse}
+    .bo-modal-actions > *, .bo-modal-actions button{width:100%}
     .bo-table td[data-label]::before{content:attr(data-label);flex:0 0 auto;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);text-align:left}
   }
 </style>
 </helmet>
+
+<sc-if value="{{ isAccept }}">
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:rgb(71,29,27);padding:20px">
+    <div style="width:100%;max-width:460px;background:rgb(255,255,255);padding:clamp(32px,6vw,52px);font-family:var(--font-body);animation:bo-in .25s ease">
+      <img src="assets/CS-LOGOMARK.svg" alt="Carole Sessegnon" style="width:40px;height:auto;display:block;margin:0 auto 22px">
+      <p style="margin:0 0 6px;text-align:center;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:rgb(94,94,94)">Invitation</p>
+
+      <sc-if value="{{ accept.isValid }}">
+        <h1 style="margin:0 0 14px;text-align:center;font-family:var(--font-display);font-weight:400;font-size:28px;color:rgb(71,29,27)">Rejoindre la Maison</h1>
+        <p style="margin:0 0 22px;text-align:center;font-size:14px;line-height:22px;color:rgb(70,70,70)">{{ accept.intro }}</p>
+        <div style="margin:0 0 22px;padding:16px 18px;background:rgb(255,251,248);font-size:13px;line-height:20px;color:rgb(70,70,70)">
+          <p style="margin:0 0 4px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">Rôle : {{ accept.roleLabel }}</p>
+          <p style="margin:0">Vous verrez : {{ accept.acces }}</p>
+          <p style="margin:4px 0 0">Vous ne verrez pas : {{ accept.neVoitPas }}</p>
+        </div>
+        <sc-if value="{{ accept.message }}">
+          <blockquote style="margin:0 0 22px;padding:0 0 0 14px;box-shadow:inset 2px 0 0 rgb(177,115,69);font-family:var(--font-display);font-style:italic;font-size:16px;line-height:24px;color:rgb(71,29,27)">« {{ accept.message }} »<span style="display:block;margin-top:6px;font-family:var(--font-body);font-style:normal;font-size:12px;color:rgb(94,94,94)">— {{ accept.inviter }}</span></blockquote>
+        </sc-if>
+        <form onSubmit="{{ acceptInvite }}" noValidate style="display:flex;flex-direction:column;gap:16px">
+          <label style="display:block;font-size:13px;color:rgb(70,70,70)">Votre nom
+            <input value="{{ accept.nom }}" onChange="{{ setAcc.nom }}" autocomplete="name" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+          </label>
+          <sc-if value="{{ accept.email }}">
+            <p style="margin:0;font-size:13px;color:rgb(70,70,70)">Adresse de connexion : <span style="color:rgb(0,0,0)">{{ accept.email }}</span></p>
+          </sc-if>
+          <label style="display:block;font-size:13px;color:rgb(70,70,70)">Choisissez un mot de passe
+            <input type="password" value="{{ accept.pass }}" onChange="{{ setAcc.pass }}" autocomplete="new-password" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+          </label>
+          <label style="display:block;font-size:13px;color:rgb(70,70,70)">Confirmez le mot de passe
+            <input type="password" value="{{ accept.pass2 }}" onChange="{{ setAcc.pass2 }}" autocomplete="new-password" aria-invalid="{{ accept.hasErr }}" aria-describedby="err-accept" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:{{ accept.pass2Shadow }};color:rgb(0,0,0)">
+            <sc-if value="{{ accept.err }}"><span id="err-accept" role="alert" style="display:block;margin-top:6px;font-size:12px;color:rgb(155,24,33)">{{ accept.err }}</span></sc-if>
+          </label>
+          <x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="primary" dc-props="{{ btnBlock }}" style="margin-top:6px" hint-size="100%,58px">Activer mon accès</x-import>
+          <p style="margin:0;font-size:12px;color:rgb(94,94,94);text-align:center">{{ accept.expiry }}</p>
+        </form>
+      </sc-if>
+
+      <sc-if value="{{ accept.isDone }}">
+        <h1 style="margin:0 0 14px;text-align:center;font-family:var(--font-display);font-weight:400;font-size:28px;color:rgb(71,29,27)">Votre accès est activé</h1>
+        <p style="margin:0 0 28px;text-align:center;font-size:14px;line-height:22px;color:rgb(70,70,70)">{{ accept.doneText }}</p>
+        <x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="primary" onClick="{{ enterAfterAccept }}" dc-props="{{ btnBlock }}" hint-size="100%,58px">Accéder à l'espace</x-import>
+      </sc-if>
+
+      <sc-if value="{{ accept.isInvalid }}">
+        <h1 style="margin:0 0 14px;text-align:center;font-family:var(--font-display);font-weight:400;font-size:28px;color:rgb(71,29,27)">{{ accept.invalidTitle }}</h1>
+        <p style="margin:0 0 28px;text-align:center;font-size:14px;line-height:22px;color:rgb(70,70,70)">{{ accept.invalidBody }}</p>
+        <button type="button" onClick="{{ leaveAccept }}" style="width:100%;height:46px;padding:0 20px;background:transparent;border:0;box-shadow:inset 0 0 0 2px rgb(71,29,27);color:rgb(71,29,27);cursor:pointer;font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase">Aller à la connexion</button>
+      </sc-if>
+    </div>
+  </div>
+</sc-if>
 
 <sc-if value="{{ isLogin }}" hint-placeholder-val="{{ true }}">
   <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:rgb(71,29,27);padding:20px">
@@ -465,69 +518,122 @@
         </sc-if>
 
         <sc-if value="{{ isEquipe }}">
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:24px">
-            <p style="margin:0;font-size:14px;color:rgb(70,70,70);max-width:56ch">Chaque collaborateur reçoit un accès restreint par rôle — un compte ne peut pas voir plus que ce que son rôle autorise.</p>
-            <x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="primary" onClick="{{ inviteTeam }}" dc-props="{{ btnUpperSm }}" hint-size="auto,46px">Inviter un collaborateur</x-import>
+          <div role="tablist" aria-label="Équipe" style="display:flex;gap:28px;overflow-x:auto;margin-bottom:24px;box-shadow:inset 0 -1px 0 rgba(0,0,0,.1)">
+            <sc-for list="{{ teamTabs }}" as="tab" hint-placeholder-count="3">
+              <button type="button" role="tab" aria-selected="{{ tab.selected }}" onClick="{{ tab.select }}" style="flex:0 0 auto;background:none;border:0;padding:12px 0;cursor:pointer;font-size:13px;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;color:{{ tab.color }};box-shadow:{{ tab.underline }}">{{ tab.label }}</button>
+            </sc-for>
           </div>
 
-          <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);overflow:auto;margin-bottom:28px">
-            <table class="bo-table" style="width:100%;border-collapse:collapse;min-width:680px">
-              <thead>
-                <tr style="text-align:left">
-                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Collaborateur</th>
-                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Rôle</th>
-                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Statut</th>
-                  <th style="padding:14px 18px;border-bottom:1px solid rgba(0,0,0,.1)"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Actions</span></th>
-                </tr>
-              </thead>
-              <tbody>
-                <sc-for list="{{ team }}" as="t" hint-placeholder-count="4">
-                  <tr style="transition:background-color .15s" style-hover="background:rgb(255,251,248)">
-                    <td style="padding:14px 18px;border-bottom:1px solid rgba(0,0,0,.06);text-align:left">
-                      <div>
-                        <p style="margin:0;font-size:14px;color:rgb(0,0,0)">{{ t.nom }}</p>
-                        <p style="margin:3px 0 0;font-size:12px;color:rgb(94,94,94);overflow-wrap:anywhere">{{ t.email }}</p>
-                      </div>
-                    </td>
-                    <td data-label="Rôle" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)">{{ t.roleLabel }}</td>
-                    <td data-label="Statut" style="padding:14px 18px;border-bottom:1px solid rgba(0,0,0,.06)">
-                      <span style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ t.statutBg }};color:{{ t.statutFg }};box-shadow:{{ t.statutShadow }}">{{ t.statutLabel }}</span>
-                    </td>
-                    <td style="padding:14px 18px;text-align:right;border-bottom:1px solid rgba(0,0,0,.06)">
-                      <sc-if value="{{ t.canToggle }}">
-                        <button type="button" onClick="{{ t.toggle }}" aria-label="{{ t.toggleAria }}" style="background:none;border:0;padding:0;color:rgb(70,70,70);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(70,70,70)">{{ t.toggleLabel }}</button>
-                      </sc-if>
-                      <sc-if value="{{ t.lockedLabel }}">
-                        <span style="font-size:12px;color:rgb(94,94,94)">{{ t.lockedLabel }}</span>
-                      </sc-if>
-                    </td>
+          <sc-if value="{{ isTeamMembres }}">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:24px">
+              <p style="margin:0;font-size:14px;color:rgb(70,70,70);max-width:56ch">Chaque collaborateur reçoit un accès restreint par rôle — un compte ne peut pas voir plus que ce que son rôle autorise.</p>
+              <x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="primary" onClick="{{ openInvite }}" dc-props="{{ btnUpperSm }}" hint-size="auto,46px">Inviter un collaborateur</x-import>
+            </div>
+
+            <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);overflow:auto">
+              <table class="bo-table" style="width:100%;border-collapse:collapse;min-width:680px">
+                <thead>
+                  <tr style="text-align:left">
+                    <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Collaborateur</th>
+                    <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Rôle</th>
+                    <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Statut</th>
+                    <th style="padding:14px 18px;border-bottom:1px solid rgba(0,0,0,.1)"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Actions</span></th>
                   </tr>
-                </sc-for>
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  <sc-for list="{{ team }}" as="t" hint-placeholder-count="4">
+                    <tr style="transition:background-color .15s" style-hover="background:rgb(255,251,248)">
+                      <td style="padding:14px 18px;border-bottom:1px solid rgba(0,0,0,.06);text-align:left">
+                        <div>
+                          <p style="margin:0;font-size:14px;color:rgb(0,0,0)">{{ t.displayName }}</p>
+                          <p style="margin:3px 0 0;font-size:12px;color:rgb(94,94,94);overflow-wrap:anywhere">{{ t.emailLabel }}</p>
+                          <sc-if value="{{ t.inviteInfo }}">
+                            <p style="margin:3px 0 0;font-size:12px;color:{{ t.inviteInfoColor }}">{{ t.inviteInfo }}</p>
+                          </sc-if>
+                        </div>
+                      </td>
+                      <td data-label="Rôle" title="{{ t.roleHint }}" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)">{{ t.roleLabel }}</td>
+                      <td data-label="Statut" style="padding:14px 18px;border-bottom:1px solid rgba(0,0,0,.06)">
+                        <span style="display:inline-block;white-space:nowrap;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ t.statutBg }};color:{{ t.statutFg }};box-shadow:{{ t.statutShadow }}">{{ t.statutLabel }}</span>
+                      </td>
+                      <td style="padding:14px 18px;text-align:right;border-bottom:1px solid rgba(0,0,0,.06)">
+                        <sc-if value="{{ t.isInvite }}">
+                          <div style="display:inline-flex;gap:16px;flex-wrap:wrap;justify-content:flex-end">
+                            <button type="button" onClick="{{ t.copyLink }}" aria-label="{{ t.copyAria }}" style="background:none;border:0;padding:0;color:rgb(70,70,70);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(70,70,70);white-space:nowrap">Copier le lien</button>
+                            <button type="button" onClick="{{ t.resend }}" aria-label="{{ t.resendAria }}" style="background:none;border:0;padding:0;color:rgb(70,70,70);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(70,70,70);white-space:nowrap">Renvoyer</button>
+                            <button type="button" onClick="{{ t.revoke }}" aria-label="{{ t.revokeAria }}" style="background:none;border:0;padding:0;color:rgb(70,70,70);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(70,70,70);white-space:nowrap">Annuler l'invitation</button>
+                          </div>
+                        </sc-if>
+                        <sc-if value="{{ t.canToggle }}">
+                          <button type="button" onClick="{{ t.toggle }}" aria-label="{{ t.toggleAria }}" style="background:none;border:0;padding:0;color:rgb(70,70,70);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(70,70,70)">{{ t.toggleLabel }}</button>
+                        </sc-if>
+                        <sc-if value="{{ t.lockedLabel }}">
+                          <span style="font-size:12px;color:rgb(94,94,94)">{{ t.lockedLabel }}</span>
+                        </sc-if>
+                      </td>
+                    </tr>
+                  </sc-for>
+                </tbody>
+              </table>
+            </div>
+          </sc-if>
 
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr));gap:20px">
-            <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:24px">
-              <p style="margin:0 0 16px;font-family:var(--font-display);font-size:19px;color:rgb(71,29,27)">Rôles et accès</p>
+          <sc-if value="{{ isTeamRoles }}">
+            <p style="margin:0 0 24px;font-size:14px;color:rgb(70,70,70);max-width:62ch">Ce que chaque rôle permet de voir et de faire. Le rôle se choisit à l'invitation et reste modifiable par la Direction.</p>
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));gap:20px">
               <sc-for list="{{ roles }}" as="r" hint-placeholder-count="6">
-                <div style="padding:12px 0;border-top:1px solid rgba(0,0,0,.08)">
-                  <p style="margin:0 0 4px;font-size:14px;color:rgb(0,0,0)">{{ r.label }}</p>
-                  <p style="margin:0;font-size:12px;color:rgb(94,94,94)">Voit : {{ r.acces }}</p>
-                  <p style="margin:4px 0 0;font-size:12px;color:rgb(94,94,94)">Ne voit pas : {{ r.neVoitPas }}</p>
+                <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:24px;display:flex;flex-direction:column;gap:14px">
+                  <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px">
+                    <p style="margin:0;font-family:var(--font-display);font-size:19px;color:rgb(71,29,27)">{{ r.label }}</p>
+                    <span style="flex:0 0 auto;font-size:12px;color:rgb(94,94,94)">{{ r.countLabel }}</span>
+                  </div>
+                  <div>
+                    <p style="margin:0 0 4px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">Voit</p>
+                    <p style="margin:0;font-size:13px;color:rgb(0,0,0)">{{ r.acces }}</p>
+                  </div>
+                  <div>
+                    <p style="margin:0 0 4px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">Ne voit pas</p>
+                    <p style="margin:0;font-size:13px;color:rgb(70,70,70)">{{ r.neVoitPas }}</p>
+                  </div>
                 </div>
               </sc-for>
             </div>
-            <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:24px">
-              <p style="margin:0 0 16px;font-family:var(--font-display);font-size:19px;color:rgb(71,29,27)">Journal d'audit</p>
-              <sc-for list="{{ audit }}" as="a" hint-placeholder-count="4">
-                <div style="padding:12px 0;border-top:1px solid rgba(0,0,0,.08)">
-                  <p style="margin:0;font-size:13px;color:rgb(0,0,0)">{{ a.action }}</p>
-                  <p style="margin:4px 0 0;font-size:12px;color:rgb(94,94,94)">{{ a.auteur }} — {{ a.date }}</p>
-                </div>
-              </sc-for>
+          </sc-if>
+
+          <sc-if value="{{ isTeamAudit }}">
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:20px">
+              <input type="search" aria-label="Rechercher dans le journal" value="{{ auditSearch }}" onChange="{{ setAuditSearch }}" placeholder="Rechercher une action, une pièce, une commande…" style="flex:1 1 240px;max-width:420px;min-width:0;height:46px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);color:rgb(0,0,0);font-size:14px">
+              <select aria-label="Filtrer par collaborateur" value="{{ auditAuteur }}" onChange="{{ setAuditAuteur }}" style="flex:1 1 200px;max-width:260px;height:46px;padding:0 12px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);color:rgb(0,0,0);font-size:14px">
+                <option value="tous">Tous les collaborateurs</option>
+                <sc-for list="{{ auditAuteurs }}" as="n" hint-placeholder-count="4">
+                  <option value="{{ n }}">{{ n }}</option>
+                </sc-for>
+              </select>
             </div>
-          </div>
+            <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);overflow:auto">
+              <table class="bo-table" style="width:100%;border-collapse:collapse;min-width:680px">
+                <thead>
+                  <tr style="text-align:left">
+                    <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Action</th>
+                    <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Collaborateur</th>
+                    <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <sc-for list="{{ filteredAudit }}" as="a" hint-placeholder-count="4">
+                    <tr>
+                      <td style="padding:14px 18px;font-size:14px;color:rgb(0,0,0);border-bottom:1px solid rgba(0,0,0,.06);text-align:left">{{ a.action }}</td>
+                      <td data-label="Collaborateur" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);white-space:nowrap">{{ a.auteur }}</td>
+                      <td data-label="Date" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);white-space:nowrap;font-variant-numeric:tabular-nums">{{ a.date }}</td>
+                    </tr>
+                  </sc-for>
+                </tbody>
+              </table>
+              <sc-if value="{{ noAudit }}">
+                <p style="margin:0;padding:28px 18px;font-size:14px;color:rgb(94,94,94)">Aucune action ne correspond à ces critères.</p>
+              </sc-if>
+            </div>
+          </sc-if>
         </sc-if>
 
         <sc-if value="{{ isProprietaires }}">
@@ -567,12 +673,81 @@
       </div>
     </main>
 
+    <sc-if value="{{ hasInvite }}">
+      <div onClick="{{ closeInvite }}" style="position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;padding:20px">
+        <div role="dialog" aria-modal="true" aria-labelledby="bo-invite-title" onClick="{{ stopClick }}" style="position:relative;width:100%;max-width:560px;max-height:calc(100vh - 40px);overflow:auto;background:rgb(255,255,255);padding:clamp(24px,4vw,36px);animation:bo-in .2s ease">
+          <button type="button" onClick="{{ closeInvite }}" aria-label="Fermer" style="position:absolute;top:14px;right:14px;width:36px;height:36px;background:none;border:0;cursor:pointer;color:rgb(94,94,94);font-size:22px;line-height:1">×</button>
+
+          <sc-if value="{{ invite.isForm }}">
+            <p style="margin:0 0 6px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">Équipe et accès</p>
+            <p id="bo-invite-title" style="margin:0 0 10px;font-family:var(--font-display);font-size:26px;color:rgb(71,29,27)">Inviter un collaborateur</p>
+            <p style="margin:0 0 24px;font-size:14px;line-height:22px;color:rgb(70,70,70)">La personne reçoit un lien personnel, valable {{ inviteDays }} jours, pour choisir elle-même son mot de passe.</p>
+            <form onSubmit="{{ sendInvite }}" noValidate style="display:flex;flex-direction:column;gap:18px">
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:16px">
+                <label style="display:block;font-size:13px;color:rgb(70,70,70)">Nom complet
+                  <input data-invite-first value="{{ invite.nom }}" onChange="{{ setInv.nom }}" autocomplete="off" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+                </label>
+                <label style="display:block;font-size:13px;color:rgb(70,70,70)">Adresse e-mail
+                  <input type="email" value="{{ invite.email }}" onChange="{{ setInv.email }}" autocomplete="off" placeholder="prenom.nom@carolesessegnon.com" aria-invalid="{{ invite.hasEmailErr }}" aria-describedby="err-invite-email" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:{{ invite.emailShadow }};color:rgb(0,0,0)">
+                  <sc-if value="{{ invite.emailErr }}"><span id="err-invite-email" style="display:block;margin-top:6px;font-size:12px;color:rgb(155,24,33)">{{ invite.emailErr }}</span></sc-if>
+                </label>
+              </div>
+              <label style="display:block;font-size:13px;color:rgb(70,70,70)">Rôle
+                <select value="{{ invite.role }}" onChange="{{ setInv.role }}" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+                  <option value="commandes">Commandes et clientèle</option>
+                  <option value="logistique">Logistique</option>
+                  <option value="atelier">Atelier et registre</option>
+                  <option value="contenu">Contenu</option>
+                  <option value="comptabilite">Comptabilité</option>
+                  <option value="direction">Direction</option>
+                </select>
+              </label>
+              <div style="padding:16px 18px;background:rgb(255,251,248);font-size:13px;line-height:20px;color:rgb(70,70,70)">
+                <p style="margin:0">Verra : {{ inviteRole.acces }}</p>
+                <p style="margin:4px 0 0">Ne verra pas : {{ inviteRole.neVoitPas }}</p>
+                <sc-if value="{{ inviteRole.isDirection }}">
+                  <p style="margin:8px 0 0;color:rgb(155,24,33)">Ce rôle donne un accès complet, y compris la gestion des comptes.</p>
+                </sc-if>
+              </div>
+              <label style="display:block;font-size:13px;color:rgb(70,70,70)">Message personnel <span style="color:rgb(94,94,94)">(facultatif)</span>
+                <textarea value="{{ invite.message }}" onChange="{{ setInv.message }}" rows="3" placeholder="Quelques mots d'accueil, affichés sur la page d'invitation." style="margin-top:8px;width:100%;padding:14px 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0);resize:vertical;font-family:var(--font-body);font-size:15px;line-height:22px"></textarea>
+              </label>
+              <div class="bo-modal-actions" style="display:flex;justify-content:flex-end;gap:12px;flex-wrap:wrap;margin-top:4px">
+                <button type="button" onClick="{{ closeInvite }}" style="height:46px;padding:0 20px;background:transparent;border:0;box-shadow:inset 0 0 0 2px rgb(71,29,27);color:rgb(71,29,27);cursor:pointer;font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase">Annuler</button>
+                <x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="primary" dc-props="{{ btnUpperSmModal }}" hint-size="auto,46px">Envoyer l'invitation</x-import>
+              </div>
+            </form>
+          </sc-if>
+
+          <sc-if value="{{ invite.isSent }}">
+            <div aria-hidden="true" style="width:48px;height:48px;border-radius:50%;background:rgba(71,29,27,.1);color:rgb(71,29,27);display:flex;align-items:center;justify-content:center;margin:0 0 18px">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M4 10.5 8 14.5 16 5.5"></path></svg>
+            </div>
+            <p id="bo-invite-title" role="status" style="margin:0 0 10px;font-family:var(--font-display);font-size:26px;color:rgb(71,29,27)">Invitation prête</p>
+            <p style="margin:0 0 20px;font-size:14px;line-height:22px;color:rgb(70,70,70)">{{ invite.sentText }}</p>
+            <label style="display:block;font-size:13px;color:rgb(70,70,70)">Lien d'invitation personnel
+              <div style="display:flex;gap:8px;margin-top:8px">
+                <input readOnly value="{{ invite.link }}" onFocus="{{ selectAll }}" style="flex:1;min-width:0;height:46px;padding:0 14px;background:rgb(252,249,248);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);color:rgb(70,70,70);font-size:13px">
+                <button type="button" onClick="{{ invite.copy }}" style="flex:0 0 auto;height:46px;padding:0 20px;background:transparent;border:0;box-shadow:inset 0 0 0 2px rgb(71,29,27);color:rgb(71,29,27);cursor:pointer;font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase">{{ invite.copyLabel }}</button>
+              </div>
+            </label>
+            <p style="margin:10px 0 0;font-size:12px;color:rgb(94,94,94)">{{ invite.expiry }}</p>
+            <p style="margin:6px 0 0;font-size:12px;color:rgb(94,94,94)">Démonstration : aucun e-mail n'est réellement envoyé. Transmettez ce lien, ou <a href="{{ invite.link }}" target="_blank" rel="noopener" style="border-bottom:1px solid rgb(71,29,27)">ouvrez-le dans un nouvel onglet</a> pour voir la page du collaborateur.</p>
+            <div class="bo-modal-actions" style="display:flex;justify-content:flex-end;gap:12px;flex-wrap:wrap;margin-top:26px">
+              <button type="button" onClick="{{ inviteAnother }}" style="height:46px;padding:0 20px;background:transparent;border:0;box-shadow:inset 0 0 0 2px rgb(71,29,27);color:rgb(71,29,27);cursor:pointer;font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase">Inviter une autre personne</button>
+              <x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="primary" onClick="{{ closeInvite }}" dc-props="{{ btnUpperSmModal }}" hint-size="auto,46px">Terminé</x-import>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </sc-if>
+
     <sc-if value="{{ hasConfirm }}">
       <div onClick="{{ confirmCancel }}" style="position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;padding:20px">
         <div role="dialog" aria-modal="true" aria-labelledby="bo-confirm-title" aria-describedby="bo-confirm-body" onClick="{{ stopClick }}" style="width:100%;max-width:460px;background:rgb(255,255,255);padding:clamp(24px,4vw,36px);animation:bo-in .2s ease">
           <p id="bo-confirm-title" style="margin:0 0 12px;font-family:var(--font-display);font-size:22px;color:rgb(71,29,27)">{{ confirm.title }}</p>
           <p id="bo-confirm-body" style="margin:0 0 26px;font-size:14px;line-height:22px;color:rgb(70,70,70)">{{ confirm.body }}</p>
-          <div style="display:flex;justify-content:flex-end;gap:12px;flex-wrap:wrap">
+          <div class="bo-modal-actions" style="display:flex;justify-content:flex-end;gap:12px;flex-wrap:wrap">
             <button type="button" data-confirm-cancel onClick="{{ confirmCancel }}" style="height:46px;padding:0 20px;background:transparent;border:0;box-shadow:inset 0 0 0 2px rgb(71,29,27);color:rgb(71,29,27);cursor:pointer;font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase">{{ confirm.cancelLabel }}</button>
             <sc-if value="{{ confirm.okLabel }}">
               <x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="primary" onClick="{{ confirmOk }}" dc-props="{{ btnUpperSmDanger }}" hint-size="auto,46px">{{ confirm.okLabel }}</x-import>
@@ -619,10 +794,16 @@ const SEED_TEAM = [
   {id:'t1', nom:'Carole Sessegnon', email:'carole@carolesessegnon.com', role:'direction', statut:'actif'},
   {id:'t2', nom:'Aya Bamba', email:'aya.bamba@carolesessegnon.com', role:'commandes', statut:'actif'},
   {id:'t3', nom:'Issa Traoré', email:'issa.traore@carolesessegnon.com', role:'logistique', statut:'actif'},
-  {id:'t4', nom:'Michelle Kouassi', email:'michelle.kouassi@carolesessegnon.com', role:'atelier', statut:'invite'}
+  {id:'t4', nom:'Michelle Kouassi', email:'michelle.kouassi@carolesessegnon.com', role:'atelier', statut:'invite',
+    invitedAt:'2026-09-19', expiresAt:'2026-09-26', token:'mk7f3a2c', message:'', invitedBy:'Carole Sessegnon'}
 ];
-// Compte connecté dans cette démonstration (identifiant « maison »).
+// Compte connecté dans cette démonstration (connexion libre).
 const ME_ID = 't1';
+// Équipe et journal sont gardés dans le navigateur, pour qu'un lien d'invitation
+// ouvert dans un autre onglet retrouve l'invitation (démonstration sans serveur).
+const STORE_KEY = 'cs-bo-equipe-v1';
+const INVITE_DAYS = 7;
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const SEED_AUDIT = [
   {date:'21 sept. 2026 — 09:12', auteur:'Carole Sessegnon', action:'Consultation du code d\'activation — CS-0042-2026'},
   {date:'20 sept. 2026 — 17:40', auteur:'Issa Traoré', action:'Code de suivi saisi — commande #CS-2026-9051'},
@@ -647,8 +828,8 @@ const STATUT_LABEL = {disponible:'Disponible', vendue:'Vendue', bientot:'Bientô
 const STATUT_KIND = {disponible:'progress', vendue:'done', bientot:'neutral'};
 const ORDER_STATUT_LABEL = {preparation:'En préparation', expediee:'Expédiée', livree:'Livrée', annulee:'Annulée'};
 const ORDER_STATUT_KIND = {preparation:'neutral', expediee:'progress', livree:'done', annulee:'alert'};
-const TEAM_STATUT_LABEL = {actif:'Actif', invite:'Invitation envoyée', desactive:'Désactivé'};
-const TEAM_STATUT_KIND = {actif:'done', invite:'neutral', desactive:'neutral'};
+const TEAM_STATUT_LABEL = {actif:'Actif', invite:'Invitation envoyée', expiree:'Invitation expirée', desactive:'Désactivé'};
+const TEAM_STATUT_KIND = {actif:'done', invite:'neutral', expiree:'alert', desactive:'neutral'};
 
 const SERIE_RE = /^CS-\d{4}-\d{4}$/;
 const CODE_RE = /^[A-Z0-9]{4}-[A-Z0-9]{4}$/;
@@ -662,6 +843,19 @@ const fmtIsoDate = iso => {
   const [y,m,d] = iso.split('-').map(Number);
   return new Date(y, m-1, d).toLocaleDateString('fr-FR', {day:'numeric', month:'long', year:'numeric'});
 };
+const isoToday = () => {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+};
+const addDays = (iso, n) => {
+  const [y,m,d] = iso.split('-').map(Number);
+  const x = new Date(y, m-1, d + n);
+  return x.getFullYear() + '-' + String(x.getMonth()+1).padStart(2,'0') + '-' + String(x.getDate()).padStart(2,'0');
+};
+const newToken = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
+const inviteLink = token => location.href.split('#')[0] + '#invitation=' + token;
+const isExpired = t => t.statut==='invite' && !!t.expiresAt && t.expiresAt < isoToday();
+const displayName = t => t.nom || t.email || 'Collaborateur sans nom';
 const nowLabel = () => {
   const d = new Date();
   return d.toLocaleDateString('fr-FR', {day:'numeric', month:'short', year:'numeric'}) + ' — ' +
@@ -675,10 +869,39 @@ class Component extends DCLogic {
     pieces:SEED_PIECES, owners:SEED_OWNERS, orders:SEED_ORDERS, team:SEED_TEAM, audit:SEED_AUDIT,
     search:'', statutFilter:'tous', sortBy:'recent', registreOpen:false,
     ownerSearch:'', orderSearch:'', orderStatutFilter:'tous',
+    teamTab:'membres', auditSearch:'', auditAuteur:'tous',
     viewOrderId:null, orderDraft:{statut:'', tracking:''},
     editId:null, form:this._emptyForm(), fieldErr:{}, codeRevealed:false,
-    flash:'', confirm:null
+    flash:'', confirm:null,
+    meId:ME_ID, invite:null,
+    acceptToken:'', accept:this._emptyAccept()
   };
+
+  _emptyInvite(){ return {step:'form', nom:'', email:'', role:'commandes', message:'', emailErr:'', sentId:null, copied:false}; }
+  _emptyAccept(){ return {nom:null, pass:'', pass2:'', err:'', done:false, doneName:'', doneId:null}; }
+
+  persist(){
+    try { localStorage.setItem(STORE_KEY, JSON.stringify({team:this.state.team, audit:this.state.audit})); } catch(e) {}
+  }
+  loadStored(){
+    try {
+      const saved = JSON.parse(localStorage.getItem(STORE_KEY) || 'null');
+      if (saved && Array.isArray(saved.team)) this.setState({team:saved.team, audit:Array.isArray(saved.audit) ? saved.audit : SEED_AUDIT});
+    } catch(e) {}
+  }
+  readHash(){
+    const m = (location.hash || '').match(/invitation=([A-Za-z0-9_-]+)/);
+    if (m && m[1]!==this.state.acceptToken) this.setState({acceptToken:m[1], accept:this._emptyAccept()});
+  }
+  setTeam(updater){
+    this.setState(st => ({team:updater(st.team)}), () => this.persist());
+  }
+  copyText(text, done){
+    const ok = () => done && done();
+    try {
+      navigator.clipboard.writeText(text).then(ok, () => this.showFlash('Copie impossible ici : sélectionnez le lien et copiez-le à la main.'));
+    } catch(e) { this.showFlash('Copie impossible ici : sélectionnez le lien et copiez-le à la main.'); }
+  }
 
   componentDidMount(){
     try {
@@ -690,6 +913,7 @@ class Component extends DCLogic {
     this._onKey = e => {
       if (e.key !== 'Escape') return;
       if (this.state.confirm) this.setState({confirm:null});
+      else if (this.state.invite) this.setState({invite:null});
       else if (this.state.registreOpen) this.setState({registreOpen:false});
       else if (this.state.navOpen) this.setState({navOpen:false});
     };
@@ -698,12 +922,20 @@ class Component extends DCLogic {
     };
     document.addEventListener('keydown', this._onKey);
     document.addEventListener('mousedown', this._onDown);
+    this.loadStored();
+    this.readHash();
+    this._onHash = () => this.readHash();
+    this._onStorage = e => { if (e.key===STORE_KEY) this.loadStored(); };
+    window.addEventListener('hashchange', this._onHash);
+    window.addEventListener('storage', this._onStorage);
   }
 
   componentWillUnmount(){
     try { this._mq.removeEventListener('change', this._onMq); } catch(e) {}
     document.removeEventListener('keydown', this._onKey);
     document.removeEventListener('mousedown', this._onDown);
+    window.removeEventListener('hashchange', this._onHash);
+    window.removeEventListener('storage', this._onStorage);
     clearTimeout(this._flashT);
   }
 
@@ -720,11 +952,50 @@ class Component extends DCLogic {
     this._flashT = setTimeout(() => this.setState({flash:''}), ms || 5000);
   }
 
-  logAudit(action){
-    this.setState(st => ({audit:[{date:nowLabel(), auteur:this._me().nom, action}].concat(st.audit)}));
+  logAudit(action, auteur){
+    this.setState(st => ({audit:[{date:nowLabel(), auteur:auteur || displayName(this._me()), action}].concat(st.audit)}), () => this.persist());
   }
 
-  _me(){ return this.state.team.find(t => t.id===ME_ID) || SEED_TEAM[0]; }
+  _me(){ return this.state.team.find(t => t.id===this.state.meId) || SEED_TEAM[0]; }
+
+  openInvite(){
+    this.setState({invite:this._emptyInvite()});
+    setTimeout(() => { try { document.querySelector('[data-invite-first]').focus(); } catch(e){} }, 30);
+  }
+
+  sendInvite(e){
+    e.preventDefault();
+    const f = this.state.invite;
+    const email = f.email.trim();
+    let emailErr = '';
+    if (email && !EMAIL_RE.test(email)) emailErr = 'Adresse e-mail invalide (ex. prenom.nom@carolesessegnon.com).';
+    else if (email && this.state.team.some(t => (t.email||'').toLowerCase()===email.toLowerCase() && t.statut!=='desactive'))
+      emailErr = 'Cette adresse a déjà un accès ou une invitation en cours.';
+    if (emailErr) { this.setState({invite:Object.assign({}, f, {emailErr})}); return; }
+    const today = isoToday();
+    const member = {id:'t' + Date.now(), nom:f.nom.trim(), email, role:f.role, statut:'invite',
+      invitedAt:today, expiresAt:addDays(today, INVITE_DAYS), token:newToken(), message:f.message.trim(), invitedBy:displayName(this._me())};
+    const role = ROLES.find(r => r.key===member.role) || ROLES[0];
+    this.setTeam(team => team.concat([member]));
+    this.logAudit('Invitation envoyée — ' + displayName(member) + ' (' + role.label + ')');
+    this.setState({invite:Object.assign({}, f, {step:'sent', sentId:member.id, emailErr:'', copied:false})});
+  }
+
+  acceptInvite(e, inv){
+    e.preventDefault();
+    const a = this.state.accept;
+    if ((a.pass || a.pass2) && a.pass!==a.pass2) { this.setState({accept:Object.assign({}, a, {err:'Les deux mots de passe ne correspondent pas.'})}); return; }
+    const nom = (a.nom===null ? inv.nom : a.nom).trim();
+    this.setTeam(team => team.map(t => t.id===inv.id
+      ? Object.assign({}, t, {nom, statut:'actif', token:'', acceptedAt:isoToday()}) : t));
+    this.logAudit('Invitation acceptée — ' + (nom || inv.email || 'collaborateur'), nom || inv.email || 'Collaborateur');
+    this.setState({accept:Object.assign({}, a, {done:true, doneName:nom, doneId:inv.id, err:''})});
+  }
+
+  leaveAccept(extra){
+    try { history.replaceState(null, '', location.pathname + location.search); } catch(e) {}
+    this.setState(Object.assign({acceptToken:'', accept:this._emptyAccept()}, extra || {}));
+  }
 
   askConfirm(c){
     this.setState({confirm:Object.assign({cancelLabel:'Annuler', okLabel:''}, c)});
@@ -734,7 +1005,7 @@ class Component extends DCLogic {
   submitLogin(e){
     e.preventDefault();
     // Démonstration : aucun champ n'est obligatoire, toute saisie (même vide) ouvre l'espace.
-    this.setState({authed:true, loginErr:'', loginInfo:''});
+    this.setState({authed:true, loginErr:'', loginInfo:'', meId:ME_ID});
   }
 
   downloadCsv(filename, rows){
@@ -760,6 +1031,7 @@ class Component extends DCLogic {
     const s = this.state;
     const btnBlock = {style:{width:'100%', textTransform:'uppercase', letterSpacing:'.1em', fontSize:14}};
     const btnUpperSm = {style:{textTransform:'uppercase', letterSpacing:'.08em', fontSize:13}};
+    const btnUpperSmModal = {style:{textTransform:'uppercase', letterSpacing:'.08em', fontSize:13, padding:'0 22px', height:46}};
     const btnUpperSmDanger = {style:{textTransform:'uppercase', letterSpacing:'.08em', fontSize:13, padding:'0 22px', height:46, backgroundColor:'rgb(155,24,33)'}};
     const me = this._me();
     const sidebarWide = s.isMobile || s.sidebarWide;
@@ -818,13 +1090,50 @@ class Component extends DCLogic {
 
     const activeDirection = s.team.filter(t => t.role==='direction' && t.statut==='actif').length;
 
+    // Le journal d'audit n'est visible que par la Direction.
+    const teamTabKeys = [
+      {key:'membres', label:'Collaborateurs'},
+      {key:'roles', label:'Rôles et accès'}
+    ].concat(me.role==='direction' ? [{key:'audit', label:"Journal d'audit"}] : []);
+    const teamTab = teamTabKeys.some(t => t.key===s.teamTab) ? s.teamTab : 'membres';
+    const aSq = s.auditSearch.trim().toLowerCase();
+    const filteredAudit = s.audit.filter(a =>
+      (!aSq || a.action.toLowerCase().includes(aSq)) &&
+      (s.auditAuteur==='tous' || a.auteur===s.auditAuteur));
+
     return {
-      isLogin: !s.authed, isApp: s.authed,
+      isAccept: !!s.acceptToken,
+      isLogin: !s.authed && !s.acceptToken, isApp: s.authed && !s.acceptToken,
+      accept: (() => {
+        const a = s.accept;
+        if (a.done) return {isDone:true, doneText:'Bienvenue' + (a.doneName ? ', ' + a.doneName : '') + '. Vous pouvez désormais accéder à l\'espace d\'administration de la Maison.'};
+        const inv = s.acceptToken ? s.team.find(t => t.token && t.token===s.acceptToken) : null;
+        const invalid = (title, body) => ({isInvalid:true, invalidTitle:title, invalidBody:body});
+        if (!inv) return invalid('Lien non valable', 'Cette invitation a été annulée, déjà utilisée ou n\'existe pas. Demandez à la Direction de vous envoyer une nouvelle invitation.');
+        if (isExpired(inv)) return invalid('Invitation expirée', 'Ce lien a expiré le ' + fmtIsoDate(inv.expiresAt) + '. Demandez à la Direction de vous renvoyer l\'invitation.');
+        const r = ROLES.find(x => x.key===inv.role) || ROLES[0];
+        return {isValid:true,
+          intro: (inv.invitedBy || 'La Direction') + ' vous invite à rejoindre l\'espace d\'administration de la Maison Carole Sessegnon.',
+          roleLabel:r.label, acces:r.acces, neVoitPas:r.neVoitPas,
+          message:inv.message || '', inviter:inv.invitedBy || 'La Direction',
+          nom: a.nom===null ? inv.nom : a.nom, email:inv.email, pass:a.pass, pass2:a.pass2,
+          err:a.err, hasErr:!!a.err, pass2Shadow: a.err ? FIELD_ERR : FIELD_OK,
+          expiry:'Ce lien est valable jusqu\'au ' + fmtIsoDate(inv.expiresAt) + '.'};
+      })(),
+      setAcc: Object.fromEntries(['nom','pass','pass2'].map(key => [key, e => {
+        const v = e.target.value; this.setState(st => ({accept:Object.assign({}, st.accept, {[key]:v, err:''})}));
+      }])),
+      acceptInvite: e => {
+        const inv = s.team.find(t => t.token && t.token===s.acceptToken);
+        if (inv) this.acceptInvite(e, inv); else e.preventDefault();
+      },
+      enterAfterAccept: () => this.leaveAccept({authed:true, meId:s.accept.doneId || ME_ID, route:'dashboard', flash:''}),
+      leaveAccept: () => this.leaveAccept(),
       loginErr: s.loginErr, loginInfo: s.loginInfo,
       submitLogin: e => this.submitLogin(e),
       forgotPassword: () => this.setState({loginErr:'', loginInfo:"Demandez à la Direction de réinitialiser votre accès depuis l'espace Équipe."}),
-      btnBlock, btnUpperSm, btnUpperSmDanger,
-      me: {nom:me.nom, roleLabel:(ROLES.find(r => r.key===me.role)||ROLES[0]).label},
+      btnBlock, btnUpperSm, btnUpperSmDanger, btnUpperSmModal,
+      me: {nom:displayName(me), roleLabel:(ROLES.find(r => r.key===me.role)||ROLES[0]).label},
 
       sidebarWide,
       sidebarCols: s.sidebarWide ? '240px 1fr' : '76px 1fr',
@@ -835,7 +1144,7 @@ class Component extends DCLogic {
       navOpen: s.navOpen,
       openNav: () => this.setState({navOpen:true}),
       closeNav: () => this.setState({navOpen:false}),
-      logout: () => this.setState({authed:false, route:'dashboard', navOpen:false, confirm:null, flash:''}),
+      logout: () => this.setState({authed:false, route:'dashboard', navOpen:false, confirm:null, invite:null, flash:'', meId:ME_ID}),
 
       navItems: navKeys.map(n => ({
         label:n.label, iconHtml:{__html:ICONS[n.icon]},
@@ -871,33 +1180,108 @@ class Component extends DCLogic {
       // Équipe
       team: s.team.map(t => {
         const r = ROLES.find(r => r.key===t.role) || ROLES[0];
-        const isSelf = t.id===ME_ID;
+        const isSelf = t.id===s.meId;
         const isLastDirection = t.role==='direction' && t.statut==='actif' && activeDirection<=1;
         const isDisabled = t.statut==='desactive';
-        return {...t, roleLabel:r.label, ...BADGE[TEAM_STATUT_KIND[t.statut]], statutLabel:TEAM_STATUT_LABEL[t.statut],
-          canToggle: !isSelf && !isLastDirection,
-          lockedLabel: isSelf ? 'Votre compte' : (isLastDirection ? 'Seul compte Direction' : ''),
+        const isInvite = t.statut==='invite';
+        const expired = isExpired(t);
+        const statutKey = expired ? 'expiree' : t.statut;
+        const name = displayName(t);
+        return {...t, roleLabel:r.label, roleHint:'Voit : ' + r.acces + '. Ne voit pas : ' + r.neVoitPas + '.', ...BADGE[TEAM_STATUT_KIND[statutKey]], statutLabel:TEAM_STATUT_LABEL[statutKey],
+          displayName:name,
+          emailLabel: t.email || 'Aucune adresse e-mail — lien à transmettre',
+          isInvite,
+          inviteInfo: !isInvite ? '' : (expired
+            ? 'Envoyée le ' + fmtIsoDate(t.invitedAt) + ' · expirée le ' + fmtIsoDate(t.expiresAt)
+            : 'Envoyée le ' + fmtIsoDate(t.invitedAt) + ' · valable jusqu\'au ' + fmtIsoDate(t.expiresAt)),
+          inviteInfoColor: expired ? 'rgb(155,24,33)' : 'rgb(94,94,94)',
+          copyAria:'Copier le lien d\'invitation de ' + name,
+          resendAria:'Renvoyer l\'invitation à ' + name,
+          revokeAria:'Annuler l\'invitation de ' + name,
+          copyLink: () => this.copyText(inviteLink(t.token), () => this.showFlash('Lien d\'invitation de ' + name + ' copié.')),
+          resend: () => {
+            const today = isoToday(), until = addDays(today, INVITE_DAYS);
+            this.setTeam(team => team.map(x => x.id===t.id ? Object.assign({}, x, {invitedAt:today, expiresAt:until}) : x));
+            this.logAudit('Invitation renvoyée — ' + name);
+            this.showFlash('Invitation renvoyée' + (t.email ? ' à ' + t.email : '') + ' — valable jusqu\'au ' + fmtIsoDate(until) + '.');
+          },
+          revoke: () => this.askConfirm({
+            title:'Annuler l\'invitation\u00a0?',
+            body:'Le lien envoyé à ' + name + ' ne fonctionnera plus. Vous pourrez l\'inviter de nouveau plus tard.',
+            okLabel:'Annuler l\'invitation', cancelLabel:'Retour',
+            onOk: () => {
+              this.setTeam(team => team.filter(x => x.id!==t.id));
+              this.logAudit('Invitation annulée — ' + name);
+              this.showFlash('Invitation de ' + name + ' annulée.');
+            }
+          }),
+          canToggle: !isInvite && !isSelf && !isLastDirection,
+          lockedLabel: isInvite ? '' : (isSelf ? 'Votre compte' : (isLastDirection ? 'Seul compte Direction' : '')),
           toggleLabel: isDisabled ? 'Réactiver' : 'Désactiver',
-          toggleAria: (isDisabled ? 'Réactiver ' : 'Désactiver ') + t.nom,
+          toggleAria: (isDisabled ? 'Réactiver ' : 'Désactiver ') + name,
           toggle: () => {
             const apply = next => {
-              this.setState(st => ({team: st.team.map(x => x.id===t.id ? Object.assign({}, x, {statut:next}) : x)}));
-              this.logAudit((next==='desactive' ? 'Compte désactivé — ' : 'Compte réactivé — ') + t.nom);
-              this.showFlash((next==='desactive' ? 'Accès de ' : 'Accès rétabli pour ') + t.nom + (next==='desactive' ? ' désactivé.' : '.'));
+              this.setTeam(team => team.map(x => x.id===t.id ? Object.assign({}, x, {statut:next}) : x));
+              this.logAudit((next==='desactive' ? 'Compte désactivé — ' : 'Compte réactivé — ') + name);
+              this.showFlash((next==='desactive' ? 'Accès de ' : 'Accès rétabli pour ') + name + (next==='desactive' ? ' désactivé.' : '.'));
             };
             if (isDisabled) { apply('actif'); return; }
             this.askConfirm({
-              title:'Désactiver ' + t.nom + '\u00a0?',
-              body: t.nom + ' (' + r.label + ') ne pourra plus se connecter. Ses actions restent visibles dans le journal d\'audit, et vous pourrez réactiver le compte à tout moment.',
+              title:'Désactiver ' + name + '\u00a0?',
+              body: name + ' (' + r.label + ') ne pourra plus se connecter. Ses actions restent visibles dans le journal d\'audit, et vous pourrez réactiver le compte à tout moment.',
               okLabel:'Désactiver',
               onOk: () => apply('desactive')
             });
           }
         };
       }),
-      roles: ROLES,
-      audit: s.audit,
-      inviteTeam: () => this.showFlash("Démonstration — l'invitation par e-mail (le collaborateur définit lui-même son mot de passe) n'est pas branchée ici.", 7000),
+      teamTabs: teamTabKeys.map(t => ({
+        label:t.label, selected: teamTab===t.key ? 'true' : 'false',
+        color: teamTab===t.key ? 'rgb(71,29,27)' : 'rgb(94,94,94)',
+        underline: teamTab===t.key ? 'inset 0 -2px 0 rgb(71,29,27)' : 'none',
+        select: () => this.setState({teamTab:t.key})
+      })),
+      isTeamMembres: teamTab==='membres', isTeamRoles: teamTab==='roles', isTeamAudit: teamTab==='audit',
+      roles: ROLES.map(r => {
+        const n = s.team.filter(t => t.role===r.key && t.statut!=='desactive').length;
+        return {...r, countLabel: n===0 ? 'Aucun compte' : (n + (n>1 ? ' comptes' : ' compte'))};
+      }),
+      auditSearch: s.auditSearch, setAuditSearch: e => this.setState({auditSearch:e.target.value}),
+      auditAuteur: s.auditAuteur, setAuditAuteur: e => this.setState({auditAuteur:e.target.value}),
+      auditAuteurs: Array.from(new Set(s.audit.map(a => a.auteur))),
+      filteredAudit, noAudit: filteredAudit.length===0,
+      inviteDays: INVITE_DAYS,
+      hasInvite: !!s.invite,
+      openInvite: () => this.openInvite(),
+      closeInvite: () => this.setState({invite:null}),
+      inviteAnother: () => this.openInvite(),
+      sendInvite: e => this.sendInvite(e),
+      setInv: Object.fromEntries(['nom','email','role','message'].map(key => [key, e => {
+        const v = e.target.value;
+        this.setState(st => ({invite:Object.assign({}, st.invite, {[key]:v}, key==='email' ? {emailErr:''} : {})}));
+      }])),
+      selectAll: e => { try { e.target.select(); } catch(err) {} },
+      inviteRole: (() => {
+        const r = ROLES.find(x => x.key===(s.invite ? s.invite.role : 'commandes')) || ROLES[0];
+        return {acces:r.acces, neVoitPas:r.neVoitPas, isDirection:r.key==='direction'};
+      })(),
+      invite: (() => {
+        const f = s.invite;
+        if (!f) return {};
+        if (f.step==='form') return {isForm:true, nom:f.nom, email:f.email, role:f.role, message:f.message,
+          emailErr:f.emailErr, hasEmailErr:!!f.emailErr, emailShadow: f.emailErr ? FIELD_ERR : FIELD_OK};
+        const m = s.team.find(t => t.id===f.sentId);
+        if (!m) return {};
+        const name = displayName(m);
+        const link = inviteLink(m.token);
+        return {isSent:true, link,
+          sentText: m.email
+            ? 'L\'invitation de ' + name + ' est enregistrée. Un e-mail l\'invitera à rejoindre l\'espace à l\'adresse ' + m.email + '.'
+            : 'L\'invitation de ' + name + ' est enregistrée. Sans adresse e-mail, transmettez-lui vous-même le lien ci-dessous.',
+          expiry:'Valable jusqu\'au ' + fmtIsoDate(m.expiresAt) + '. Vous pourrez la renvoyer ou l\'annuler depuis la liste de l\'équipe.',
+          copyLabel: f.copied ? 'Copié' : 'Copier',
+          copy: () => this.copyText(link, () => this.setState(st => ({invite: st.invite ? Object.assign({}, st.invite, {copied:true}) : null})))};
+      })(),
 
       // Commandes
       orderSearch: s.orderSearch, setOrderSearch: e => this.setState({orderSearch:e.target.value}),
