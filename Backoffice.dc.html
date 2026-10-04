@@ -220,6 +220,22 @@
               </div>
             </div>
           </sc-if>
+          <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:24px;margin-bottom:20px">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:6px">
+              <p style="margin:0;font-family:var(--font-display);font-size:19px;color:rgb(71,29,27)">Stock disponible à la vente</p>
+              <button type="button" onClick="{{ goPiecesDispo }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);text-align:left;font-family:inherit">Voir les pièces</button>
+            </div>
+            <p style="margin:0 0 16px;font-size:13px;color:rgb(94,94,94)">Calculé depuis le registre : une pièce vendue en ligne ou hors site sort du stock automatiquement.</p>
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,170px),1fr));gap:12px">
+              <sc-for list="{{ stockByModel }}" as="m" hint-placeholder-count="5">
+                <div style="padding:14px 16px;background:rgb(252,249,248)">
+                  <p style="margin:0;font-size:14px;color:rgb(0,0,0)">{{ m.modele }}</p>
+                  <p style="margin:6px 0 2px;font-family:var(--font-display);font-size:28px;color:rgb(71,29,27)">{{ m.dispo }}</p>
+                  <p style="margin:0;font-size:12px;color:rgb(94,94,94)">{{ m.detail }}</p>
+                </div>
+              </sc-for>
+            </div>
+          </div>
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr));gap:20px">
             <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:24px">
               <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
@@ -248,7 +264,7 @@
                 <button type="button" onClick="{{ o.open }}" style="display:flex;width:100%;justify-content:space-between;gap:14px;padding:12px 0;border-top:1px solid rgba(0,0,0,.08);background:none;border-left:0;border-right:0;border-bottom:0;text-align:left;cursor:pointer;font-family:inherit" style-hover="opacity:.7">
                   <div>
                     <p style="margin:0;font-size:14px;color:rgb(0,0,0)">{{ o.no }}</p>
-                    <p style="margin:3px 0 0;font-size:12px;color:rgb(94,94,94)">{{ o.client }}</p>
+                    <p style="margin:3px 0 0;font-size:12px;color:rgb(94,94,94)">{{ o.clientLine }}</p>
                   </div>
                   <span style="flex:0 0 auto;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ o.statutBg }};color:{{ o.statutFg }};box-shadow:{{ o.statutShadow }};align-self:flex-start">{{ o.statutLabel }}</span>
                 </button>
@@ -260,10 +276,10 @@
                 <button type="button" onClick="{{ goProprietaires }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27)">Tout voir</button>
               </div>
               <sc-for list="{{ recentOwners }}" as="o" hint-placeholder-count="3">
-                <div style="padding:12px 0;border-top:1px solid rgba(0,0,0,.08)">
+                <button type="button" onClick="{{ o.open }}" style="display:block;width:100%;padding:12px 0;border-top:1px solid rgba(0,0,0,.08);background:none;border-left:0;border-right:0;border-bottom:0;text-align:left;cursor:pointer;font-family:inherit" style-hover="opacity:.7">
                   <p style="margin:0;font-size:14px;color:rgb(0,0,0)">{{ o.owner }}</p>
-                  <p style="margin:3px 0 0;font-size:12px;color:rgb(94,94,94)">{{ o.piece }} — {{ o.date }}</p>
-                </div>
+                  <p style="margin:3px 0 0;font-size:12px;color:rgb(94,94,94)">{{ o.pieceLabel }} — {{ o.date }}</p>
+                </button>
               </sc-for>
             </div>
           </div>
@@ -276,8 +292,10 @@
               <select aria-label="Filtrer par statut" value="{{ statutFilter }}" onChange="{{ setStatutFilter }}" style="flex:1 1 160px;height:46px;padding:0 12px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);color:rgb(0,0,0);font-size:14px">
                 <option value="tous">Tous les statuts</option>
                 <option value="disponible">Disponible</option>
-                <option value="vendue">Vendue</option>
                 <option value="bientot">Bientôt disponible</option>
+                <option value="vendue">Vendue</option>
+                <option value="prototype">Prototype</option>
+                <option value="offerte">Offerte</option>
               </select>
               <select aria-label="Trier les pièces" value="{{ sortBy }}" onChange="{{ setSortBy }}" style="flex:1 1 180px;height:46px;padding:0 12px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);color:rgb(0,0,0);font-size:14px">
                 <option value="recent">Plus récentes d'abord</option>
@@ -310,7 +328,7 @@
                 <tr style="text-align:left">
                   <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Pièce</th>
                   <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">N° de série</th>
-                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Matière</th>
+                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Prix</th>
                   <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Fabrication</th>
                   <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Statut</th>
                   <th style="padding:14px 18px;border-bottom:1px solid rgba(0,0,0,.1)"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Actions</span></th>
@@ -324,11 +342,14 @@
                         <div style="flex:0 0 36px;width:36px;height:36px;border-radius:50%;overflow:hidden;outline:1px solid oklch(0 0 0 / 0.1);outline-offset:-1px">
                           <image-slot id="{{ p.slot }}" shape="circle" placeholder="Photo"></image-slot>
                         </div>
-                        <span style="font-size:14px;color:rgb(0,0,0)">{{ p.modele }}</span>
+                        <div>
+                          <span style="display:block;font-size:14px;color:rgb(0,0,0)">{{ p.modele }}</span>
+                          <span style="display:block;margin-top:2px;font-size:12px;color:rgb(94,94,94)">{{ p.refLabel }}</span>
+                        </div>
                       </div>
                     </td>
                     <td data-label="N° de série" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);font-variant-numeric:tabular-nums;border-bottom:1px solid rgba(0,0,0,.06)">{{ p.serie }}</td>
-                    <td data-label="Matière" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)">{{ p.matiere }}</td>
+                    <td data-label="Prix" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);font-variant-numeric:tabular-nums;white-space:nowrap;border-bottom:1px solid rgba(0,0,0,.06)">{{ p.prixLabel }}</td>
                     <td data-label="Fabrication" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)">{{ p.dateFabLabel }}</td>
                     <td data-label="Statut" style="padding:14px 18px;border-bottom:1px solid rgba(0,0,0,.06)">
                       <span style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ p.statutBg }};color:{{ p.statutFg }};box-shadow:{{ p.statutShadow }}">{{ p.statutLabel }}</span>
@@ -360,22 +381,45 @@
                 </label>
               </div>
               <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:16px">
-                <label style="display:block;font-size:13px;color:rgb(70,70,70)">Numéro de série
-                  <input value="{{ form.serie }}" onChange="{{ setF.serie }}" placeholder="CS-0000-2026" aria-invalid="{{ fieldInvalid.serie }}" aria-describedby="err-serie" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:{{ fieldShadow.serie }};color:rgb(0,0,0);letter-spacing:.06em">
-                  <sc-if value="{{ fieldErr.serie }}"><span id="err-serie" style="display:block;margin-top:6px;font-size:12px;color:rgb(155,24,33)">{{ fieldErr.serie }}</span></sc-if>
+                <label style="display:block;font-size:13px;color:rgb(70,70,70)">Référence article
+                  <input value="{{ form.reference }}" onChange="{{ setF.reference }}" placeholder="{{ refPlaceholder }}" autocomplete="off" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0);text-transform:uppercase;letter-spacing:.06em">
                 </label>
-                <div style="font-size:13px;color:rgb(70,70,70)">
-                  <div style="display:flex;justify-content:space-between;gap:10px">
-                    <label for="bo-code">Code d'activation privé</label>
-                    <sc-if value="{{ isEditing }}">
-                      <button type="button" onClick="{{ toggleCode }}" aria-controls="bo-code" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:12px;border-bottom:1px solid rgb(71,29,27)">{{ codeToggleLabel }}</button>
-                    </sc-if>
+                <label style="display:block;font-size:13px;color:rgb(70,70,70)">Prix de vente (FCFA)
+                  <input type="number" min="0" step="1000" inputMode="numeric" value="{{ form.prix }}" onChange="{{ setF.prix }}" aria-invalid="{{ fieldInvalid.prix }}" aria-describedby="err-prix" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:{{ fieldShadow.prix }};color:rgb(0,0,0);font-variant-numeric:tabular-nums">
+                  <sc-if value="{{ fieldErr.prix }}"><span id="err-prix" style="display:block;margin-top:6px;font-size:12px;color:rgb(155,24,33)">{{ fieldErr.prix }}</span></sc-if>
+                </label>
+              </div>
+
+              <div style="padding:16px 18px;background:rgb(252,249,248);display:flex;flex-direction:column;gap:14px">
+                <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap">
+                  <p style="margin:0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">Identifiants du passeport</p>
+                  <sc-if value="{{ canToggleAuto }}">
+                    <button type="button" onClick="{{ toggleAutoIds }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);text-align:left;font-family:inherit;font-size:12px">{{ autoIdsLabel }}</button>
+                  </sc-if>
+                </div>
+                <p style="margin:0;font-size:12px;line-height:18px;color:rgb(94,94,94)">{{ idsHint }}</p>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:16px">
+                  <label style="display:block;font-size:13px;color:rgb(70,70,70)">Numéro de série
+                    <input value="{{ form.serie }}" onChange="{{ setF.serie }}" readOnly="{{ idsLocked }}" placeholder="CS-0000-2026" aria-invalid="{{ fieldInvalid.serie }}" aria-describedby="err-serie" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:{{ idsBg }};border:0;box-shadow:{{ fieldShadow.serie }};color:rgb(0,0,0);letter-spacing:.06em">
+                    <sc-if value="{{ fieldErr.serie }}"><span id="err-serie" style="display:block;margin-top:6px;font-size:12px;color:rgb(155,24,33)">{{ fieldErr.serie }}</span></sc-if>
+                  </label>
+                  <div style="font-size:13px;color:rgb(70,70,70)">
+                    <div style="display:flex;justify-content:space-between;gap:10px">
+                      <label for="bo-code">Code d'activation privé</label>
+                      <sc-if value="{{ isEditing }}">
+                        <button type="button" onClick="{{ toggleCode }}" aria-controls="bo-code" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);text-align:left;font-family:inherit;font-size:12px">{{ codeToggleLabel }}</button>
+                      </sc-if>
+                      <sc-if value="{{ canRegenCode }}">
+                        <button type="button" onClick="{{ regenCode }}" aria-controls="bo-code" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);text-align:left;font-family:inherit;font-size:12px">Régénérer</button>
+                      </sc-if>
+                    </div>
+                    <input id="bo-code" type="{{ codeType }}" autocomplete="off" value="{{ form.code }}" onChange="{{ setF.code }}" readOnly="{{ idsLocked }}" placeholder="8F3K-22QD" aria-invalid="{{ fieldInvalid.code }}" aria-describedby="err-code" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:{{ idsBg }};border:0;box-shadow:{{ fieldShadow.code }};color:rgb(0,0,0);letter-spacing:.06em">
+                    <sc-if value="{{ fieldErr.code }}"><span id="err-code" style="display:block;margin-top:6px;font-size:12px;color:rgb(155,24,33)">{{ fieldErr.code }}</span></sc-if>
+                    <sc-if value="{{ isEditing }}"><span style="display:block;margin-top:6px;font-size:12px;color:rgb(94,94,94)">Chaque affichage du code est inscrit au journal d'audit.</span></sc-if>
                   </div>
-                  <input id="bo-code" type="{{ codeType }}" autocomplete="off" value="{{ form.code }}" onChange="{{ setF.code }}" placeholder="8F3K-22QD" aria-invalid="{{ fieldInvalid.code }}" aria-describedby="err-code" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:{{ fieldShadow.code }};color:rgb(0,0,0);letter-spacing:.06em">
-                  <sc-if value="{{ fieldErr.code }}"><span id="err-code" style="display:block;margin-top:6px;font-size:12px;color:rgb(155,24,33)">{{ fieldErr.code }}</span></sc-if>
-                  <sc-if value="{{ isEditing }}"><span style="display:block;margin-top:6px;font-size:12px;color:rgb(94,94,94)">Chaque affichage du code est inscrit au journal d'audit.</span></sc-if>
                 </div>
               </div>
+
               <label style="display:block;font-size:13px;color:rgb(70,70,70)">Matière
                 <input value="{{ form.matiere }}" onChange="{{ setF.matiere }}" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
               </label>
@@ -383,14 +427,30 @@
                 <label style="display:block;font-size:13px;color:rgb(70,70,70)">Date de fabrication
                   <input type="date" value="{{ form.dateFab }}" onChange="{{ setF.dateFab }}" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
                 </label>
-                <label style="display:block;font-size:13px;color:rgb(70,70,70)">Statut
-                  <select value="{{ form.statut }}" onChange="{{ setF.statut }}" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
-                    <option value="disponible">Disponible</option>
-                    <option value="vendue">Vendue</option>
-                    <option value="bientot">Bientôt disponible</option>
-                  </select>
-                </label>
+                <sc-if value="{{ statutSelectable }}">
+                  <label style="display:block;font-size:13px;color:rgb(70,70,70)">Statut
+                    <select value="{{ form.statut }}" onChange="{{ setF.statut }}" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+                      <option value="bientot">Bientôt disponible</option>
+                      <option value="disponible">Disponible</option>
+                      <option value="prototype">Prototype</option>
+                      <option value="offerte">Offerte</option>
+                    </select>
+                  </label>
+                </sc-if>
+                <sc-if value="{{ soldInfo.isSold }}">
+                  <div style="font-size:13px;color:rgb(70,70,70)">
+                    <p style="margin:0">Statut</p>
+                    <div style="margin-top:8px;min-height:52px;padding:10px 16px;background:rgba(71,29,27,.06);display:flex;flex-direction:column;justify-content:center;gap:4px">
+                      <span style="font-size:14px;color:rgb(71,29,27)">Vendue</span>
+                      <span style="font-size:12px;color:rgb(94,94,94)">{{ soldInfo.text }}</span>
+                    </div>
+                    <sc-if value="{{ soldInfo.hasOrder }}">
+                      <button type="button" onClick="{{ soldInfo.open }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);text-align:left;font-family:inherit;margin-top:8px;font-size:12px">Voir la commande {{ soldInfo.no }}</button>
+                    </sc-if>
+                  </div>
+                </sc-if>
               </div>
+              <p style="margin:-6px 0 0;font-size:12px;line-height:18px;color:rgb(94,94,94)">« Vendue » se met à jour seul à chaque vente confirmée, en ligne ou hors site. Prototype et Offerte restent au registre sans jamais être proposées à la vente.</p>
               <sc-if value="{{ hasFieldErr }}">
                 <p role="alert" style="margin:0;font-size:13px;color:rgb(155,24,33)">La pièce n'a pas été enregistrée : corrigez les champs signalés.</p>
               </sc-if>
@@ -402,9 +462,9 @@
               </div>
             </form>
 
-            <div>
-              <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:clamp(22px,3vw,32px);margin-bottom:20px">
-                <p style="margin:0 0 16px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">Aperçu du certificat</p>
+            <div style="display:flex;flex-direction:column;gap:20px">
+              <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:clamp(22px,3vw,32px)">
+                <p style="margin:0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);margin-bottom:16px">Aperçu du certificat</p>
                 <div style="position:relative;aspect-ratio:.9;max-width:220px;margin:0 auto;overflow:hidden;border-radius:50%;outline:1px solid oklch(0 0 0 / 0.1);outline-offset:-1px">
                   <image-slot id="{{ formSlot }}" shape="circle" placeholder="Photo de la pièce"></image-slot>
                 </div>
@@ -414,15 +474,28 @@
 
               <sc-if value="{{ isEditing }}">
                 <div style="background:rgb(255,251,248);padding:clamp(22px,3vw,32px)">
-                  <p style="margin:0 0 14px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">Propriétaire</p>
+                  <p style="margin:0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);margin-bottom:14px">Propriétaire</p>
                   <sc-if value="{{ hasOwnerForForm }}">
                     <p style="margin:0;font-size:14px;color:rgb(0,0,0)">{{ formOwner.owner }}</p>
                     <p style="margin:6px 0 0;font-size:13px;color:rgb(94,94,94)">{{ formOwner.email }}</p>
                     <p style="margin:6px 0 0;font-size:13px;color:rgb(94,94,94)">Associée le {{ formOwner.date }}</p>
+                    <button type="button" onClick="{{ formOwner.open }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);text-align:left;font-family:inherit;margin-top:12px">Voir la fiche propriétaire</button>
                   </sc-if>
                   <sc-if value="{{ noOwnerForForm }}">
                     <p style="margin:0;font-size:14px;color:rgb(94,94,94)">Pièce non encore associée à un propriétaire.</p>
                   </sc-if>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ formSav.length }}">
+                <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:clamp(22px,3vw,32px)">
+                  <p style="margin:0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);margin-bottom:6px">Suivi après-vente</p>
+                  <sc-for list="{{ formSav }}" as="e" hint-placeholder-count="2">
+                    <div style="padding:12px 0;border-top:1px solid rgba(0,0,0,.08)">
+                      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><span style="display:inline-block;white-space:nowrap;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ e.statutBg }};color:{{ e.statutFg }};box-shadow:{{ e.statutShadow }}">{{ e.statutLabel }}</span><span style="font-size:12px;color:rgb(94,94,94)">{{ e.dateLabel }}</span></div>
+                      <sc-if value="{{ e.note }}"><p style="margin:8px 0 0;font-size:13px;line-height:20px;color:rgb(70,70,70)">{{ e.note }}</p></sc-if>
+                    </div>
+                  </sc-for>
                 </div>
               </sc-if>
             </div>
@@ -431,9 +504,15 @@
 
         <sc-if value="{{ isCommandes }}">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:20px">
-            <div style="display:flex;gap:10px;flex-wrap:wrap;flex:1 1 420px;min-width:0">
-              <input type="search" aria-label="Rechercher une commande" value="{{ orderSearch }}" onChange="{{ setOrderSearch }}" placeholder="Rechercher un client, un n° de commande…" style="flex:1 1 240px;min-width:0;height:46px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);color:rgb(0,0,0);font-size:14px">
-              <select aria-label="Filtrer par statut" value="{{ orderStatutFilter }}" onChange="{{ setOrderStatutFilter }}" style="flex:1 1 180px;height:46px;padding:0 12px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);color:rgb(0,0,0);font-size:14px">
+            <div style="display:flex;gap:10px;flex-wrap:wrap;flex:1 1 520px;min-width:0">
+              <input type="search" aria-label="Rechercher une commande" value="{{ orderSearch }}" onChange="{{ setOrderSearch }}" placeholder="Rechercher un client, une pièce, un n°…" style="flex:1 1 240px;min-width:0;height:46px;padding:0 12px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);color:rgb(0,0,0);font-size:14px;padding:0 16px">
+              <select aria-label="Filtrer par canal" value="{{ canalFilter }}" onChange="{{ setCanalFilter }}" style="flex:1 1 160px;height:46px;padding:0 12px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);color:rgb(0,0,0);font-size:14px">
+                <option value="tous">Tous les canaux</option>
+                <option value="en_ligne">En ligne</option>
+                <option value="popup">Pop-up</option>
+                <option value="directe">Vente directe</option>
+              </select>
+              <select aria-label="Filtrer par statut" value="{{ orderStatutFilter }}" onChange="{{ setOrderStatutFilter }}" style="flex:1 1 160px;height:46px;padding:0 12px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);color:rgb(0,0,0);font-size:14px">
                 <option value="tous">Tous les statuts</option>
                 <option value="preparation">En préparation</option>
                 <option value="expediee">Expédiée</option>
@@ -441,34 +520,43 @@
                 <option value="annulee">Annulée</option>
               </select>
             </div>
-            <x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="secondary" onClick="{{ exportOrdersCsv }}" dc-props="{{ btnUpperSm }}" hint-size="auto,46px">Exporter</x-import>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="secondary" onClick="{{ exportOrdersCsv }}" dc-props="{{ btnUpperSm }}" hint-size="auto,46px">Exporter</x-import>
+              <x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="primary" onClick="{{ openVente }}" dc-props="{{ btnUpperSm }}" hint-size="auto,46px">Enregistrer une vente</x-import>
+            </div>
           </div>
+          <p style="margin:0 0 10px;font-size:13px;color:rgb(94,94,94)">{{ ordersCount }}</p>
           <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);overflow:auto">
-            <table class="bo-table" style="width:100%;border-collapse:collapse;min-width:820px">
+            <table class="bo-table" style="width:100%;border-collapse:collapse;min-width:900px">
               <thead>
                 <tr style="text-align:left">
                   <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">N° de commande</th>
+                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Canal</th>
                   <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Client</th>
-                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Articles</th>
+                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Pièces</th>
                   <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Total</th>
                   <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Date</th>
                   <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Statut</th>
-                  <th style="padding:14px 18px;border-bottom:1px solid rgba(0,0,0,.1)"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Actions</span></th>
+                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Actions</span></th>
                 </tr>
               </thead>
               <tbody>
-                <sc-for list="{{ filteredOrders }}" as="o" hint-placeholder-count="4">
+                <sc-for list="{{ filteredOrders }}" as="o" hint-placeholder-count="5">
                   <tr onClick="{{ o.open }}" style="cursor:pointer;transition:background-color .15s" style-hover="background:rgb(255,251,248)">
-                    <td style="padding:14px 18px;font-size:14px;color:rgb(0,0,0);font-variant-numeric:tabular-nums;border-bottom:1px solid rgba(0,0,0,.06)">{{ o.no }}</td>
-                    <td data-label="Client" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)">{{ o.client }}</td>
-                    <td data-label="Articles" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)">{{ o.items }}</td>
-                    <td data-label="Total" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);font-variant-numeric:tabular-nums;border-bottom:1px solid rgba(0,0,0,.06)">{{ o.totalLabel }}</td>
-                    <td data-label="Date" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)">{{ o.date }}</td>
-                    <td data-label="Statut" style="padding:14px 18px;border-bottom:1px solid rgba(0,0,0,.06)">
-                      <span style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ o.statutBg }};color:{{ o.statutFg }};box-shadow:{{ o.statutShadow }}">{{ o.statutLabel }}</span>
+                    <td style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);font-size:14px;color:rgb(0,0,0);font-variant-numeric:tabular-nums;white-space:nowrap">{{ o.no }}</td>
+                    <td data-label="Canal" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)">
+                      <div>
+                        <span style="display:block">{{ o.canalLabel }}</span>
+                        <sc-if value="{{ o.evenement }}"><span style="display:block;margin-top:2px;font-size:12px;color:rgb(94,94,94)">{{ o.evenement }}</span></sc-if>
+                      </div>
                     </td>
-                    <td style="padding:14px 18px;text-align:right;border-bottom:1px solid rgba(0,0,0,.06)">
-                      <button type="button" onClick="{{ o.open }}" aria-label="{{ o.detailLabel }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27)">Détail</button>
+                    <td data-label="Client" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)">{{ o.clientLabel }}</td>
+                    <td data-label="Pièces" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)">{{ o.items }}</td>
+                    <td data-label="Total" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);font-variant-numeric:tabular-nums;white-space:nowrap">{{ o.totalLabel }}</td>
+                    <td data-label="Date" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);white-space:nowrap">{{ o.dateLabel }}</td>
+                    <td data-label="Statut" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)"><span style="display:inline-block;white-space:nowrap;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ o.statutBg }};color:{{ o.statutFg }};box-shadow:{{ o.statutShadow }}">{{ o.statutLabel }}</span></td>
+                    <td style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);text-align:right">
+                      <button type="button" onClick="{{ o.open }}" aria-label="{{ o.detailLabel }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);text-align:left;font-family:inherit">Détail</button>
                     </td>
                   </tr>
                 </sc-for>
@@ -484,18 +572,30 @@
           <button type="button" onClick="{{ goCommandes }}" style="background:none;border:0;padding:0;margin-bottom:22px;color:rgb(94,94,94);cursor:pointer;font-size:13px">← Retour aux commandes</button>
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:24px;align-items:start;max-width:1000px">
             <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:clamp(22px,3vw,32px)">
-              <p style="margin:0 0 4px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">Commande</p>
+              <p style="margin:0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);margin-bottom:4px">{{ viewOrder.kindLabel }}</p>
               <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 22px">
                 <p style="margin:0;font-family:var(--font-display);font-size:24px;color:rgb(71,29,27)">{{ viewOrder.no }}</p>
-                <span style="flex:0 0 auto;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ viewOrder.statutBg }};color:{{ viewOrder.statutFg }};box-shadow:{{ viewOrder.statutShadow }}">{{ viewOrder.statutLabel }}</span>
+                <span style="display:inline-block;white-space:nowrap;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ viewOrder.statutBg }};color:{{ viewOrder.statutFg }};box-shadow:{{ viewOrder.statutShadow }}">{{ viewOrder.statutLabel }}</span>
               </div>
-              <div style="display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Client</span><span>{{ viewOrder.client }}</span></div>
-              <div style="display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">E-mail</span><span style="overflow-wrap:anywhere;text-align:right">{{ viewOrder.email }}</span></div>
-              <div style="display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Articles</span><span style="text-align:right">{{ viewOrder.items }}</span></div>
-              <div style="display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Total</span><span style="font-variant-numeric:tabular-nums">{{ viewOrder.totalLabel }}</span></div>
-              <div style="display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Date</span><span>{{ viewOrder.date }}</span></div>
-              <div style="display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Réception</span><span style="text-align:right">{{ viewOrder.mode }}</span></div>
-              <div style="display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px;border-bottom:1px solid rgba(0,0,0,.08)"><span style="color:rgb(94,94,94)">Code de suivi</span><span style="text-align:right;letter-spacing:.04em">{{ viewOrder.trackingLabel }}</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Canal</span><span style="text-align:right">{{ viewOrder.canalLabel }}</span></div>
+              <sc-if value="{{ viewOrder.evenement }}"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Événement</span><span style="text-align:right">{{ viewOrder.evenement }}</span></div></sc-if>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Client</span><span style="text-align:right">{{ viewOrder.clientLabel }}</span></div>
+              <sc-if value="{{ viewOrder.email }}"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">E-mail</span><span style="overflow-wrap:anywhere;text-align:right">{{ viewOrder.email }}</span></div></sc-if>
+              <sc-if value="{{ viewOrder.telephone }}"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Téléphone</span><span style="text-align:right">{{ viewOrder.telephone }}</span></div></sc-if>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Pièces</span>
+                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+                  <sc-for list="{{ viewOrder.pieces }}" as="vp" hint-placeholder-count="1">
+                    <button type="button" onClick="{{ vp.open }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);text-align:left;font-family:inherit;font-size:14px;text-align:right">{{ vp.label }}</button>
+                  </sc-for>
+                </div>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Total</span><span style="font-variant-numeric:tabular-nums">{{ viewOrder.totalLabel }}</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Date</span><span>{{ viewOrder.dateLabel }}</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Paiement</span><span style="text-align:right">{{ viewOrder.paiementLabel }}</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Réception</span><span style="text-align:right">{{ viewOrder.mode }}</span></div>
+              <sc-if value="{{ viewOrder.isOnline }}"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Code de suivi</span><span style="text-align:right;letter-spacing:.04em">{{ viewOrder.trackingLabel }}</span></div></sc-if>
+              <sc-if value="{{ viewOrder.note }}"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Note</span><span style="text-align:right;max-width:70%">{{ viewOrder.note }}</span></div></sc-if>
+              <div style="border-top:1px solid rgba(0,0,0,.08)"></div>
             </div>
             <form onSubmit="{{ saveOrder }}" style="background:rgb(255,251,248);padding:clamp(22px,3vw,32px);display:flex;flex-direction:column;gap:18px">
               <p style="margin:0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">Suivi de la commande</p>
@@ -507,15 +607,114 @@
                   <option value="annulee">Annulée</option>
                 </select>
               </label>
-              <label style="display:block;font-size:13px;color:rgb(70,70,70)">Code de suivi du transporteur
-                <input value="{{ orderDraft.tracking }}" onChange="{{ setDraft.tracking }}" placeholder="Ex. EXP-4471-CI" autocomplete="off" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0);letter-spacing:.04em">
-              </label>
+              <sc-if value="{{ viewOrder.isOnline }}">
+                <label style="display:block;font-size:13px;color:rgb(70,70,70)">Code de suivi du transporteur
+                  <input value="{{ orderDraft.tracking }}" onChange="{{ setDraft.tracking }}" placeholder="Ex. EXP-4471-CI" autocomplete="off" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0);letter-spacing:.04em">
+                </label>
+              </sc-if>
+              <p style="margin:0;font-size:12px;line-height:18px;color:rgb(94,94,94)">Tant que la commande n'est pas annulée, ses pièces restent « Vendue ». L'annuler les remet automatiquement en « Disponible ».</p>
               <sc-if value="{{ orderDirty }}">
                 <p style="margin:0;font-size:12px;color:rgb(94,94,94)">Modifications non enregistrées.</p>
               </sc-if>
               <x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="primary" disabled="{{ orderUnchanged }}" dc-props="{{ btnBlock }}" hint-size="100%,58px">Mettre à jour</x-import>
             </form>
           </div>
+        </sc-if>
+
+        <sc-if value="{{ isVenteForm }}">
+          <button type="button" onClick="{{ goCommandes }}" style="background:none;border:0;padding:0;margin-bottom:22px;color:rgb(94,94,94);cursor:pointer;font-size:13px">← Retour aux commandes</button>
+          <form onSubmit="{{ saveVente }}" noValidate style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:24px;align-items:start;max-width:1100px">
+            <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:clamp(22px,3vw,32px);display:flex;flex-direction:column;gap:18px">
+              <p style="margin:0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">Vente hors site</p>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:16px">
+                <label style="display:block;font-size:13px;color:rgb(70,70,70)">Canal
+                  <select value="{{ vente.canal }}" onChange="{{ setVente.canal }}" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+                    <option value="popup">Pop-up</option>
+                    <option value="directe">Vente directe</option>
+                  </select>
+                </label>
+                <label style="display:block;font-size:13px;color:rgb(70,70,70)">Date de la vente
+                  <input type="date" value="{{ vente.date }}" onChange="{{ setVente.date }}" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+                </label>
+              </div>
+              <label style="display:block;font-size:13px;color:rgb(70,70,70)">Événement ou lieu <span style="color:rgb(94,94,94)">(facultatif)</span>
+                <input value="{{ vente.evenement }}" onChange="{{ setVente.evenement }}" placeholder="Ex. Pop-up Abidjan — Plateau" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+              </label>
+
+              <div>
+                <p style="margin:0;font-size:13px;color:rgb(70,70,70)">Pièces vendues</p>
+                <input type="search" aria-label="Filtrer les pièces disponibles" value="{{ venteSearch }}" onChange="{{ setVenteSearch }}" placeholder="Filtrer par modèle ou n° de série…" style="margin-top:8px;width:100%;height:46px;padding:0 12px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);color:rgb(0,0,0);font-size:14px;padding:0 16px">
+                <div role="group" aria-label="Pièces disponibles" style="margin-top:8px;max-height:320px;overflow:auto;box-shadow:{{ ventePiecesShadow }}">
+                  <sc-for list="{{ ventePieces }}" as="v" hint-placeholder-count="4">
+                    <label style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid rgba(0,0,0,.06);cursor:pointer;background:{{ v.bg }}">
+                      <input type="checkbox" checked="{{ v.checked }}" onChange="{{ v.toggle }}" aria-describedby="err-vente-pieces" style="flex:0 0 auto;width:18px;height:18px;margin:0;accent-color:rgb(71,29,27)">
+                      <span style="flex:1;min-width:0">
+                        <span style="display:block;font-size:14px;color:rgb(0,0,0)">{{ v.modele }}</span>
+                        <span style="display:block;margin-top:2px;font-size:12px;color:rgb(94,94,94)">{{ v.sub }}</span>
+                      </span>
+                      <span style="flex:0 0 auto;font-size:13px;color:rgb(70,70,70);font-variant-numeric:tabular-nums">{{ v.prixLabel }}</span>
+                    </label>
+                  </sc-for>
+                  <sc-if value="{{ noVentePieces }}">
+                    <p style="margin:0;padding:20px;font-size:13px;color:rgb(94,94,94)">{{ noVentePiecesText }}</p>
+                  </sc-if>
+                </div>
+                <sc-if value="{{ venteErr.pieces }}"><span id="err-vente-pieces" style="display:block;margin-top:6px;font-size:12px;color:rgb(155,24,33)">{{ venteErr.pieces }}</span></sc-if>
+              </div>
+
+              <p style="margin:0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);margin-top:6px">Client <span style="text-transform:none;letter-spacing:0">(facultatif)</span></p>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:16px">
+                <label style="display:block;font-size:13px;color:rgb(70,70,70)">Nom
+                  <input value="{{ vente.client }}" onChange="{{ setVente.client }}" autocomplete="off" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+                </label>
+                <label style="display:block;font-size:13px;color:rgb(70,70,70)">E-mail
+                  <input type="email" value="{{ vente.email }}" onChange="{{ setVente.email }}" autocomplete="off" aria-invalid="{{ venteInvalid.email }}" aria-describedby="err-vente-email" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:{{ venteShadow.email }};color:rgb(0,0,0)">
+                  <sc-if value="{{ venteErr.email }}"><span id="err-vente-email" style="display:block;margin-top:6px;font-size:12px;color:rgb(155,24,33)">{{ venteErr.email }}</span></sc-if>
+                </label>
+              </div>
+              <label style="display:block;font-size:13px;color:rgb(70,70,70)">Téléphone
+                <input type="tel" value="{{ vente.telephone }}" onChange="{{ setVente.telephone }}" autocomplete="off" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+              </label>
+
+              <p style="margin:0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);margin-top:6px">Paiement</p>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:16px">
+                <label style="display:block;font-size:13px;color:rgb(70,70,70)">Montant encaissé (FCFA)
+                  <input type="number" min="0" step="1000" inputMode="numeric" value="{{ vente.montant }}" onChange="{{ setVente.montant }}" placeholder="{{ venteSuggested }}" aria-invalid="{{ venteInvalid.montant }}" aria-describedby="err-vente-montant" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:{{ venteShadow.montant }};color:rgb(0,0,0);font-variant-numeric:tabular-nums">
+                  <sc-if value="{{ venteErr.montant }}"><span id="err-vente-montant" style="display:block;margin-top:6px;font-size:12px;color:rgb(155,24,33)">{{ venteErr.montant }}</span></sc-if>
+                </label>
+                <label style="display:block;font-size:13px;color:rgb(70,70,70)">Moyen de paiement
+                  <select value="{{ vente.paiement }}" onChange="{{ setVente.paiement }}" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+                    <option value="Espèces">Espèces</option>
+                    <option value="Carte bancaire">Carte bancaire</option>
+                    <option value="Mobile Money">Mobile Money</option>
+                    <option value="Virement">Virement</option>
+                  </select>
+                </label>
+              </div>
+              <label style="display:block;font-size:13px;color:rgb(70,70,70)">Note <span style="color:rgb(94,94,94)">(facultatif)</span>
+                <textarea value="{{ vente.note }}" onChange="{{ setVente.note }}" rows="3" placeholder="Ex. remise accordée, emballage cadeau…" style="margin-top:8px;width:100%;padding:14px 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0);resize:vertical;font-family:var(--font-body);font-size:15px;line-height:22px"></textarea>
+              </label>
+            </div>
+
+            <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:clamp(22px,3vw,32px);display:flex;flex-direction:column;gap:14px">
+              <p style="margin:0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">Récapitulatif</p>
+              <sc-for list="{{ venteSelected }}" as="v" hint-placeholder-count="1">
+                <div style="display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px">
+                  <span>{{ v.modele }} <span style="display:block;font-size:12px;color:rgb(94,94,94)">{{ v.serie }}</span></span>
+                  <span style="font-variant-numeric:tabular-nums;white-space:nowrap">{{ v.prixLabel }}</span>
+                </div>
+              </sc-for>
+              <sc-if value="{{ venteNoneSelected }}">
+                <p style="margin:0;font-size:14px;color:rgb(94,94,94)">Aucune pièce sélectionnée.</p>
+              </sc-if>
+              <div style="display:flex;justify-content:space-between;gap:12px;padding:14px 0 0;border-top:1px solid rgba(0,0,0,.15)">
+                <span style="font-size:14px">Total encaissé</span>
+                <span style="font-family:var(--font-display);font-size:22px;color:rgb(71,29,27);font-variant-numeric:tabular-nums">{{ venteTotalLabel }}</span>
+              </div>
+              <p style="margin:0;font-size:12px;line-height:18px;color:rgb(94,94,94)">La vente rejoint le suivi des commandes. Les pièces sélectionnées passent automatiquement en « Vendue » et sortent du stock.</p>
+              <x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="primary" dc-props="{{ btnBlock }}" hint-size="100%,58px">Enregistrer la vente</x-import>
+            </div>
+          </form>
         </sc-if>
 
         <sc-if value="{{ isEquipe }}">
@@ -639,28 +838,42 @@
 
         <sc-if value="{{ isProprietaires }}">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:20px">
-            <input type="search" aria-label="Rechercher un propriétaire" value="{{ ownerSearch }}" onChange="{{ setOwnerSearch }}" placeholder="Rechercher un propriétaire, une pièce…" style="flex:1 1 240px;max-width:420px;min-width:0;height:46px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);color:rgb(0,0,0);font-size:14px">
+            <input type="search" aria-label="Rechercher un propriétaire" value="{{ ownerSearch }}" onChange="{{ setOwnerSearch }}" placeholder="Rechercher un propriétaire, une pièce…" style="flex:1 1 240px;max-width:420px;min-width:0;height:46px;padding:0 12px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);color:rgb(0,0,0);font-size:14px;padding:0 16px">
             <x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="secondary" onClick="{{ exportOwnersCsv }}" dc-props="{{ btnUpperSm }}" hint-size="auto,46px">Exporter</x-import>
           </div>
           <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);overflow:auto">
-            <table class="bo-table" style="width:100%;border-collapse:collapse;min-width:760px">
+            <table class="bo-table" style="width:100%;border-collapse:collapse;min-width:860px">
               <thead>
                 <tr style="text-align:left">
-                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Pièce</th>
                   <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Propriétaire</th>
-                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">E-mail</th>
+                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Pièce</th>
                   <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Pays</th>
-                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Date d'association</th>
+                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Association</th>
+                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Après-vente</th>
+                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Actions</span></th>
                 </tr>
               </thead>
               <tbody>
                 <sc-for list="{{ filteredOwners }}" as="o" hint-placeholder-count="4">
-                  <tr style="transition:background-color .15s" style-hover="background:rgb(255,251,248)">
-                    <td style="padding:14px 18px;font-size:14px;color:rgb(0,0,0);border-bottom:1px solid rgba(0,0,0,.06);text-align:left">{{ o.piece }}</td>
-                    <td data-label="Propriétaire" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)">{{ o.owner }}</td>
-                    <td data-label="E-mail" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);overflow-wrap:anywhere">{{ o.email }}</td>
+                  <tr onClick="{{ o.open }}" style="cursor:pointer;transition:background-color .15s" style-hover="background:rgb(255,251,248)">
+                    <td style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);text-align:left">
+                      <div>
+                        <p style="margin:0;font-size:14px;color:rgb(0,0,0)">{{ o.owner }}</p>
+                        <p style="margin:3px 0 0;font-size:12px;color:rgb(94,94,94);overflow-wrap:anywhere">{{ o.email }}</p>
+                      </div>
+                    </td>
+                    <td data-label="Pièce" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)">
+                      <button type="button" onClick="{{ o.openPiece }}" aria-label="{{ o.pieceAria }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);text-align:left;font-family:inherit;color:rgb(0,0,0);border-bottom-color:rgba(0,0,0,.35)">{{ o.pieceLabel }}</button>
+                    </td>
                     <td data-label="Pays" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)">{{ o.pays }}</td>
-                    <td data-label="Association" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);font-variant-numeric:tabular-nums;border-bottom:1px solid rgba(0,0,0,.06)">{{ o.date }}</td>
+                    <td data-label="Association" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);font-variant-numeric:tabular-nums">{{ o.date }}</td>
+                    <td data-label="Après-vente" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)">
+                      <sc-if value="{{ o.hasSav }}"><span style="display:inline-block;white-space:nowrap;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ o.sav.statutBg }};color:{{ o.sav.statutFg }};box-shadow:{{ o.sav.statutShadow }}">{{ o.sav.statutLabel }}</span></sc-if>
+                      <sc-if value="{{ o.noSav }}"><span style="color:rgb(94,94,94)">—</span></sc-if>
+                    </td>
+                    <td style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);text-align:right">
+                      <button type="button" onClick="{{ o.open }}" aria-label="{{ o.openAria }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);text-align:left;font-family:inherit">Fiche</button>
+                    </td>
                   </tr>
                 </sc-for>
               </tbody>
@@ -668,6 +881,96 @@
             <sc-if value="{{ noOwners }}">
               <p style="margin:0;padding:40px;text-align:center;font-size:14px;color:rgb(94,94,94)">Aucune association ne correspond à cette recherche.</p>
             </sc-if>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isProprietaire }}">
+          <button type="button" onClick="{{ goProprietaires }}" style="background:none;border:0;padding:0;margin-bottom:22px;color:rgb(94,94,94);cursor:pointer;font-size:13px">← Retour aux propriétaires</button>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:24px;align-items:start;max-width:1100px">
+            <div style="display:flex;flex-direction:column;gap:20px">
+              <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:clamp(22px,3vw,32px)">
+                <p style="margin:0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);margin-bottom:4px">Propriétaire</p>
+                <p style="margin:0 0 22px;font-family:var(--font-display);font-size:24px;color:rgb(71,29,27)">{{ viewOwner.owner }}</p>
+                <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">E-mail</span><span style="overflow-wrap:anywhere;text-align:right">{{ viewOwner.email }}</span></div>
+                <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Pays</span><span>{{ viewOwner.pays }}</span></div>
+                <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Passeport activé le</span><span>{{ viewOwner.date }}</span></div>
+                <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px;border-bottom:1px solid rgba(0,0,0,.08)"><span style="color:rgb(94,94,94)">Commande d'origine</span>
+                  <sc-if value="{{ viewOwner.hasOrder }}"><button type="button" onClick="{{ viewOwner.openOrder }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);text-align:left;font-family:inherit;font-size:14px">{{ viewOwner.orderLabel }}</button></sc-if>
+                  <sc-if value="{{ viewOwner.noOrder }}"><span style="color:rgb(94,94,94)">—</span></sc-if>
+                </div>
+              </div>
+
+              <button type="button" onClick="{{ viewOwner.openPiece }}" style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);border:0;padding:clamp(22px,3vw,32px);display:flex;align-items:center;gap:18px;text-align:left;cursor:pointer;font-family:inherit;width:100%" style-hover="box-shadow:inset 0 0 0 1px rgb(71,29,27)">
+                <div style="flex:0 0 64px;width:64px;height:64px;border-radius:50%;overflow:hidden;outline:1px solid oklch(0 0 0 / 0.1);outline-offset:-1px">
+                  <image-slot id="{{ viewOwner.pieceSlot }}" shape="circle" placeholder="Photo"></image-slot>
+                </div>
+                <div style="flex:1;min-width:0">
+                  <p style="margin:0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);margin-bottom:6px">Pièce associée</p>
+                  <p style="margin:0;font-family:var(--font-display);font-size:20px;color:rgb(71,29,27)">{{ viewOwner.pieceModele }}</p>
+                  <p style="margin:4px 0 0;font-size:13px;color:rgb(94,94,94);font-variant-numeric:tabular-nums">{{ viewOwner.pieceSerie }}</p>
+                </div>
+                <span style="flex:0 0 auto;font-size:13px;color:rgb(71,29,27)">Ouvrir →</span>
+              </button>
+            </div>
+
+            <div style="background:rgb(255,251,248);padding:clamp(22px,3vw,32px)">
+              <p style="margin:0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);margin-bottom:6px">Suivi après-vente</p>
+              <p style="margin:0 0 20px;font-size:13px;line-height:20px;color:rgb(70,70,70)">Les évènements s'ajoutent les uns aux autres et restent attachés à la pièce, même si elle change de propriétaire.</p>
+              <form onSubmit="{{ addSav }}" noValidate style="display:flex;flex-direction:column;gap:14px">
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:16px">
+                  <label style="display:block;font-size:13px;color:rgb(70,70,70)">Évènement
+                    <select value="{{ savForm.type }}" onChange="{{ setSav.type }}" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+                      <option value="en_reparation">En réparation</option>
+                      <option value="reparee">Réparée</option>
+                      <option value="irreparable">Irréparable</option>
+                      <option value="remplacee">Remplacée</option>
+                      <option value="remboursee">Remboursée</option>
+                      <option value="restituee">Restituée</option>
+                    </select>
+                  </label>
+                  <label style="display:block;font-size:13px;color:rgb(70,70,70)">Date
+                    <input type="date" value="{{ savForm.date }}" onChange="{{ setSav.date }}" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+                  </label>
+                </div>
+                <sc-if value="{{ savNeedsReplacement }}">
+                  <label style="display:block;font-size:13px;color:rgb(70,70,70)">Pièce de remplacement <span style="color:rgb(94,94,94)">(facultatif)</span>
+                    <select value="{{ savForm.replacementId }}" onChange="{{ setSav.replacementId }}" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+                      <option value="">Aucune pour l'instant</option>
+                      <sc-for list="{{ savReplacementOptions }}" as="r" hint-placeholder-count="2">
+                        <option value="{{ r.id }}">{{ r.label }}</option>
+                      </sc-for>
+                    </select>
+                    <span style="display:block;margin-top:6px;font-size:12px;line-height:18px;color:rgb(94,94,94)">La pièce choisie sort du stock et passe en « Offerte ».</span>
+                  </label>
+                </sc-if>
+                <label style="display:block;font-size:13px;color:rgb(70,70,70)">Précision <span style="color:rgb(94,94,94)">(facultatif)</span>
+                  <textarea value="{{ savForm.note }}" onChange="{{ setSav.note }}" rows="3" placeholder="Ex. fermoir à remplacer, devis envoyé le…" style="margin-top:8px;width:100%;padding:14px 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0);resize:vertical;font-family:var(--font-body);font-size:15px;line-height:22px"></textarea>
+                </label>
+                <div><x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="primary" dc-props="{{ btnUpperSm }}" hint-size="auto,46px">Ajouter au suivi</x-import></div>
+              </form>
+
+              <div style="margin-top:26px">
+                <sc-for list="{{ ownerSav }}" as="e" hint-placeholder-count="2">
+                  <div style="padding:14px 0;border-top:1px solid rgba(0,0,0,.1)">
+                    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+                      <span style="display:inline-block;white-space:nowrap;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ e.statutBg }};color:{{ e.statutFg }};box-shadow:{{ e.statutShadow }}">{{ e.statutLabel }}</span>
+                      <span style="font-size:12px;color:rgb(94,94,94)">{{ e.dateLabel }}</span>
+                    </div>
+                    <sc-if value="{{ e.note }}"><p style="margin:10px 0 0;font-size:14px;line-height:21px;color:rgb(0,0,0)">{{ e.note }}</p></sc-if>
+                    <sc-if value="{{ e.replacementLabel }}">
+                      <p style="margin:8px 0 0;font-size:13px;color:rgb(70,70,70)">Remplacée par <button type="button" onClick="{{ e.openReplacement }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);text-align:left;font-family:inherit">{{ e.replacementLabel }}</button></p>
+                    </sc-if>
+                    <div style="display:flex;justify-content:space-between;gap:12px;margin-top:8px">
+                      <span style="font-size:12px;color:rgb(94,94,94)">Ajouté par {{ e.auteur }}</span>
+                      <button type="button" onClick="{{ e.remove }}" aria-label="{{ e.removeAria }}" style="background:none;border:0;padding:0;color:rgb(94,94,94);cursor:pointer;font-size:12px;border-bottom:1px solid rgba(0,0,0,.3)">Retirer</button>
+                    </div>
+                  </div>
+                </sc-for>
+                <sc-if value="{{ noSav }}">
+                  <p style="margin:0;padding-top:14px;border-top:1px solid rgba(0,0,0,.1);font-size:13px;color:rgb(94,94,94)">Aucun évènement pour le moment.</p>
+                </sc-if>
+              </div>
+            </div>
           </div>
         </sc-if>
 
@@ -769,19 +1072,30 @@ const ICONS = {
   orders: '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1"><path d="M2 6h16l-1.4 11H3.4L2 6Z"></path><path d="M6.5 6V4a3.5 3.5 0 0 1 7 0v2"></path></svg>',
   team: '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1"><circle cx="7" cy="6" r="3"></circle><circle cx="15" cy="7" r="2.4"></circle><path d="M1.5 17c0-3.3 2.5-5.2 5.5-5.2s5.5 1.9 5.5 5.2M13 12.5c2.4.2 4 1.7 4 4.5"></path></svg>'
 };
+// Le statut stocké ne contient jamais « vendue » pour une pièce passée par une vente :
+// « Vendue » est calculé à partir des commandes non annulées (voir effStatut).
 const SEED_PIECES = [
-  {id:'p1', modele:'Huperano', coloris:'Cuir naturel & bordeaux', serie:'CS-0042-2026', code:'8F3K-22QD', matiere:'Cuir de vachette, tannage végétal', dateFab:'2026-03-12', statut:'vendue'},
-  {id:'p2', modele:'Radah', coloris:'Bordeaux', serie:'CS-0043-2026', code:'2LK9-77RT', matiere:'Cuir bordeaux, doublure daim', dateFab:'2026-03-20', statut:'disponible'},
-  {id:'p3', modele:'Nafi', coloris:'Cuir naturel', serie:'CS-0044-2026', code:'9QW1-40MZ', matiere:'Cuir naturel patiné à la main', dateFab:'2026-04-02', statut:'disponible'},
-  {id:'p4', modele:'Sikadi', coloris:'Cuir grainé', serie:'CS-0045-2026', code:'5TY6-88XP', matiere:'Cuir grainé, ferrures bronze', dateFab:'2026-04-15', statut:'disponible'},
-  {id:'p5', modele:'Ayaba', coloris:'Cuir tressé', serie:'CS-0046-2026', code:'3JH2-19CV', matiere:'Cuir tressé, pièce d\'atelier', dateFab:'2026-05-01', statut:'bientot'},
-  {id:'p6', modele:'Wèlè', coloris:'Cuir souple', serie:'CS-0047-2026', code:'6RF8-33NB', matiere:'Cuir souple, fermoir aimanté', dateFab:'2026-05-10', statut:'disponible'}
+  {id:'p1', reference:'HUP', modele:'Huperano', coloris:'Cuir naturel & bordeaux', serie:'CS-0042-2026', code:'8F3K-22QD', matiere:'Cuir de vachette, tannage végétal', dateFab:'2026-03-12', prix:420000, statut:'disponible', sav:[]},
+  {id:'p2', reference:'RAD', modele:'Radah', coloris:'Bordeaux', serie:'CS-0043-2026', code:'2LK9-77RT', matiere:'Cuir bordeaux, doublure daim', dateFab:'2026-03-20', prix:380000, statut:'disponible', sav:[]},
+  {id:'p3', reference:'NAF', modele:'Nafi', coloris:'Cuir naturel', serie:'CS-0044-2026', code:'9QW7-4XMZ', matiere:'Cuir naturel patiné à la main', dateFab:'2026-04-02', prix:300000, statut:'disponible', sav:[]},
+  {id:'p4', reference:'SIK', modele:'Sikadi', coloris:'Cuir grainé', serie:'CS-0045-2026', code:'5TY6-88XP', matiere:'Cuir grainé, ferrures bronze', dateFab:'2026-04-15', prix:510000, statut:'disponible', sav:[]},
+  {id:'p5', reference:'AYA', modele:'Ayaba', coloris:'Cuir tressé', serie:'CS-0046-2026', code:'3JH2-K9CV', matiere:'Cuir tressé, pièce d\'atelier', dateFab:'2026-05-01', prix:450000, statut:'bientot', sav:[]},
+  {id:'p6', reference:'WEL', modele:'Wèlè', coloris:'Cuir souple', serie:'CS-0047-2026', code:'6RF8-33NB', matiere:'Cuir souple, fermoir aimanté', dateFab:'2026-05-10', prix:340000, statut:'disponible', sav:[]},
+  {id:'p7', reference:'SIK', modele:'Sikadi', coloris:'Cuir grainé', serie:'CS-0038-2026', code:'4MW2-T7HD', matiere:'Cuir grainé, ferrures bronze', dateFab:'2026-02-10', prix:510000, statut:'disponible', sav:[]},
+  {id:'p8', reference:'NAF', modele:'Nafi', coloris:'Cuir naturel', serie:'CS-0031-2026', code:'Q8ZN-25RA', matiere:'Cuir naturel patiné à la main', dateFab:'2026-01-20', prix:300000, statut:'disponible', sav:[
+    {id:'s1', type:'en_reparation', date:'2026-09-02', note:'Couture de l\'anse à reprendre, pièce reçue à l\'atelier.', auteur:'Michelle Kouassi', replacementId:''},
+    {id:'s2', type:'reparee', date:'2026-09-18', note:'Anse recousue à la main, renvoyée à la cliente.', auteur:'Michelle Kouassi', replacementId:''}
+  ]},
+  {id:'p9', reference:'HUP', modele:'Huperano', coloris:'Toile et cuir naturel', serie:'CS-0001-2026', code:'PR7T-0TY9', matiere:'Prototype d\'atelier — toile, cuir naturel', dateFab:'2025-11-05', prix:'', statut:'prototype', sav:[]},
+  {id:'p10', reference:'RAD', modele:'Radah', coloris:'Bordeaux', serie:'CS-0039-2026', code:'G4FT-8WKE', matiere:'Cuir bordeaux, doublure daim', dateFab:'2026-02-14', prix:380000, statut:'offerte', sav:[]}
 ];
+// Chaque commande, en ligne ou hors site, désigne les pièces vendues par leur id.
 const SEED_ORDERS = [
-  {id:'o1', no:'#CS-2026-9482', client:'Awa Koné', email:'awa.kone@exemple.ci', items:'Huperano ×1', total:420000, date:'2 septembre 2026', mode:'Retrait boutique — Riviéra CIAD', statut:'livree', tracking:''},
-  {id:'o2', no:'#CS-2026-9120', client:'Marie Lefèvre', email:'marie.lefevre@exemple.fr', items:'Radah ×1, Nafi ×1', total:680000, date:'14 juillet 2026', mode:'Livraison à domicile', statut:'preparation', tracking:''},
-  {id:'o3', no:'#CS-2026-9051', client:'Fatou Diop', email:'fatou.diop@exemple.sn', items:'Sikadi ×1', total:510000, date:'2 juillet 2026', mode:'Livraison à domicile', statut:'expediee', tracking:'EXP-4471-SN'},
-  {id:'o4', no:'#CS-2026-8990', client:'Julien Petit', email:'julien.petit@exemple.fr', items:'Wèlè ×1', total:340000, date:'20 juin 2026', mode:'Retrait boutique — Cocody Angré', statut:'annulee', tracking:''}
+  {id:'o5', no:'#CS-2026-9530', canal:'en_ligne', evenement:'', client:'Koffi Yao', email:'koffi.yao@exemple.ci', telephone:'', pieceIds:['p2'], total:380000, dateIso:'2026-09-21', mode:'Livraison à domicile', paiement:'Mobile Money', statut:'preparation', tracking:'', note:''},
+  {id:'o1', no:'#CS-2026-9482', canal:'en_ligne', evenement:'', client:'Awa Koné', email:'awa.kone@exemple.ci', telephone:'', pieceIds:['p1'], total:420000, dateIso:'2026-09-02', mode:'Livraison à domicile', paiement:'Carte bancaire', statut:'livree', tracking:'CIP-2093-AB', note:''},
+  {id:'o2', no:'#CS-2026-9120', canal:'en_ligne', evenement:'', client:'Marie Lefèvre', email:'marie.lefevre@exemple.fr', telephone:'', pieceIds:['p7'], total:510000, dateIso:'2026-07-14', mode:'Livraison internationale', paiement:'Carte bancaire', statut:'livree', tracking:'DHL-5521-FR', note:''},
+  {id:'o3', no:'#CS-2026-9051', canal:'popup', evenement:'Pop-up Dakar — Almadies', client:'Fatou Diop', email:'fatou.diop@exemple.sn', telephone:'+221 77 000 00 00', pieceIds:['p8'], total:300000, dateIso:'2026-07-02', mode:'Remise en main propre', paiement:'Espèces', statut:'livree', tracking:'', note:''},
+  {id:'o4', no:'#CS-2026-8990', canal:'en_ligne', evenement:'', client:'Julien Petit', email:'julien.petit@exemple.fr', telephone:'', pieceIds:['p6'], total:340000, dateIso:'2026-06-20', mode:'Livraison à domicile', paiement:'Carte bancaire', statut:'annulee', tracking:'', note:'Annulée à la demande du client avant expédition.'}
 ];
 const ROLES = [
   {key:'direction', label:'Direction', acces:'Accès complet, création des comptes et paramètres généraux', neVoitPas:'—'},
@@ -807,14 +1121,14 @@ const INVITE_DAYS = 7;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const SEED_AUDIT = [
   {date:'21 sept. 2026 — 09:12', auteur:'Carole Sessegnon', action:'Consultation du code d\'activation — CS-0042-2026'},
-  {date:'20 sept. 2026 — 17:40', auteur:'Issa Traoré', action:'Code de suivi saisi — commande #CS-2026-9051'},
+  {date:'20 sept. 2026 — 17:40', auteur:'Issa Traoré', action:'Code de suivi saisi — commande #CS-2026-9120'},
   {date:'19 sept. 2026 — 11:05', auteur:'Michelle Kouassi', action:'Pièce créée — Wèlè, CS-0047-2026'},
   {date:'18 sept. 2026 — 08:50', auteur:'Aya Bamba', action:'Remboursement initié — commande #CS-2026-8990'}
 ];
 const SEED_OWNERS = [
-  {pieceId:'p1', piece:'Huperano — CS-0042-2026', owner:'Awa Koné', email:'awa.kone@exemple.ci', pays:"Côte d'Ivoire", date:'2 septembre 2026'},
-  {pieceId:'p7', piece:'Sikadi — CS-0038-2026', owner:'Marie Lefèvre', email:'marie.lefevre@exemple.fr', pays:'France', date:'28 août 2026'},
-  {pieceId:'p8', piece:'Nafi — CS-0031-2026', owner:'Fatou Diop', email:'fatou.diop@exemple.sn', pays:'Sénégal', date:'19 août 2026'}
+  {id:'w1', pieceId:'p1', owner:'Awa Koné', email:'awa.kone@exemple.ci', pays:"Côte d'Ivoire", date:'2 septembre 2026'},
+  {id:'w2', pieceId:'p7', owner:'Marie Lefèvre', email:'marie.lefevre@exemple.fr', pays:'France', date:'28 août 2026'},
+  {id:'w3', pieceId:'p8', owner:'Fatou Diop', email:'fatou.diop@exemple.sn', pays:'Sénégal', date:'19 août 2026'}
 ];
 
 // Un seul jeu de badges pour tout le back-office :
@@ -825,8 +1139,14 @@ const BADGE = {
   done:     {statutBg:'rgba(71,29,27,.1)',     statutFg:'rgb(71,29,27)',   statutShadow:'none'},
   alert:    {statutBg:'rgba(155,24,33,.08)',   statutFg:'rgb(155,24,33)',  statutShadow:'none'}
 };
-const STATUT_LABEL = {disponible:'Disponible', vendue:'Vendue', bientot:'Bientôt disponible'};
-const STATUT_KIND = {disponible:'progress', vendue:'done', bientot:'neutral'};
+const STATUT_LABEL = {disponible:'Disponible', vendue:'Vendue', bientot:'Bientôt disponible', prototype:'Prototype', offerte:'Offerte'};
+const STATUT_KIND = {disponible:'progress', vendue:'done', bientot:'neutral', prototype:'neutral', offerte:'done'};
+const CANAL_LABEL = {en_ligne:'En ligne', popup:'Pop-up', directe:'Vente directe'};
+const SAV_LABEL = {en_reparation:'En réparation', reparee:'Réparée', irreparable:'Irréparable', remplacee:'Remplacée', remboursee:'Remboursée', restituee:'Restituée'};
+const SAV_KIND = {en_reparation:'progress', reparee:'done', irreparable:'alert', remplacee:'neutral', remboursee:'neutral', restituee:'neutral'};
+// Nomenclature des identifiants : n° de série CS-<n° d'ordre sur 4 chiffres>-<année de fabrication>,
+// code d'activation aléatoire XXXX-XXXX sans caractères ambigus (0/O, 1/I).
+const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 const ORDER_STATUT_LABEL = {preparation:'En préparation', expediee:'Expédiée', livree:'Livrée', annulee:'Annulée'};
 const ORDER_STATUT_KIND = {preparation:'neutral', expediee:'progress', livree:'done', annulee:'alert'};
 const TEAM_STATUT_LABEL = {actif:'Actif', invite:'Invitation envoyée', expiree:'Invitation expirée', desactive:'Désactivé'};
@@ -857,6 +1177,29 @@ const newToken = () => Math.random().toString(36).slice(2, 10) + Date.now().toSt
 const inviteLink = token => location.href.split('#')[0] + '#invitation=' + token;
 const isExpired = t => t.statut==='invite' && !!t.expiresAt && t.expiresAt < isoToday();
 const displayName = t => t.nom || t.email || 'Collaborateur sans nom';
+const fmtFcfa = n => (n===''||n===null||n===undefined||isNaN(Number(n))) ? '—' : fmtNumber(Math.round(Number(n))) + ' FCFA';
+const yearOf = iso => (iso && /^\d{4}/.test(iso)) ? iso.slice(0,4) : String(new Date().getFullYear());
+const refFromModele = m => (m || '').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^A-Za-z]/g, '').slice(0, 3).toUpperCase();
+const nextSerie = (pieces, iso) => {
+  const max = pieces.reduce((m, p) => { const x = /^CS-(\d{4})-/.exec(p.serie || ''); return x ? Math.max(m, Number(x[1])) : m; }, 0);
+  return 'CS-' + String(max + 1).padStart(4, '0') + '-' + yearOf(iso);
+};
+const genCode = pieces => {
+  const used = new Set(pieces.map(p => (p.code || '').toUpperCase()));
+  for (;;) {
+    let raw = '';
+    try {
+      const buf = new Uint32Array(8); crypto.getRandomValues(buf);
+      buf.forEach(v => { raw += CODE_ALPHABET[v % CODE_ALPHABET.length]; });
+    } catch (e) { for (let i = 0; i < 8; i++) raw += CODE_ALPHABET[Math.floor(Math.random() * CODE_ALPHABET.length)]; }
+    const code = raw.slice(0, 4) + '-' + raw.slice(4);
+    if (!used.has(code)) return code;
+  }
+};
+// Une pièce est « Vendue » dès qu'une commande non annulée la contient, quel que soit le canal.
+const saleOf = (pieceId, orders) => orders.find(o => o.statut!=='annulee' && (o.pieceIds || []).includes(pieceId));
+const effStatut = (p, orders) => saleOf(p.id, orders) ? 'vendue' : p.statut;
+const pieceLabel = p => p ? (p.modele || 'Pièce sans nom') + ' — ' + (p.serie || 'sans n°') : 'Pièce introuvable';
 const nowLabel = () => {
   const d = new Date();
   return d.toLocaleDateString('fr-FR', {day:'numeric', month:'short', year:'numeric'}) + ' — ' +
@@ -869,7 +1212,9 @@ class Component extends DCLogic {
     sidebarWide:true, isMobile:false, navOpen:false,
     pieces:SEED_PIECES, owners:SEED_OWNERS, orders:SEED_ORDERS, team:SEED_TEAM, audit:SEED_AUDIT,
     search:'', statutFilter:'tous', sortBy:'recent', registreOpen:false,
-    ownerSearch:'', orderSearch:'', orderStatutFilter:'tous',
+    ownerSearch:'', orderSearch:'', orderStatutFilter:'tous', canalFilter:'tous',
+    vente:null, venteErr:{}, venteSearch:'',
+    viewOwnerId:null, savForm:this._emptySav(),
     teamTab:'membres', auditSearch:'', auditAuteur:'tous',
     viewOrderId:null, orderDraft:{statut:'', tracking:''},
     editId:null, form:this._emptyForm(), fieldErr:{}, codeRevealed:false,
@@ -940,7 +1285,9 @@ class Component extends DCLogic {
     clearTimeout(this._flashT);
   }
 
-  _emptyForm(){ return {modele:'', coloris:'', serie:'', code:'', matiere:'', dateFab:'', statut:'disponible'}; }
+  _emptyForm(){ return {modele:'', coloris:'', reference:'', prix:'', serie:'', code:'', matiere:'', dateFab:'', statut:'disponible', autoIds:false}; }
+  _emptySav(){ return {type:'en_reparation', date:isoToday(), note:'', replacementId:''}; }
+  _emptyVente(){ return {canal:'popup', date:isoToday(), evenement:'', pieceIds:[], client:'', email:'', telephone:'', montant:'', paiement:'Espèces', note:''}; }
 
   go(route, extra){
     this.setState(Object.assign({route, navOpen:false, registreOpen:false}, extra||{}));
@@ -1024,7 +1371,10 @@ class Component extends DCLogic {
     const serie = f.serie.trim();
     if (serie && !SERIE_RE.test(serie)) err.serie = 'Format attendu : CS-0000-2026.';
     else if (serie && this.state.pieces.some(p => p.serie===serie && p.id!==this.state.editId)) err.serie = 'Ce numéro de série est déjà attribué à une autre pièce.';
-    if (f.code.trim() && !CODE_RE.test(f.code.trim().toUpperCase())) err.code = 'Format attendu : 4 caractères, un tiret, 4 caractères (ex. 8F3K-22QD).';
+    const code = f.code.trim().toUpperCase();
+    if (code && !CODE_RE.test(code)) err.code = 'Format attendu : 4 caractères, un tiret, 4 caractères (ex. 8F3K-22QD).';
+    else if (code && this.state.pieces.some(p => (p.code||'').toUpperCase()===code && p.id!==this.state.editId)) err.code = 'Ce code est déjà attribué à une autre pièce.';
+    if (String(f.prix).trim()!=='' && !(Number(f.prix) >= 0)) err.prix = 'Indiquez un montant en FCFA (chiffres uniquement).';
     return err;
   }
 
@@ -1039,16 +1389,21 @@ class Component extends DCLogic {
 
     // Pièces
     const ownerOf = id => s.owners.find(o => o.pieceId===id);
-    const decPieces = s.pieces.map(p => ({
-      ...p, slot:'bo-p-' + p.id, ...BADGE[STATUT_KIND[p.statut]],
-      statutLabel:STATUT_LABEL[p.statut], dateFabLabel:fmtIsoDate(p.dateFab),
-      editLabel:'Modifier ' + p.modele + ' ' + p.serie,
-      open: () => this.go('piece-form', {editId:p.id, form:Object.assign({}, p), fieldErr:{}, codeRevealed:false})
-    }));
+    const pieceById = id => s.pieces.find(p => p.id===id);
+    const openPiece = p => this.go('piece-form', {editId:p.id, form:Object.assign(this._emptyForm(), p, {prix: p.prix===undefined ? '' : p.prix}), fieldErr:{}, codeRevealed:false});
+    const decPieces = s.pieces.map(p => {
+      const eff = effStatut(p, s.orders);
+      return {...p, eff, slot:'bo-p-' + p.id, ...BADGE[STATUT_KIND[eff] || 'neutral'],
+        statutLabel:STATUT_LABEL[eff] || eff, dateFabLabel:fmtIsoDate(p.dateFab),
+        prixLabel: fmtFcfa(p.prix),
+        refLabel: [p.reference, p.coloris].filter(Boolean).join(' · '),
+        editLabel:'Modifier ' + p.modele + ' ' + p.serie,
+        open: () => openPiece(p)};
+    });
     const q = s.search.trim().toLowerCase();
     let filteredPieces = decPieces.filter(p =>
-      (!q || (p.modele+' '+p.serie+' '+p.matiere).toLowerCase().includes(q)) &&
-      (s.statutFilter==='tous' || p.statut===s.statutFilter));
+      (!q || (p.modele+' '+p.serie+' '+p.matiere+' '+(p.reference||'')).toLowerCase().includes(q)) &&
+      (s.statutFilter==='tous' || p.eff===s.statutFilter));
     filteredPieces = filteredPieces.slice().sort((a,b) =>
       s.sortBy==='serie' ? a.serie.localeCompare(b.serie) :
       s.sortBy==='ancien' ? (a.dateFab||'').localeCompare(b.dateFab||'') :
@@ -1057,26 +1412,67 @@ class Component extends DCLogic {
     const isEditing = !!s.editId;
     const ownerForForm = isEditing ? ownerOf(s.editId) : null;
     const fieldErr = s.fieldErr || {};
-    const fieldKeys = ['modele','serie','code'];
+    const fieldKeys = ['modele','serie','code','prix'];
     const fieldShadow = {}, fieldInvalid = {};
     fieldKeys.forEach(k => { fieldShadow[k] = fieldErr[k] ? FIELD_ERR : FIELD_OK; fieldInvalid[k] = !!fieldErr[k]; });
 
-    // Propriétaires
-    const oq = s.ownerSearch.trim().toLowerCase();
-    const filteredOwners = oq ? s.owners.filter(o => (o.owner+' '+o.piece+' '+o.email).toLowerCase().includes(oq)) : s.owners;
-
-    // Commandes
-    const decOrders = s.orders.map(o => ({
-      ...o, ...BADGE[ORDER_STATUT_KIND[o.statut]], statutLabel:ORDER_STATUT_LABEL[o.statut],
-      totalLabel: fmtNumber(o.total) + ' FCFA',
-      trackingLabel: o.tracking || '—',
-      detailLabel: 'Détail de la commande ' + o.no,
-      open: () => this.go('commande-detail', {viewOrderId:o.id, orderDraft:{statut:o.statut, tracking:o.tracking||''}})
-    }));
+    // Commandes (en ligne et hors site, même suivi)
+    const openOrder = o => this.go('commande-detail', {viewOrderId:o.id, orderDraft:{statut:o.statut, tracking:o.tracking||''}});
+    const decOrders = s.orders.slice().sort((a,b) => (b.dateIso||'').localeCompare(a.dateIso||'')).map(o => {
+      const ps = (o.pieceIds || []).map(pieceById);
+      const items = ps.map(p => p ? p.modele + ' (' + p.serie + ')' : 'Pièce supprimée').join(', ') || '—';
+      const canalLabel = CANAL_LABEL[o.canal] || 'En ligne';
+      return {...o, ...BADGE[ORDER_STATUT_KIND[o.statut]], statutLabel:ORDER_STATUT_LABEL[o.statut],
+        items, canalLabel, isOnline: o.canal==='en_ligne',
+        kindLabel: o.canal==='en_ligne' ? 'Commande en ligne' : 'Vente hors site',
+        clientLabel: o.client || 'Client non renseigné',
+        clientLine: (o.client || 'Client non renseigné') + ' · ' + canalLabel,
+        totalLabel: fmtFcfa(o.total), dateLabel: fmtIsoDate(o.dateIso),
+        paiementLabel: o.paiement || '—',
+        trackingLabel: o.tracking || '—',
+        detailLabel: 'Détail de la commande ' + o.no,
+        pieces: ps.filter(Boolean).map(p => ({label: pieceLabel(p), open: () => openPiece(p)})),
+        open: () => openOrder(o)};
+    });
     const oSq = s.orderSearch.trim().toLowerCase();
     const filteredOrders = decOrders.filter(o =>
-      (!oSq || (o.no+' '+o.client+' '+o.items).toLowerCase().includes(oSq)) &&
+      (!oSq || (o.no+' '+o.client+' '+o.items+' '+(o.evenement||'')).toLowerCase().includes(oSq)) &&
+      (s.canalFilter==='tous' || o.canal===s.canalFilter) &&
       (s.orderStatutFilter==='tous' || o.statut===s.orderStatutFilter));
+
+    // Propriétaires et suivi après-vente (l'historique est porté par la pièce)
+    const decSav = (p, e) => ({...e, ...BADGE[SAV_KIND[e.type] || 'neutral'], statutLabel:SAV_LABEL[e.type] || e.type,
+      dateLabel: fmtIsoDate(e.date),
+      replacementLabel: e.replacementId ? pieceLabel(pieceById(e.replacementId)) : '',
+      openReplacement: () => { const r = pieceById(e.replacementId); if (r) openPiece(r); },
+      removeAria: 'Retirer l\'évènement ' + (SAV_LABEL[e.type] || '') + ' du ' + fmtIsoDate(e.date),
+      remove: () => this.askConfirm({
+        title:'Retirer cet évènement\u00a0?',
+        body:'« ' + (SAV_LABEL[e.type] || e.type) + ' » du ' + fmtIsoDate(e.date) + ' sera retiré du suivi de ' + pieceLabel(p) + '.',
+        okLabel:'Retirer', cancelLabel:'Garder',
+        onOk: () => {
+          this.setState(st => ({pieces: st.pieces.map(x => x.id===p.id ? Object.assign({}, x, {sav:(x.sav||[]).filter(y => y.id!==e.id)}) : x)}));
+          this.logAudit('Après-vente retiré — ' + pieceLabel(p) + ' : ' + (SAV_LABEL[e.type] || e.type));
+          this.showFlash('Évènement retiré du suivi.');
+        }
+      })});
+    const savSorted = p => (p && p.sav ? p.sav.slice() : []).sort((a,b) => (b.date||'').localeCompare(a.date||'') || (b.id||'').localeCompare(a.id||''));
+    const decOwners = s.owners.map(o => {
+      const p = pieceById(o.pieceId);
+      const last = savSorted(p)[0];
+      const sale = p ? saleOf(p.id, s.orders) : null;
+      return {...o, piece:p,
+        pieceLabel: p ? pieceLabel(p) : (o.piece || 'Pièce introuvable'),
+        pieceAria: 'Ouvrir la pièce ' + (p ? pieceLabel(p) : ''),
+        openAria: 'Ouvrir la fiche de ' + o.owner,
+        hasSav: !!last, noSav: !last, sav: last ? decSav(p, last) : {},
+        sale,
+        open: () => this.go('proprietaire', {viewOwnerId:o.id, savForm:this._emptySav()}),
+        openPiece: e => { if (e && e.stopPropagation) e.stopPropagation(); if (p) openPiece(p); }};
+    });
+    const oq = s.ownerSearch.trim().toLowerCase();
+    const filteredOwners = oq ? decOwners.filter(o => (o.owner+' '+o.pieceLabel+' '+o.email+' '+o.pays).toLowerCase().includes(oq)) : decOwners;
+    const viewOwnerRaw = decOwners.find(o => o.id===s.viewOwnerId);
     const viewOrder = decOrders.find(o => o.id===s.viewOrderId);
     const orderDirty = !!viewOrder && (s.orderDraft.statut!==viewOrder.statut || s.orderDraft.tracking.trim()!==(viewOrder.tracking||''));
 
@@ -1087,7 +1483,8 @@ class Component extends DCLogic {
       {key:'proprietaires', label:'Propriétaires', icon:'owners'},
       {key:'equipe', label:'Équipe', icon:'team'}
     ];
-    const activeNav = s.route==='piece-form' ? 'pieces' : (s.route==='commande-detail' ? 'commandes' : s.route);
+    const NAV_PARENT = {'piece-form':'pieces', 'commande-detail':'commandes', 'vente-form':'commandes', 'proprietaire':'proprietaires'};
+    const activeNav = NAV_PARENT[s.route] || s.route;
 
     const activeDirection = s.team.filter(t => t.role==='direction' && t.statut==='actif').length;
 
@@ -1170,13 +1567,21 @@ class Component extends DCLogic {
       isCommandes: s.route==='commandes',
       isCommandeDetail: s.route==='commande-detail',
       isEquipe: s.route==='equipe',
+      isVenteForm: s.route==='vente-form',
+      isProprietaire: s.route==='proprietaire' && !!viewOwnerRaw,
       goPieces: () => this.go('pieces'),
       goCommandes: () => this.go('commandes'),
       goProprietaires: () => this.go('proprietaires'),
 
-      crumb: s.route==='piece-form' ? 'Pièces' : (s.route==='commande-detail' ? 'Commandes' : ''),
-      crumbGo: () => this.go(s.route==='piece-form' ? 'pieces' : 'commandes'),
-      pageTitle: s.route==='dashboard' ? 'Tableau de bord' : (s.route==='pieces' ? 'Pièces' : (s.route==='piece-form' ? (isEditing ? 'Modifier la pièce' : 'Ajouter une pièce') : (s.route==='commandes' ? 'Commandes' : (s.route==='commande-detail' ? (viewOrder ? viewOrder.no : 'Commande') : (s.route==='equipe' ? 'Équipe et accès' : 'Propriétaires'))))),
+      crumb: ({'piece-form':'Pièces', 'commande-detail':'Commandes', 'vente-form':'Commandes', 'proprietaire':'Propriétaires'})[s.route] || '',
+      crumbGo: () => this.go(NAV_PARENT[s.route] || 'dashboard'),
+      pageTitle: ({
+        dashboard:'Tableau de bord', pieces:'Pièces', commandes:'Commandes', equipe:'Équipe et accès', proprietaires:'Propriétaires',
+        'piece-form': isEditing ? 'Modifier la pièce' : 'Ajouter une pièce',
+        'commande-detail': viewOrder ? viewOrder.no : 'Commande',
+        'vente-form': 'Enregistrer une vente',
+        'proprietaire': viewOwnerRaw ? viewOwnerRaw.owner : 'Propriétaire'
+      })[s.route] || 'Administration',
 
       // Équipe
       team: s.team.map(t => {
@@ -1287,10 +1692,17 @@ class Component extends DCLogic {
       // Commandes
       orderSearch: s.orderSearch, setOrderSearch: e => this.setState({orderSearch:e.target.value}),
       orderStatutFilter: s.orderStatutFilter, setOrderStatutFilter: e => this.setState({orderStatutFilter:e.target.value}),
+      canalFilter: s.canalFilter, setCanalFilter: e => this.setState({canalFilter:e.target.value}),
       filteredOrders, noOrders: filteredOrders.length===0,
+      ordersCount: (() => {
+        const horsSite = s.orders.filter(o => o.canal!=='en_ligne').length;
+        const base = filteredOrders.length===s.orders.length ? s.orders.length + ' commandes' : filteredOrders.length + ' sur ' + s.orders.length + ' commandes';
+        return base + ' · dont ' + horsSite + ' hors site';
+      })(),
       exportOrdersCsv: () => this.downloadCsv('commandes-carole-sessegnon.csv',
-        [['N° de commande','Client','E-mail','Articles','Total','Date','Mode de réception','Code de suivi','Statut']]
-          .concat(s.orders.map(o => [o.no,o.client,o.email,o.items,o.total,o.date,o.mode,o.tracking||'',ORDER_STATUT_LABEL[o.statut]]))),
+        [['N° de commande','Canal','Événement','Client','E-mail','Téléphone','Pièces','Total (FCFA)','Date','Paiement','Réception','Code de suivi','Statut']]
+          .concat(decOrders.map(o => [o.no,o.canalLabel,o.evenement||'',o.client||'',o.email||'',o.telephone||'',o.items,o.total,o.dateIso,o.paiement||'',o.mode||'',o.tracking||'',ORDER_STATUT_LABEL[o.statut]]))),
+      openVente: () => this.go('vente-form', {vente:this._emptyVente(), venteErr:{}, venteSearch:''}),
       viewOrder: viewOrder || {},
       orderDraft: s.orderDraft,
       orderDirty, orderUnchanged: !orderDirty,
@@ -1303,16 +1715,28 @@ class Component extends DCLogic {
         if (!orderDirty) return;
         const d = {statut:s.orderDraft.statut, tracking:s.orderDraft.tracking.trim()};
         const o = viewOrder;
+        const piecesTxt = o.pieces.map(x => x.label).join(', ');
+        // Réactiver une commande annulée : ses pièces ne doivent pas avoir été revendues entre-temps.
+        if (o.statut==='annulee' && d.statut!=='annulee') {
+          const taken = (o.pieceIds||[]).map(pieceById).filter(p => p && (saleOf(p.id, s.orders) || p.statut!=='disponible'));
+          if (taken.length) {
+            this.askConfirm({title:'Réactivation impossible', cancelLabel:'Compris',
+              body:'Ces pièces ne sont plus disponibles (vendues ailleurs ou retirées de la vente) : ' + taken.map(pieceLabel).join(', ') + '.'});
+            return;
+          }
+        }
         const apply = () => {
           this.setState(st => ({orders: st.orders.map(x => x.id===o.id ? Object.assign({}, x, d) : x)}));
-          if (d.statut!==o.statut) this.logAudit('Statut modifié — commande ' + o.no + ' : ' + ORDER_STATUT_LABEL[o.statut] + ' → ' + ORDER_STATUT_LABEL[d.statut]);
+          if (d.statut==='annulee' && o.statut!=='annulee') this.logAudit('Commande annulée — ' + o.no + ' : pièces remises en stock (' + piecesTxt + ')');
+          else if (o.statut==='annulee' && d.statut!=='annulee') this.logAudit('Commande réactivée — ' + o.no + ' : pièces repassées en « Vendue » (' + piecesTxt + ')');
+          else if (d.statut!==o.statut) this.logAudit('Statut modifié — commande ' + o.no + ' : ' + ORDER_STATUT_LABEL[o.statut] + ' → ' + ORDER_STATUT_LABEL[d.statut]);
           if (d.tracking!==(o.tracking||'')) this.logAudit('Code de suivi saisi — commande ' + o.no);
           this.showFlash('Commande ' + o.no + ' mise à jour.');
         };
         if (d.statut==='annulee' && o.statut!=='annulee') {
           this.askConfirm({
             title:'Annuler cette commande\u00a0?',
-            body:'La commande ' + o.no + ' de ' + o.client + ' (' + o.totalLabel + ') passera en « Annulée ». Le remboursement éventuel reste à initier séparément.',
+            body:'La commande ' + o.no + ' (' + o.clientLabel + ', ' + o.totalLabel + ') passera en « Annulée » et ' + (o.pieces.length>1 ? 'ses pièces repasseront' : 'sa pièce repassera') + ' en « Disponible » : ' + piecesTxt + '. Le remboursement éventuel reste à faire séparément.',
             okLabel:'Annuler la commande', cancelLabel:'Retour',
             onOk: apply
           });
@@ -1321,18 +1745,130 @@ class Component extends DCLogic {
         apply();
       },
 
+      // Vente hors site
+      vente: s.vente || {},
+      setVente: Object.fromEntries(Object.keys(this._emptyVente()).filter(k => k!=='pieceIds').map(key => [key, e => {
+        const v = e.target.value;
+        this.setState(st => {
+          const ve = Object.assign({}, st.venteErr); delete ve[key];
+          return {vente:Object.assign({}, st.vente, {[key]:v}), venteErr:ve};
+        });
+      }])),
+      venteSearch: s.venteSearch, setVenteSearch: e => this.setState({venteSearch:e.target.value}),
+      ...(() => {
+        const v = s.vente || this._emptyVente();
+        const ve = s.venteErr || {};
+        const vq = s.venteSearch.trim().toLowerCase();
+        const avail = decPieces.filter(p => p.eff==='disponible');
+        const list = avail.filter(p => v.pieceIds.includes(p.id) || !vq || (p.modele+' '+p.serie+' '+(p.reference||'')).toLowerCase().includes(vq));
+        const selected = v.pieceIds.map(id => decPieces.find(p => p.id===id)).filter(Boolean);
+        const suggested = selected.reduce((t,p) => t + (Number(p.prix) || 0), 0);
+        const total = String(v.montant).trim()!=='' ? Number(v.montant) : suggested;
+        return {
+          ventePieces: list.map(p => ({...p, checked: v.pieceIds.includes(p.id),
+            bg: v.pieceIds.includes(p.id) ? 'rgb(255,251,248)' : 'rgb(255,255,255)',
+            sub: p.serie + (p.coloris ? ' · ' + p.coloris : ''),
+            toggle: () => this.setState(st => {
+              const ids = st.vente.pieceIds.includes(p.id) ? st.vente.pieceIds.filter(x => x!==p.id) : st.vente.pieceIds.concat([p.id]);
+              const err = Object.assign({}, st.venteErr); delete err.pieces;
+              return {vente:Object.assign({}, st.vente, {pieceIds:ids}), venteErr:err};
+            })})),
+          noVentePieces: list.length===0,
+          noVentePiecesText: avail.length ? 'Aucune pièce disponible ne correspond à ce filtre.' : 'Aucune pièce n\'est disponible à la vente dans le registre.',
+          ventePiecesShadow: ve.pieces ? 'inset 0 0 0 2px rgb(155,24,33)' : 'inset 0 0 0 1px rgba(0,0,0,.12)',
+          venteSelected: selected, venteNoneSelected: selected.length===0,
+          venteSuggested: suggested ? fmtNumber(suggested) : 'Ex. 420 000',
+          venteTotalLabel: fmtFcfa(isNaN(total) ? 0 : total),
+          venteErr: ve,
+          venteInvalid: {email:!!ve.email, montant:!!ve.montant},
+          venteShadow: {email: ve.email ? FIELD_ERR : FIELD_OK, montant: ve.montant ? FIELD_ERR : FIELD_OK},
+          saveVente: e => {
+            e.preventDefault();
+            const err = {};
+            const ids = v.pieceIds.filter(id => { const p = pieceById(id); return p && effStatut(p, s.orders)==='disponible'; });
+            if (!ids.length) err.pieces = 'Sélectionnez au moins une pièce vendue.';
+            if (v.email.trim() && !EMAIL_RE.test(v.email.trim())) err.email = 'Adresse e-mail invalide.';
+            if (String(v.montant).trim()!=='' && !(Number(v.montant) >= 0)) err.montant = 'Indiquez un montant en FCFA (chiffres uniquement).';
+            if (Object.keys(err).length) { this.setState({venteErr:err}); return; }
+            const year = yearOf(v.date || isoToday());
+            const maxNo = s.orders.reduce((m,o) => { const x = /(\d+)$/.exec(o.no || ''); return x ? Math.max(m, Number(x[1])) : m; }, 0);
+            const order = {id:'o' + Date.now(), no:'#CS-' + year + '-' + String(maxNo + 1).padStart(4,'0'),
+              canal:v.canal, evenement:v.evenement.trim(), client:v.client.trim(), email:v.email.trim(), telephone:v.telephone.trim(),
+              pieceIds:ids, total: String(v.montant).trim()!=='' ? Number(v.montant) : suggested, dateIso:v.date || isoToday(),
+              mode:'Remise en main propre', paiement:v.paiement, statut:'livree', tracking:'', note:v.note.trim()};
+            const labels = ids.map(id => pieceLabel(pieceById(id))).join(', ');
+            this.setState(st => ({orders: st.orders.concat([order])}));
+            this.logAudit('Vente hors site enregistrée — ' + order.no + ' (' + CANAL_LABEL[order.canal] + (order.evenement ? ', ' + order.evenement : '') + ') : ' + labels);
+            this.go('commande-detail', {viewOrderId:order.id, orderDraft:{statut:order.statut, tracking:''}, vente:null, venteErr:{}});
+            this.showFlash('Vente ' + order.no + ' enregistrée — ' + (ids.length>1 ? ids.length + ' pièces passées' : '1 pièce passée') + ' en « Vendue ».', 6000);
+          }
+        };
+      })(),
+
+      // Fiche propriétaire et suivi après-vente
+      viewOwner: (() => {
+        const o = viewOwnerRaw;
+        if (!o) return {};
+        const p = o.piece;
+        return {...o,
+          pieceSlot: p ? 'bo-p-' + p.id : 'bo-p-none', pieceModele: p ? p.modele : 'Pièce introuvable', pieceSerie: p ? p.serie : '',
+          hasOrder: !!o.sale, noOrder: !o.sale,
+          orderLabel: o.sale ? o.sale.no + ' · ' + (CANAL_LABEL[o.sale.canal] || '') : '',
+          openOrder: () => { if (o.sale) openOrder(o.sale); },
+          openPiece: () => { if (p) openPiece(p); }};
+      })(),
+      ownerSav: viewOwnerRaw && viewOwnerRaw.piece ? savSorted(viewOwnerRaw.piece).map(e => decSav(viewOwnerRaw.piece, e)) : [],
+      noSav: !(viewOwnerRaw && viewOwnerRaw.piece && (viewOwnerRaw.piece.sav||[]).length),
+      savForm: s.savForm,
+      setSav: Object.fromEntries(Object.keys(this._emptySav()).map(key => [key, e => {
+        const v = e.target.value; this.setState(st => ({savForm:Object.assign({}, st.savForm, {[key]:v})}));
+      }])),
+      savNeedsReplacement: s.savForm.type==='remplacee',
+      savReplacementOptions: decPieces.filter(p => p.eff==='disponible' && (!viewOwnerRaw || p.id!==viewOwnerRaw.pieceId))
+        .map(p => ({id:p.id, label:pieceLabel(p) + (p.coloris ? ' · ' + p.coloris : '')})),
+      addSav: e => {
+        e.preventDefault();
+        const o = viewOwnerRaw; if (!o || !o.piece) return;
+        const f = s.savForm;
+        const entry = {id:'s' + Date.now(), type:f.type, date:f.date || isoToday(), note:f.note.trim(), auteur:displayName(me),
+          replacementId: f.type==='remplacee' ? (f.replacementId || '') : ''};
+        const repl = entry.replacementId ? pieceById(entry.replacementId) : null;
+        this.setState(st => ({pieces: st.pieces.map(x =>
+          x.id===o.piece.id ? Object.assign({}, x, {sav:(x.sav||[]).concat([entry])}) :
+          (repl && x.id===repl.id ? Object.assign({}, x, {statut:'offerte'}) : x)),
+          savForm:Object.assign(this._emptySav(), {type:f.type})}));
+        this.logAudit('Après-vente — ' + pieceLabel(o.piece) + ' : ' + SAV_LABEL[entry.type] + (entry.note ? ' (' + entry.note + ')' : ''));
+        if (repl) this.logAudit('Pièce de remplacement attribuée — ' + pieceLabel(repl) + ' passée en « Offerte » pour ' + o.owner);
+        this.showFlash('« ' + SAV_LABEL[entry.type] + ' » ajouté au suivi de ' + pieceLabel(o.piece) + (repl ? ' — ' + pieceLabel(repl) + ' sort du stock.' : '.'));
+      },
+
       // Tableau de bord
       kpis: (() => {
         const paidOrders = s.orders.filter(o => o.statut!=='annulee');
-        const ca = paidOrders.reduce((t,o) => t+o.total, 0);
+        const ca = paidOrders.reduce((t,o) => t + (Number(o.total)||0), 0);
+        const caHors = paidOrders.filter(o => o.canal!=='en_ligne').reduce((t,o) => t + (Number(o.total)||0), 0);
         const panierMoyen = paidOrders.length ? Math.round(ca/paidOrders.length) : 0;
+        const vendues = decPieces.filter(p => p.eff==='vendue');
+        const vHors = vendues.filter(p => { const o = saleOf(p.id, s.orders); return o && o.canal!=='en_ligne'; }).length;
+        const dispo = decPieces.filter(p => p.eff==='disponible');
         return [
-          {label:"Chiffre d'affaires", value: fmtNumber(ca), unit:'FCFA', hint: paidOrders.length + ' commandes, hors annulations'},
-          {label:'Panier moyen', value: fmtNumber(panierMoyen), unit:'FCFA', hint:'Par commande, hors annulations'},
-          {label:'Pièces vendues', value:String(s.pieces.filter(p=>p.statut==='vendue').length), unit:'', hint:'Sur ' + s.pieces.length + ' pièces au registre'},
+          {label:"Chiffre d'affaires", value: fmtNumber(ca), unit:'FCFA', hint: paidOrders.length + ' ventes · panier moyen ' + fmtNumber(panierMoyen) + ' FCFA'},
+          {label:'Pièces vendues', value:String(vendues.length), unit:'', hint: vHors ? 'Dont ' + vHors + ' hors site (' + fmtNumber(caHors) + ' FCFA)' : 'Toutes en ligne'},
+          {label:'Disponibles à la vente', value:String(dispo.length), unit:'', hint:'Sur ' + s.pieces.length + ' pièces au registre'},
           {label:'Activations passeport', value:String(s.owners.length), unit:'', hint:'Pièces associées à un propriétaire'}
         ];
       })(),
+      stockByModel: (() => {
+        const by = {};
+        decPieces.forEach(p => {
+          if (!['disponible','bientot','vendue'].includes(p.eff)) return;
+          const m = by[p.modele] = by[p.modele] || {modele:p.modele, dispo:0, vendue:0, bientot:0};
+          m[p.eff==='disponible' ? 'dispo' : p.eff] += 1;
+        });
+        return Object.values(by).sort((a,b) => b.dispo-a.dispo || a.modele.localeCompare(b.modele)).map(m => ({...m,
+          detail: [m.vendue ? m.vendue + (m.vendue>1 ? ' vendues' : ' vendue') : '', m.bientot ? m.bientot + ' bientôt' : ''].filter(Boolean).join(' · ') || 'Disponible'}));
+      })(),
+      goPiecesDispo: () => this.go('pieces', {statutFilter:'disponible'}),
       geoRepartition: (() => {
         const counts = {};
         s.owners.forEach(o => { counts[o.pays] = (counts[o.pays]||0)+1; });
@@ -1343,7 +1879,7 @@ class Component extends DCLogic {
         });
       })(),
       recentPieces: decPieces.slice().sort((a,b) => (b.dateFab||'').localeCompare(a.dateFab||'')).slice(0,4),
-      recentOwners: s.owners.slice(0,3),
+      recentOwners: decOwners.slice(0,3),
       recentOrders: decOrders.slice(0,4),
 
       // Liste des pièces
@@ -1351,10 +1887,11 @@ class Component extends DCLogic {
       statutFilter: s.statutFilter, setStatutFilter: e => this.setState({statutFilter:e.target.value}),
       sortBy: s.sortBy, setSortBy: e => this.setState({sortBy:e.target.value}),
       filteredPieces, noPieces: filteredPieces.length===0,
-      piecesCount: filteredPieces.length===s.pieces.length
+      piecesCount: (filteredPieces.length===s.pieces.length
         ? s.pieces.length + ' pièces au registre'
-        : filteredPieces.length + ' sur ' + s.pieces.length + ' pièces',
-      newPiece: () => this.go('piece-form', {editId:null, form:this._emptyForm(), fieldErr:{}, codeRevealed:true}),
+        : filteredPieces.length + ' sur ' + s.pieces.length + ' pièces') + ' · ' + decPieces.filter(p => p.eff==='disponible').length + ' disponibles à la vente',
+      newPiece: () => this.go('piece-form', {editId:null, fieldErr:{}, codeRevealed:true,
+        form:Object.assign(this._emptyForm(), {autoIds:true, serie:nextSerie(s.pieces, ''), code:genCode(s.pieces)})}),
       registreOpen: s.registreOpen,
       registreChevron: s.registreOpen ? 'rotate(180deg)' : 'none',
       toggleRegistre: () => this.setState(st => ({registreOpen:!st.registreOpen})),
@@ -1365,14 +1902,41 @@ class Component extends DCLogic {
           this.setState({registreOpen:false});
           // Les codes d'activation restent hors de l'export : ils ne quittent pas le back-office.
           this.downloadCsv('pieces-carole-sessegnon.csv',
-            [['Modèle','Coloris','Numéro de série','Matière','Date de fabrication','Statut']]
-              .concat(s.pieces.map(p => [p.modele,p.coloris,p.serie,p.matiere,p.dateFab,STATUT_LABEL[p.statut]])));
+            [['Référence','Modèle','Coloris','Numéro de série','Prix (FCFA)','Matière','Date de fabrication','Statut']]
+              .concat(decPieces.map(p => [p.reference||'',p.modele,p.coloris,p.serie,p.prix===''||p.prix===undefined?'':p.prix,p.matiere,p.dateFab,STATUT_LABEL[p.eff]])));
         }}
       ],
 
       // Formulaire pièce
       form: s.form, isEditing,
       fieldErr, fieldShadow, fieldInvalid, hasFieldErr: Object.keys(fieldErr).length>0,
+      refPlaceholder: refFromModele(s.form.modele) ? 'Ex. ' + refFromModele(s.form.modele) : 'Ex. HUP',
+      idsLocked: isEditing || !!s.form.autoIds,
+      idsBg: (isEditing || s.form.autoIds) ? 'rgb(252,249,248)' : 'rgb(255,255,255)',
+      canToggleAuto: !isEditing,
+      autoIdsLabel: s.form.autoIds ? 'Saisir manuellement' : 'Générer automatiquement',
+      canRegenCode: !isEditing && !!s.form.autoIds,
+      idsHint: isEditing
+        ? 'Le n° de série et le code sont figés une fois la pièce enregistrée : ils sont imprimés sur le certificat et encodés dans le QR code.'
+        : (s.form.autoIds
+          ? 'Générés automatiquement : n° de série CS-numéro d\'ordre-année de fabrication, code aléatoire de 8 caractères sans 0/O ni 1/I, unique au registre.'
+          : 'Saisie manuelle : à réserver aux pièces déjà numérotées (registre papier ou fichier Excel existant).'),
+      toggleAutoIds: () => this.setState(st => st.form.autoIds
+        ? {form:Object.assign({}, st.form, {autoIds:false})}
+        : {form:Object.assign({}, st.form, {autoIds:true, serie:nextSerie(st.pieces, st.form.dateFab), code:genCode(st.pieces)}), fieldErr:{}}),
+      regenCode: () => this.setState(st => ({form:Object.assign({}, st.form, {code:genCode(st.pieces)})})),
+      ...(() => {
+        const cur = isEditing ? pieceById(s.editId) : null;
+        const sale = cur ? saleOf(cur.id, s.orders) : null;
+        const sold = !!cur && (!!sale || cur.statut==='vendue');
+        return {
+          statutSelectable: !sold,
+          soldInfo: {isSold:sold, hasOrder:!!sale, no: sale ? sale.no : '',
+            text: sale ? (CANAL_LABEL[sale.canal] + ' · ' + fmtIsoDate(sale.dateIso) + (sale.client ? ' · ' + sale.client : '')) : 'Vente enregistrée avant le suivi des commandes.',
+            open: () => { if (sale) openOrder(sale); }},
+          formSav: cur ? savSorted(cur).slice(0,3).map(e => decSav(cur, e)) : []
+        };
+      })(),
       formSlot: isEditing ? 'bo-p-' + s.editId : 'bo-p-new',
       codeType: s.codeRevealed ? 'text' : 'password',
       codeToggleLabel: s.codeRevealed ? 'Masquer' : 'Afficher',
@@ -1380,26 +1944,33 @@ class Component extends DCLogic {
         if (!s.codeRevealed) this.logAudit('Consultation du code d\'activation — ' + (s.form.serie || 'pièce sans numéro'));
         this.setState({codeRevealed:!s.codeRevealed});
       },
-      setF: Object.fromEntries(Object.keys(this._emptyForm()).map(key => [key, e => {
+      setF: Object.fromEntries(Object.keys(this._emptyForm()).filter(k => k!=='autoIds').map(key => [key, e => {
         const v = e.target.value;
         this.setState(st => {
           const fe = Object.assign({}, st.fieldErr); delete fe[key];
-          return {form: Object.assign({}, st.form, {[key]: v}), fieldErr: fe};
+          const patch = {[key]: v};
+          // En génération automatique, l'année du n° de série suit la date de fabrication.
+          if (key==='dateFab' && st.form.autoIds && !st.editId) patch.serie = (st.form.serie || nextSerie(st.pieces, v)).replace(/-\d{4}$/, '-' + yearOf(v));
+          return {form: Object.assign({}, st.form, patch), fieldErr: fe};
         });
       }])),
       hasOwnerForForm: !!ownerForForm, noOwnerForForm: isEditing && !ownerForForm,
-      formOwner: ownerForForm || {},
+      formOwner: ownerForForm ? Object.assign({}, ownerForForm, {open: () => this.go('proprietaire', {viewOwnerId:ownerForForm.id, savForm:this._emptySav()})}) : {},
       savePiece: e => {
         e.preventDefault();
-        const f = Object.assign({}, this.state.form, {
-          modele: this.state.form.modele.trim(), serie: this.state.form.serie.trim(), code: this.state.form.code.trim().toUpperCase()
+        const raw = this.state.form;
+        const f = Object.assign({}, raw, {
+          modele: raw.modele.trim(), serie: raw.serie.trim(), code: raw.code.trim().toUpperCase(),
+          reference: (raw.reference.trim() || refFromModele(raw.modele)).toUpperCase(),
+          prix: String(raw.prix).trim()==='' ? '' : Number(raw.prix)
         });
         const err = this.validatePiece(f);
         if (Object.keys(err).length) { this.setState({fieldErr:err}); return; }
+        delete f.autoIds;
         const editing = !!this.state.editId;
         this.setState(st => editing
-          ? {pieces: st.pieces.map(p => p.id===st.editId ? Object.assign({id:st.editId}, f) : p), route:'pieces', fieldErr:{}}
-          : {pieces: st.pieces.concat([Object.assign({id:'p' + Date.now()}, f)]), route:'pieces', fieldErr:{}});
+          ? {pieces: st.pieces.map(p => p.id===st.editId ? Object.assign({}, p, f, {id:st.editId, serie:p.serie, code:p.code}) : p), route:'pieces', fieldErr:{}}
+          : {pieces: st.pieces.concat([Object.assign({id:'p' + Date.now(), sav:[]}, f)]), route:'pieces', fieldErr:{}});
         const nom = f.modele || 'sans nom';
         this.logAudit((editing ? 'Pièce modifiée — ' : 'Pièce créée — ') + nom + (f.serie ? ', ' + f.serie : ''));
         this.showFlash('Pièce « ' + nom + ' » ' + (editing ? 'enregistrée.' : 'ajoutée au registre.'));
@@ -1407,6 +1978,15 @@ class Component extends DCLogic {
       deletePiece: () => {
         const p = s.pieces.find(x => x.id===s.editId);
         if (!p) return;
+        const sale = saleOf(p.id, s.orders);
+        if (sale) {
+          this.askConfirm({
+            title:'Suppression impossible',
+            body:'« ' + p.modele + ' » (' + p.serie + ') figure dans la commande ' + sale.no + '. Annulez d\'abord cette commande si la vente n\'a pas eu lieu.',
+            cancelLabel:'Compris'
+          });
+          return;
+        }
         const owner = ownerOf(p.id);
         if (owner) {
           this.askConfirm({
@@ -1432,8 +2012,8 @@ class Component extends DCLogic {
       ownerSearch: s.ownerSearch, setOwnerSearch: e => this.setState({ownerSearch:e.target.value}),
       filteredOwners, noOwners: filteredOwners.length===0,
       exportOwnersCsv: () => this.downloadCsv('proprietaires-carole-sessegnon.csv',
-        [['Pièce','Propriétaire','E-mail','Pays','Date d\'association']]
-          .concat(s.owners.map(o => [o.piece,o.owner,o.email,o.pays,o.date])))
+        [['Pièce','Propriétaire','E-mail','Pays','Date d\'association','Après-vente (dernier état)']]
+          .concat(decOwners.map(o => [o.pieceLabel,o.owner,o.email,o.pays,o.date,o.hasSav ? o.sav.statutLabel : ''])))
     };
   }
 }
