@@ -700,6 +700,9 @@
                     <sc-for list="{{ ventePieces }}" as="v" hint-placeholder-count="4">
                       <label style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid rgba(0,0,0,.06);cursor:pointer;background:{{ v.bg }}">
                         <input type="checkbox" checked="{{ v.checked }}" onChange="{{ v.toggle }}" aria-describedby="err-vente-pieces" style="flex:0 0 auto;width:18px;height:18px;margin:0;accent-color:rgb(71,29,27)">
+                        <div style="flex:0 0 40px;width:40px;height:40px;border-radius:50%;overflow:hidden;background:rgb(252,249,248);outline:1px solid oklch(0 0 0 / 0.1);outline-offset:-1px">
+                          <sc-if value="{{ v.hasPhoto }}"><img src="{{ v.photoSrc }}" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></sc-if>
+                        </div>
                         <span style="flex:1;min-width:0">
                           <span style="display:block;font-size:14px;color:rgb(0,0,0)">{{ v.modele }}</span>
                           <span style="display:block;margin-top:2px;font-size:12px;color:rgb(94,94,94)">{{ v.sub }}</span>
@@ -777,9 +780,12 @@
             <div style="flex:1 1 300px;min-width:0;background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:clamp(22px,3vw,32px);display:flex;flex-direction:column;gap:14px">
               <p style="margin:0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">Récapitulatif</p>
               <sc-for list="{{ venteSelected }}" as="v" hint-placeholder-count="1">
-                <div style="display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px">
-                  <span>{{ v.modele }} <span style="display:block;font-size:12px;color:rgb(94,94,94)">{{ v.serie }}</span></span>
-                  <span style="font-variant-numeric:tabular-nums;white-space:nowrap">{{ v.prixLabel }}</span>
+                <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px">
+                  <div style="flex:0 0 36px;width:36px;height:36px;border-radius:50%;overflow:hidden;background:rgb(252,249,248);outline:1px solid oklch(0 0 0 / 0.1);outline-offset:-1px">
+                    <sc-if value="{{ v.hasPhoto }}"><img src="{{ v.photoSrc }}" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></sc-if>
+                  </div>
+                  <span style="flex:1;min-width:0">{{ v.modele }} <span style="display:block;font-size:12px;color:rgb(94,94,94)">{{ v.serie }}</span></span>
+                  <span style="flex:0 0 auto;font-variant-numeric:tabular-nums;white-space:nowrap">{{ v.prixLabel }}</span>
                 </div>
               </sc-for>
               <sc-if value="{{ venteNoneSelected }}">
