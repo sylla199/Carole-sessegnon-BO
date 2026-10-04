@@ -255,7 +255,7 @@
               <sc-for list="{{ recentPieces }}" as="p" hint-placeholder-count="4">
                 <button type="button" onClick="{{ p.open }}" style="display:flex;width:100%;align-items:center;gap:14px;padding:12px 0;border-top:1px solid rgba(0,0,0,.08);background:none;border-left:0;border-right:0;border-bottom:0;text-align:left;cursor:pointer;font-family:inherit" style-hover="opacity:.7">
                   <div style="flex:0 0 44px;width:44px;height:44px;border-radius:50%;overflow:hidden;outline:1px solid oklch(0 0 0 / 0.1);outline-offset:-1px">
-                    <image-slot id="{{ p.slot }}" shape="circle" placeholder="Photo"></image-slot>
+                    <sc-if value="{{ p.hasPhoto }}"><img src="{{ p.photoSrc }}" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></sc-if>
                   </div>
                   <div style="flex:1;min-width:0">
                     <p style="margin:0;font-size:14px;color:rgb(0,0,0)">{{ p.modele }}</p>
@@ -353,7 +353,7 @@
                     <td style="padding:14px 18px;border-bottom:1px solid rgba(0,0,0,.06)">
                       <div style="display:flex;align-items:center;gap:12px">
                         <div style="flex:0 0 36px;width:36px;height:36px;border-radius:50%;overflow:hidden;outline:1px solid oklch(0 0 0 / 0.1);outline-offset:-1px">
-                          <image-slot id="{{ p.slot }}" shape="circle" placeholder="Photo"></image-slot>
+                          <sc-if value="{{ p.hasPhoto }}"><img src="{{ p.photoSrc }}" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></sc-if>
                         </div>
                         <div>
                           <span style="display:block;font-size:14px;color:rgb(0,0,0)">{{ p.modele }}</span>
@@ -478,9 +478,44 @@
 
             <div style="display:flex;flex-direction:column;gap:20px">
               <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:clamp(22px,3vw,32px)">
+                <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:6px">
+                  <p style="margin:0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">Photos de la pièce</p>
+                  <span style="font-size:12px;color:rgb(94,94,94);font-variant-numeric:tabular-nums">{{ photosCount }}</span>
+                </div>
+                <p style="margin:0 0 16px;font-size:12px;line-height:18px;color:rgb(94,94,94)">La première photo est la photo principale : c'est elle qui apparaît sur le certificat, dans les listes et sur le passeport. Elles sont enregistrées avec la pièce.</p>
+                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:14px">
+                  <sc-for list="{{ formPhotos }}" as="ph" hint-placeholder-count="2">
+                    <div>
+                      <div style="position:relative;aspect-ratio:1;overflow:hidden;background:rgb(252,249,248);box-shadow:{{ ph.frame }}">
+                        <img src="{{ ph.src }}" alt="{{ ph.alt }}" style="width:100%;height:100%;object-fit:cover;display:block">
+                        <sc-if value="{{ ph.isMain }}"><span style="position:absolute;left:0;top:0;padding:4px 8px;background:rgb(71,29,27);color:rgb(255,255,255);font-size:10px;letter-spacing:.08em;text-transform:uppercase">Principale</span></sc-if>
+                      </div>
+                      <div style="display:flex;justify-content:space-between;gap:8px;margin-top:8px;min-height:20px">
+                        <sc-if value="{{ ph.canMakeMain }}"><button type="button" onClick="{{ ph.makeMain }}" aria-label="{{ ph.makeMainAria }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:12px;border-bottom:1px solid rgb(71,29,27);text-align:left;font-family:inherit">Principale</button></sc-if>
+                        <button type="button" onClick="{{ ph.remove }}" aria-label="{{ ph.removeAria }}" style="background:none;border:0;padding:0;color:rgb(94,94,94);cursor:pointer;font-size:12px;border-bottom:1px solid rgba(0,0,0,.3);margin-left:auto;font-family:inherit">Retirer</button>
+                      </div>
+                    </div>
+                  </sc-for>
+                  <sc-if value="{{ canAddPhoto }}">
+                    <div>
+                      <button type="button" onClick="{{ pickPhotos }}" onDragOver="{{ photoDragOver }}" onDrop="{{ photoDrop }}" aria-label="Ajouter des photos" style="width:100%;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:rgb(255,251,248);border:0;box-shadow:inset 0 0 0 1px rgba(71,29,27,.45);color:rgb(71,29,27);cursor:pointer;font-family:inherit;font-size:12px;line-height:16px;padding:8px;text-align:center" style-hover="background:rgb(250,241,235)">
+                        <svg aria-hidden="true" width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1"><path d="M11 3v16M3 11h16"></path></svg>
+                        <span>{{ addPhotoLabel }}</span>
+                      </button>
+                    </div>
+                  </sc-if>
+                </div>
+                <input id="bo-photo-input" type="file" accept="image/jpeg,image/png,image/webp" multiple="{{ photoMultiple }}" onChange="{{ onPhotoFiles }}" tabindex="-1" aria-hidden="true" style="display:none">
+                <sc-if value="{{ photoBusy }}"><p role="status" style="margin:14px 0 0;font-size:12px;color:rgb(94,94,94)">Traitement des photos…</p></sc-if>
+                <sc-if value="{{ photoErr }}"><p role="alert" style="margin:14px 0 0;font-size:12px;line-height:18px;color:rgb(155,24,33)">{{ photoErr }}</p></sc-if>
+                <p style="margin:14px 0 0;font-size:12px;line-height:18px;color:rgb(94,94,94)">JPEG, PNG ou WebP, jusqu'à {{ photoMax }} photos. Démonstration : les photos sont gardées dans le navigateur le temps de la session.</p>
+              </div>
+
+              <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:clamp(22px,3vw,32px)">
                 <p style="margin:0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);margin-bottom:16px">Aperçu du certificat</p>
                 <div style="position:relative;aspect-ratio:.9;max-width:220px;margin:0 auto;overflow:hidden;border-radius:50%;outline:1px solid oklch(0 0 0 / 0.1);outline-offset:-1px">
-                  <image-slot id="{{ formSlot }}" shape="circle" placeholder="Photo de la pièce"></image-slot>
+                  <sc-if value="{{ hasMainPhoto }}"><img src="{{ mainPhotoSrc }}" alt="{{ mainPhotoAlt }}" style="width:100%;height:100%;object-fit:cover;display:block"></sc-if>
+                  <sc-if value="{{ noMainPhoto }}"><div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;font-size:12px;line-height:18px;color:rgb(127,127,127);background:rgb(252,249,248)">Aucune photo<br>pour l'instant</div></sc-if>
                 </div>
                 <p style="margin:16px 0 0;text-align:center;font-family:var(--font-display);font-size:18px;color:rgb(71,29,27)">{{ form.modele }}</p>
                 <p style="margin:6px 0 0;text-align:center;font-size:12px;color:rgb(94,94,94);font-variant-numeric:tabular-nums">{{ form.serie }}</p>
@@ -923,7 +958,7 @@
 
               <button type="button" onClick="{{ viewOwner.openPiece }}" style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);border:0;padding:clamp(22px,3vw,32px);display:flex;align-items:center;gap:18px;text-align:left;cursor:pointer;font-family:inherit;width:100%" style-hover="box-shadow:inset 0 0 0 1px rgb(71,29,27)">
                 <div style="flex:0 0 64px;width:64px;height:64px;border-radius:50%;overflow:hidden;outline:1px solid oklch(0 0 0 / 0.1);outline-offset:-1px">
-                  <image-slot id="{{ viewOwner.pieceSlot }}" shape="circle" placeholder="Photo"></image-slot>
+                  <sc-if value="{{ viewOwner.hasPhoto }}"><img src="{{ viewOwner.photoSrc }}" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></sc-if>
                 </div>
                 <div style="flex:1;min-width:0">
                   <p style="margin:0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);margin-bottom:6px">Pièce associée</p>
@@ -1190,6 +1225,27 @@ const SAV_LABEL = {en_reparation:'En réparation', reparee:'Réparée', irrepara
 const SAV_KIND = {en_reparation:'progress', reparee:'done', irreparable:'alert', remplacee:'neutral', remboursee:'neutral', restituee:'neutral'};
 // Nomenclature des identifiants : n° de série CS-<n° d'ordre sur 4 chiffres>-<année de fabrication>,
 // code d'activation aléatoire XXXX-XXXX sans caractères ambigus (0/O, 1/I).
+const PHOTO_MAX = 8;
+const PHOTO_MAX_SIDE = 1400;
+const PHOTO_TYPES = /^image\/(jpeg|png|webp)$/;
+// Redimensionne et recompresse en JPEG pour garder des photos légères dans la page.
+const readPhoto = file => new Promise((resolve, reject) => {
+  if (!PHOTO_TYPES.test(file.type)) { reject('format'); return; }
+  if (file.size > 25 * 1024 * 1024) { reject('taille'); return; }
+  const url = URL.createObjectURL(file);
+  const img = new Image();
+  img.onload = () => {
+    try {
+      const r = Math.min(1, PHOTO_MAX_SIDE / Math.max(img.naturalWidth, img.naturalHeight));
+      const w = Math.max(1, Math.round(img.naturalWidth * r)), h = Math.max(1, Math.round(img.naturalHeight * r));
+      const c = document.createElement('canvas'); c.width = w; c.height = h;
+      const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, w, h); g.drawImage(img, 0, 0, w, h);
+      resolve({id:'ph' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), src:c.toDataURL('image/jpeg', 0.85), name:file.name.replace(/\.[^.]+$/, '')});
+    } catch (e) { reject('lecture'); } finally { URL.revokeObjectURL(url); }
+  };
+  img.onerror = () => { URL.revokeObjectURL(url); reject('lecture'); };
+  img.src = url;
+});
 const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 const ORDER_STATUT_LABEL = {preparation:'En préparation', expediee:'Expédiée', livree:'Livrée', annulee:'Annulée'};
 const ORDER_STATUT_KIND = {preparation:'neutral', expediee:'progress', livree:'done', annulee:'alert'};
@@ -1262,7 +1318,7 @@ class Component extends DCLogic {
     serieMax:maxSerie(SEED_PIECES),
     teamTab:'membres', auditSearch:'', auditAuteur:'tous',
     viewOrderId:null, orderDraft:{statut:'', tracking:''},
-    editId:null, form:this._emptyForm(), fieldErr:{}, codeRevealed:false,
+    editId:null, form:this._emptyForm(), fieldErr:{}, codeRevealed:false, photoBusy:false, photoErr:'',
     flash:'', confirm:null,
     meId:ME_ID, invite:null,
     acceptToken:'', accept:this._emptyAccept()
@@ -1330,12 +1386,30 @@ class Component extends DCLogic {
     clearTimeout(this._flashT);
   }
 
-  _emptyForm(){ return {modele:'', coloris:'', reference:'', prix:'', serie:'', code:'', matiere:'', dateFab:'', statut:'disponible', autoIds:false}; }
+  _emptyForm(){ return {modele:'', coloris:'', reference:'', prix:'', serie:'', code:'', matiere:'', dateFab:'', statut:'disponible', autoIds:false, photos:[]}; }
   _emptySav(){ return {type:'en_reparation', date:isoToday(), note:'', replacementId:''}; }
   _emptyVente(){ return {canal:'popup', date:isoToday(), evenement:'', pieceIds:[], client:'', email:'', telephone:'', montant:'', paiement:'Espèces', note:''}; }
 
+  async addPhotos(fileList){
+    const files = Array.from(fileList || []);
+    if (!files.length) return;
+    const room = PHOTO_MAX - ((this.state.form.photos || []).length);
+    if (room <= 0) { this.setState({photoErr:'Maximum ' + PHOTO_MAX + ' photos par pièce : retirez-en une avant d\'en ajouter.'}); return; }
+    this.setState({photoBusy:true, photoErr:''});
+    const added = []; const issues = {format:0, taille:0, lecture:0};
+    for (const f of files.slice(0, room)) {
+      try { added.push(await readPhoto(f)); } catch (e) { issues[e] = (issues[e] || 0) + 1; }
+    }
+    const msgs = [];
+    if (issues.format) msgs.push(issues.format + (issues.format > 1 ? ' fichiers ignorés' : ' fichier ignoré') + ' : seuls JPEG, PNG et WebP sont acceptés.');
+    if (issues.taille) msgs.push(issues.taille + (issues.taille > 1 ? ' fichiers ignorés' : ' fichier ignoré') + ' : plus de 25 Mo.');
+    if (issues.lecture) msgs.push(issues.lecture + (issues.lecture > 1 ? ' fichiers illisibles.' : ' fichier illisible.'));
+    if (files.length > room) msgs.push('Maximum ' + PHOTO_MAX + ' photos : ' + (files.length - room) + (files.length - room > 1 ? ' photos n\'ont' : ' photo n\'a') + ' pas été ajoutée' + (files.length - room > 1 ? 's' : '') + '.');
+    this.setState(st => ({form:Object.assign({}, st.form, {photos:(st.form.photos || []).concat(added)}), photoBusy:false, photoErr:msgs.join(' ')}));
+  }
+
   go(route, extra){
-    this.setState(Object.assign({route, navOpen:false, registreOpen:false, filtersOpen:false}, extra||{}));
+    this.setState(Object.assign({route, navOpen:false, registreOpen:false, filtersOpen:false, photoErr:'', photoBusy:false}, extra||{}));
     try{window.scrollTo(0,0);}catch(e){}
   }
 
@@ -1438,7 +1512,8 @@ class Component extends DCLogic {
     const openPiece = p => this.go('piece-form', {editId:p.id, form:Object.assign(this._emptyForm(), p, {prix: p.prix===undefined ? '' : p.prix}), fieldErr:{}, codeRevealed:false});
     const decPieces = s.pieces.map(p => {
       const eff = effStatut(p, s.orders);
-      return {...p, eff, slot:'bo-p-' + p.id, ...BADGE[STATUT_KIND[eff] || 'neutral'],
+      const mainPh = (p.photos || [])[0];
+      return {...p, eff, hasPhoto:!!mainPh, photoSrc: mainPh ? mainPh.src : '', ...BADGE[STATUT_KIND[eff] || 'neutral'],
         statutLabel:STATUT_LABEL[eff] || eff, dateFabLabel:fmtIsoDate(p.dateFab),
         prixLabel: fmtFcfa(p.prix),
         refLabel: [p.reference, p.coloris].filter(Boolean).join(' · '),
@@ -1885,7 +1960,7 @@ class Component extends DCLogic {
         if (!o) return {};
         const p = o.piece;
         return {...o,
-          pieceSlot: p ? 'bo-p-' + p.id : 'bo-p-none', pieceModele: p ? p.modele : 'Pièce introuvable', pieceSerie: p ? p.serie : '',
+          hasPhoto: !!(p && p.photos && p.photos[0]), photoSrc: (p && p.photos && p.photos[0]) ? p.photos[0].src : '', pieceModele: p ? p.modele : 'Pièce introuvable', pieceSerie: p ? p.serie : '',
           hasOrder: !!o.sale, noOrder: !o.sale,
           orderLabel: o.sale ? o.sale.no + ' · ' + (CANAL_LABEL[o.sale.canal] || '') : '',
           openOrder: () => { if (o.sale) openOrder(o.sale); },
@@ -2017,7 +2092,29 @@ class Component extends DCLogic {
           formSav: cur ? savSorted(cur).slice(0,3).map(e => decSav(cur, e)) : []
         };
       })(),
-      formSlot: isEditing ? 'bo-p-' + s.editId : 'bo-p-new',
+      ...(() => {
+        const photos = s.form.photos || [];
+        const name = s.form.modele || 'la pièce';
+        return {
+          formPhotos: photos.map((ph, i) => ({...ph, isMain:i===0, canMakeMain:i>0,
+            alt: (i===0 ? 'Photo principale de ' : 'Photo ' + (i+1) + ' de ') + name,
+            frame: i===0 ? 'inset 0 0 0 2px rgb(71,29,27)' : 'inset 0 0 0 1px rgba(0,0,0,.12)',
+            makeMainAria: 'Définir la photo ' + (i+1) + ' comme photo principale',
+            removeAria: 'Retirer la photo ' + (i+1),
+            makeMain: () => this.setState(st => { const l = st.form.photos || []; return {form:Object.assign({}, st.form, {photos:[ph].concat(l.filter(x => x.id!==ph.id))})}; }),
+            remove: () => this.setState(st => ({form:Object.assign({}, st.form, {photos:(st.form.photos || []).filter(x => x.id!==ph.id)}), photoErr:''}))})),
+          hasMainPhoto: photos.length>0, noMainPhoto: photos.length===0,
+          mainPhotoSrc: photos.length ? photos[0].src : '', mainPhotoAlt: 'Photo principale de ' + name,
+          photosCount: photos.length + ' / ' + PHOTO_MAX,
+          canAddPhoto: photos.length < PHOTO_MAX,
+          addPhotoLabel: photos.length ? 'Ajouter' : 'Ajouter des photos',
+          photoMax: PHOTO_MAX, photoBusy: s.photoBusy, photoErr: s.photoErr, photoMultiple: true,
+          pickPhotos: () => { try { document.getElementById('bo-photo-input').click(); } catch(e) {} },
+          onPhotoFiles: e => { const t = e.target; const files = Array.from(t.files || []); try { t.value = ''; } catch(err) {} this.addPhotos(files); },
+          photoDragOver: e => { if (e && e.preventDefault) e.preventDefault(); },
+          photoDrop: e => { if (e && e.preventDefault) e.preventDefault(); this.addPhotos((e && e.dataTransfer && e.dataTransfer.files) || []); }
+        };
+      })(),
       canToggleCode: isEditing || !!s.form.autoIds,
       codeType: (s.codeRevealed || (!isEditing && !s.form.autoIds)) ? 'text' : 'password',
       prixHint: (String(s.form.prix).trim()!=='' && Number(s.form.prix) >= 0) ? '= ' + fmtFcfa(s.form.prix) : '',
@@ -2026,7 +2123,7 @@ class Component extends DCLogic {
         if (!s.codeRevealed) this.logAudit('Consultation du code d\'activation — ' + (s.form.serie || 'pièce sans numéro'));
         this.setState({codeRevealed:!s.codeRevealed});
       },
-      setF: Object.fromEntries(Object.keys(this._emptyForm()).filter(k => k!=='autoIds').map(key => [key, e => {
+      setF: Object.fromEntries(Object.keys(this._emptyForm()).filter(k => k!=='autoIds' && k!=='photos').map(key => [key, e => {
         const v = e.target.value;
         this.setState(st => {
           const fe = Object.assign({}, st.fieldErr); delete fe[key];
@@ -2054,7 +2151,7 @@ class Component extends DCLogic {
           ? {pieces: st.pieces.map(p => p.id===st.editId ? Object.assign({}, p, f, {id:st.editId, serie:p.serie, code:p.code}) : p), route:'pieces', fieldErr:{}}
           : {pieces: st.pieces.concat([Object.assign({id:'p' + Date.now(), sav:[]}, f)]), route:'pieces', fieldErr:{}, serieMax:Math.max(st.serieMax, serieNo(f))});
         const nom = f.modele || 'sans nom';
-        this.logAudit((editing ? 'Pièce modifiée — ' : 'Pièce créée — ') + nom + (f.serie ? ', ' + f.serie : ''));
+        this.logAudit((editing ? 'Pièce modifiée — ' : 'Pièce créée — ') + nom + (f.serie ? ', ' + f.serie : '') + ((f.photos || []).length ? ' · ' + f.photos.length + (f.photos.length>1 ? ' photos' : ' photo') : ''));
         this.showFlash('Pièce « ' + nom + ' » ' + (editing ? 'enregistrée.' : 'ajoutée au registre.'));
       },
       deletePiece: () => {
