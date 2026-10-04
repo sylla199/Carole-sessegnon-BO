@@ -33,6 +33,16 @@
   .bo-table th{white-space:nowrap}
   .bo-filters{display:contents}
   .bo-only-mobile{display:none !important}
+  /* Photos de la pièce : la vignette entière est le bouton « photo principale » */
+  .ph-promote{position:absolute;inset:0;width:100%;height:100%;border:0;padding:0;background:transparent;cursor:pointer}
+  .ph-hint{position:absolute;left:0;right:0;bottom:0;padding:7px 8px;background:rgba(71,29,27,.92);color:#fff;font-size:11px;line-height:14px;text-align:center;opacity:0;transform:translateY(4px);transition:opacity .15s,transform .15s;pointer-events:none}
+  .ph-thumb:hover .ph-hint,.ph-promote:focus-visible + .ph-hint{opacity:1;transform:none}
+  .ph-promote:focus-visible{outline:2px solid rgb(71,29,27);outline-offset:-4px}
+  .ph-x{position:absolute;right:6px;top:6px;width:32px;height:32px;border-radius:50%;border:0;padding:0;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.94);color:rgb(71,29,27);cursor:pointer;box-shadow:0 0 0 1px rgba(0,0,0,.1)}
+  .ph-x:hover{background:#fff;box-shadow:0 0 0 1px rgb(71,29,27)}
+  .ph-x svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.2;stroke-linecap:round}
+  @media (hover:none){.ph-thumb .ph-hint{opacity:1;transform:none}}
+  @media (pointer:coarse){.ph-x{width:44px;height:44px}}
   .bo-split{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);gap:24px;align-items:start;max-width:1180px}
   @media (max-width:1100px){.bo-split{grid-template-columns:minmax(0,1fr)}}
   @media (max-width:900px){
@@ -482,18 +492,17 @@
                   <p style="margin:0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">Photos de la pièce</p>
                   <span style="font-size:12px;color:rgb(94,94,94);font-variant-numeric:tabular-nums">{{ photosCount }}</span>
                 </div>
-                <p style="margin:0 0 16px;font-size:12px;line-height:18px;color:rgb(94,94,94)">La première photo est la photo principale : c'est elle qui apparaît sur le certificat, dans les listes et sur le passeport. Elles sont enregistrées avec la pièce.</p>
+                <p style="margin:0 0 16px;font-size:12px;line-height:18px;color:rgb(94,94,94)">Cliquez sur une photo pour en faire la photo principale : c'est elle qui apparaît sur le certificat, dans les listes et sur le passeport. Les photos sont enregistrées avec la pièce.</p>
                 <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:14px">
                   <sc-for list="{{ formPhotos }}" as="ph" hint-placeholder-count="2">
-                    <div>
-                      <div style="position:relative;aspect-ratio:1;overflow:hidden;background:rgb(252,249,248);box-shadow:{{ ph.frame }}">
-                        <img src="{{ ph.src }}" alt="{{ ph.alt }}" style="width:100%;height:100%;object-fit:cover;display:block">
-                        <sc-if value="{{ ph.isMain }}"><span style="position:absolute;left:0;top:0;padding:4px 8px;background:rgb(71,29,27);color:rgb(255,255,255);font-size:10px;letter-spacing:.08em;text-transform:uppercase">Principale</span></sc-if>
-                      </div>
-                      <div style="display:flex;justify-content:space-between;gap:8px;margin-top:8px;min-height:20px">
-                        <sc-if value="{{ ph.canMakeMain }}"><button type="button" onClick="{{ ph.makeMain }}" aria-label="{{ ph.makeMainAria }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:12px;border-bottom:1px solid rgb(71,29,27);text-align:left;font-family:inherit">Principale</button></sc-if>
-                        <button type="button" onClick="{{ ph.remove }}" aria-label="{{ ph.removeAria }}" style="background:none;border:0;padding:0;color:rgb(94,94,94);cursor:pointer;font-size:12px;border-bottom:1px solid rgba(0,0,0,.3);margin-left:auto;font-family:inherit">Retirer</button>
-                      </div>
+                    <div class="ph-thumb" style="position:relative;aspect-ratio:1;overflow:hidden;background:rgb(252,249,248);box-shadow:{{ ph.frame }}">
+                      <img src="{{ ph.src }}" alt="{{ ph.alt }}" style="width:100%;height:100%;object-fit:cover;display:block">
+                      <sc-if value="{{ ph.isMain }}"><span style="position:absolute;left:0;bottom:0;padding:4px 8px;background:rgb(71,29,27);color:rgb(255,255,255);font-size:10px;letter-spacing:.08em;text-transform:uppercase;pointer-events:none">Principale</span></sc-if>
+                      <sc-if value="{{ ph.notMain }}">
+                        <button type="button" class="ph-promote" onClick="{{ ph.makeMain }}" aria-label="{{ ph.promoteAria }}"></button>
+                        <span class="ph-hint">Choisir comme principale</span>
+                      </sc-if>
+                      <button type="button" class="ph-x" onClick="{{ ph.remove }}" aria-label="{{ ph.removeAria }}" title="Retirer"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9"></path></svg></button>
                     </div>
                   </sc-for>
                   <sc-if value="{{ canAddPhoto }}">
@@ -505,6 +514,12 @@
                     </div>
                   </sc-if>
                 </div>
+                <sc-if value="{{ photoNoticeText }}">
+                  <div role="status" style="margin-top:14px;min-height:44px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px 14px;background:rgb(255,251,248);box-shadow:inset 3px 0 0 rgb(71,29,27),inset 0 0 0 1px rgba(0,0,0,.08);font-size:13px;line-height:19px;color:rgb(71,29,27);animation:bo-in .18s ease">
+                    <span>{{ photoNoticeText }}</span>
+                    <sc-if value="{{ photoCanUndo }}"><button type="button" onClick="{{ undoPhoto }}" style="flex:0 0 auto;min-height:44px;padding:0 4px;background:none;border:0;color:rgb(71,29,27);font-weight:700;cursor:pointer;text-decoration:underline;font-family:inherit">Annuler</button></sc-if>
+                  </div>
+                </sc-if>
                 <input id="bo-photo-input" type="file" accept="image/jpeg,image/png,image/webp" multiple="{{ photoMultiple }}" onChange="{{ onPhotoFiles }}" tabindex="-1" aria-hidden="true" style="display:none">
                 <sc-if value="{{ photoBusy }}"><p role="status" style="margin:14px 0 0;font-size:12px;color:rgb(94,94,94)">Traitement des photos…</p></sc-if>
                 <sc-if value="{{ photoErr }}"><p role="alert" style="margin:14px 0 0;font-size:12px;line-height:18px;color:rgb(155,24,33)">{{ photoErr }}</p></sc-if>
@@ -1352,7 +1367,7 @@ class Component extends DCLogic {
     serieMax:maxSerie(SEED_PIECES),
     teamTab:'membres', auditSearch:'', auditAuteur:'tous',
     viewOrderId:null, orderDraft:{statut:'', tracking:''},
-    editId:null, form:this._emptyForm(), fieldErr:{}, codeRevealed:false, photoBusy:false, photoErr:'',
+    editId:null, form:this._emptyForm(), fieldErr:{}, codeRevealed:false, photoBusy:false, photoErr:'', photoNotice:null,
     flash:'', confirm:null,
     meId:ME_ID, invite:null,
     acceptToken:'', accept:this._emptyAccept()
@@ -1418,11 +1433,25 @@ class Component extends DCLogic {
     window.removeEventListener('hashchange', this._onHash);
     window.removeEventListener('storage', this._onStorage);
     clearTimeout(this._flashT);
+    clearTimeout(this._photoT);
   }
 
   _emptyForm(){ return {modele:'', coloris:'', reference:'', prix:'', serie:'', code:'', matiere:'', dateFab:'', statut:'disponible', autoIds:false, photos:[]}; }
   _emptySav(){ return {type:'en_reparation', date:isoToday(), note:'', replacementId:''}; }
   _emptyVente(){ return {canal:'popup', date:isoToday(), evenement:'', pieceIds:[], client:'', email:'', telephone:'', montant:'', paiement:'Espèces', note:''}; }
+
+  noticePhoto(text, undo){
+    clearTimeout(this._photoT);
+    this.setState({photoNotice:{text, undo:undo || null}});
+    this._photoT = setTimeout(() => this.setState({photoNotice:null}), 8000);
+  }
+  undoPhoto(){
+    const u = this.state.photoNotice && this.state.photoNotice.undo;
+    if (!u) return;
+    if ((this.state.form.photos || []).length >= PHOTO_MAX) { this.noticePhoto('Maximum ' + PHOTO_MAX + ' photos : impossible de rétablir celle-ci.', null); return; }
+    this.setState(st => { const l = (st.form.photos || []).slice(); l.splice(Math.min(u.index, l.length), 0, u.photo); return {form:Object.assign({}, st.form, {photos:l})}; });
+    this.noticePhoto('Photo rétablie.', null);
+  }
 
   async addPhotos(fileList){
     const files = Array.from(fileList || []);
@@ -1443,7 +1472,7 @@ class Component extends DCLogic {
   }
 
   go(route, extra){
-    this.setState(Object.assign({route, navOpen:false, registreOpen:false, filtersOpen:false, photoErr:'', photoBusy:false}, extra||{}));
+    this.setState(Object.assign({route, navOpen:false, registreOpen:false, filtersOpen:false, photoErr:'', photoBusy:false, photoNotice:null}, extra||{}));
     try{window.scrollTo(0,0);}catch(e){}
   }
 
@@ -2155,13 +2184,22 @@ class Component extends DCLogic {
         const photos = s.form.photos || [];
         const name = s.form.modele || 'la pièce';
         return {
-          formPhotos: photos.map((ph, i) => ({...ph, isMain:i===0, canMakeMain:i>0,
+          formPhotos: photos.map((ph, i) => ({...ph, isMain:i===0, notMain:i>0,
             alt: (i===0 ? 'Photo principale de ' : 'Photo ' + (i+1) + ' de ') + name,
             frame: i===0 ? 'inset 0 0 0 2px rgb(71,29,27)' : 'inset 0 0 0 1px rgba(0,0,0,.12)',
-            makeMainAria: 'Définir la photo ' + (i+1) + ' comme photo principale',
+            promoteAria: 'Choisir la photo ' + (i+1) + ' comme photo principale',
             removeAria: 'Retirer la photo ' + (i+1),
-            makeMain: () => this.setState(st => { const l = st.form.photos || []; return {form:Object.assign({}, st.form, {photos:[ph].concat(l.filter(x => x.id!==ph.id))})}; }),
-            remove: () => this.setState(st => ({form:Object.assign({}, st.form, {photos:(st.form.photos || []).filter(x => x.id!==ph.id)}), photoErr:''}))})),
+            makeMain: () => {
+              this.setState(st => { const l = st.form.photos || []; return {form:Object.assign({}, st.form, {photos:[ph].concat(l.filter(x => x.id!==ph.id))})}; });
+              this.noticePhoto('Photo principale mise à jour.', null);
+            },
+            remove: () => {
+              const nextIsMain = i===0 && photos.length>1;
+              this.setState(st => ({form:Object.assign({}, st.form, {photos:(st.form.photos || []).filter(x => x.id!==ph.id)}), photoErr:''}));
+              this.noticePhoto('Photo retirée.' + (nextIsMain ? ' La photo suivante devient la photo principale.' : ''), {photo:ph, index:i});
+            }})),
+          photoNoticeText: s.photoNotice ? s.photoNotice.text : '', photoCanUndo: !!(s.photoNotice && s.photoNotice.undo),
+          undoPhoto: () => this.undoPhoto(),
           hasMainPhoto: photos.length>0, noMainPhoto: photos.length===0,
           mainPhotoSrc: photos.length ? photos[0].src : '', mainPhotoAlt: 'Photo principale de ' + name,
           photosCount: photos.length + ' / ' + PHOTO_MAX,
