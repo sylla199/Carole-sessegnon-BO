@@ -711,22 +711,19 @@
                 <div>
                   <p style="margin:0;font-size:13px;color:rgb(70,70,70)">Pièces vendues</p>
                   <input type="search" aria-label="Filtrer les pièces disponibles" value="{{ venteSearch }}" onChange="{{ setVenteSearch }}" placeholder="Filtrer par modèle ou n° de série…" style="margin-top:8px;width:100%;height:46px;padding:0 12px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);color:rgb(0,0,0);font-size:14px;padding:0 16px">
-                  <div role="group" aria-label="Pièces disponibles" style="margin-top:8px;max-height:360px;overflow:auto;box-shadow:{{ ventePiecesShadow }}">
-                    <sc-for list="{{ venteGroups }}" as="v" hint-placeholder-count="4">
-                      <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid rgba(0,0,0,.06)">
+                  <div role="group" aria-label="Pièces disponibles" style="margin-top:8px;max-height:320px;overflow:auto;box-shadow:{{ ventePiecesShadow }}">
+                    <sc-for list="{{ ventePieces }}" as="v" hint-placeholder-count="4">
+                      <label style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid rgba(0,0,0,.06);cursor:pointer;background:{{ v.bg }}">
+                        <input type="checkbox" checked="{{ v.checked }}" onChange="{{ v.toggle }}" aria-describedby="err-vente-pieces" style="flex:0 0 auto;width:18px;height:18px;margin:0;accent-color:rgb(71,29,27)">
                         <div style="flex:0 0 40px;width:40px;height:40px;border-radius:50%;overflow:hidden;background:rgb(252,249,248);outline:1px solid oklch(0 0 0 / 0.1);outline-offset:-1px">
                           <sc-if value="{{ v.hasPhoto }}"><img src="{{ v.photoSrc }}" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></sc-if>
                         </div>
                         <span style="flex:1;min-width:0">
                           <span style="display:block;font-size:14px;color:rgb(0,0,0)">{{ v.modele }}</span>
-                          <span style="display:block;margin-top:2px;font-size:12px;color:rgb(94,94,94)">{{ v.availLabel }} · {{ v.priceLabel }}</span>
+                          <span style="display:block;margin-top:2px;font-size:12px;color:rgb(94,94,94)">{{ v.sub }}</span>
                         </span>
-                        <div style="flex:0 0 auto;display:flex;align-items:center;gap:10px" role="group" aria-label="Quantité — {{ v.modele }}">
-                          <button type="button" aria-label="Retirer un exemplaire de {{ v.modele }}" onClick="{{ v.dec }}" disabled="{{ v.cantDec }}" style="width:32px;height:32px;background:none;border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);cursor:pointer;font-size:16px;line-height:1;color:rgb(0,0,0)">−</button>
-                          <span aria-live="polite" style="min-width:20px;text-align:center;font-size:14px;font-variant-numeric:tabular-nums;color:rgb(0,0,0)">{{ v.qty }}</span>
-                          <button type="button" aria-label="Ajouter un exemplaire de {{ v.modele }}" onClick="{{ v.inc }}" disabled="{{ v.cantInc }}" style="width:32px;height:32px;background:none;border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);cursor:pointer;font-size:16px;line-height:1;color:rgb(0,0,0)">+</button>
-                        </div>
-                      </div>
+                        <span style="flex:0 0 auto;font-size:13px;color:rgb(70,70,70);font-variant-numeric:tabular-nums">{{ v.prixLabel }}</span>
+                      </label>
                     </sc-for>
                     <sc-if value="{{ noVentePieces }}">
                       <p style="margin:0;padding:20px;font-size:13px;color:rgb(94,94,94)">{{ noVentePiecesText }}</p>
@@ -797,13 +794,13 @@
 
             <div style="flex:1 1 300px;min-width:0;background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:clamp(22px,3vw,32px);display:flex;flex-direction:column;gap:14px">
               <p style="margin:0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">Récapitulatif</p>
-              <sc-for list="{{ venteSelectedGrouped }}" as="v" hint-placeholder-count="1">
+              <sc-for list="{{ venteSelected }}" as="v" hint-placeholder-count="1">
                 <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px">
                   <div style="flex:0 0 36px;width:36px;height:36px;border-radius:50%;overflow:hidden;background:rgb(252,249,248);outline:1px solid oklch(0 0 0 / 0.1);outline-offset:-1px">
                     <sc-if value="{{ v.hasPhoto }}"><img src="{{ v.photoSrc }}" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></sc-if>
                   </div>
-                  <span style="flex:1;min-width:0">{{ v.modele }} <span style="display:block;font-size:12px;color:rgb(94,94,94)">{{ v.sub }}</span></span>
-                  <span style="flex:0 0 auto;font-variant-numeric:tabular-nums;white-space:nowrap">{{ v.subtotalLabel }}</span>
+                  <span style="flex:1;min-width:0">{{ v.modele }} <span style="display:block;font-size:12px;color:rgb(94,94,94)">{{ v.serie }}</span></span>
+                  <span style="flex:0 0 auto;font-variant-numeric:tabular-nums;white-space:nowrap">{{ v.prixLabel }}</span>
                 </div>
               </sc-for>
               <sc-if value="{{ venteNoneSelected }}">
@@ -1975,50 +1972,24 @@ class Component extends DCLogic {
         const ve = s.venteErr || {};
         const vq = s.venteSearch.trim().toLowerCase();
         const avail = decPieces.filter(p => p.eff==='disponible');
+        const list = avail.filter(p => v.pieceIds.includes(p.id) || !vq || (p.modele+' '+p.serie+' '+(p.reference||'')).toLowerCase().includes(vq));
         const selected = v.pieceIds.map(id => decPieces.find(p => p.id===id)).filter(Boolean);
         const suggested = selected.reduce((t,p) => t + (Number(p.prix) || 0), 0);
         const total = String(v.montant).trim()!=='' ? Number(v.montant) : suggested;
         const step = s.venteStep || 0, vMax = Math.max(s.venteMax || 0, step);
-        // Regroupement par modèle : une pièce reste unique (n° de série), mais on choisit
-        // combien d'exemplaires disponibles de ce modèle entrent dans la vente, par +/-.
-        const byModel = new Map();
-        avail.slice().sort((a,b) => (a.dateFab||'').localeCompare(b.dateFab||'') || a.id.localeCompare(b.id))
-          .forEach(p => { if (!byModel.has(p.modele)) byModel.set(p.modele, []); byModel.get(p.modele).push(p); });
-        const setQty = (modele, ids, n) => this.setState(st => {
-          const keep = st.vente.pieceIds.filter(id => !ids.includes(id));
-          const err = Object.assign({}, st.venteErr); delete err.pieces;
-          return {vente:Object.assign({}, st.vente, {pieceIds:keep.concat(ids.slice(0, n))}), venteErr:err};
-        });
-        const groupsAll = Array.from(byModel.entries()).map(([modele, ps]) => {
-          const ids = ps.map(p => p.id);
-          const qty = ids.filter(id => v.pieceIds.includes(id)).length;
-          const prices = ps.map(p => Number(p.prix) || 0);
-          const same = prices.every(x => x===prices[0]);
-          const main = ps.find(p => p.hasPhoto) || ps[0];
-          return {
-            modele, count: ps.length, qty, ids,
-            match: (modele + ' ' + ps.map(p => p.serie + ' ' + (p.reference||'')).join(' ')).toLowerCase().includes(vq),
-            hasPhoto: !!(main && main.hasPhoto), photoSrc: main ? main.photoSrc : '',
-            availLabel: ps.length + (ps.length>1 ? ' disponibles' : ' disponible'),
-            priceLabel: same ? fmtFcfa(prices[0]) : 'dès ' + fmtFcfa(Math.min(...prices)),
-            canDec: qty>0, canInc: qty<ps.length, cantDec: qty===0, cantInc: qty>=ps.length,
-            dec: () => setQty(modele, ids, qty - 1), inc: () => setQty(modele, ids, qty + 1)
-          };
-        });
-        const groups = groupsAll.filter(g => g.qty>0 || !vq || g.match);
         return {
-          venteGroups: groups,
-          noVentePieces: groups.length===0,
-          noVentePiecesText: avail.length ? 'Aucun modèle disponible ne correspond à ce filtre.' : 'Aucune pièce n\'est disponible à la vente dans le registre.',
+          ventePieces: list.map(p => ({...p, checked: v.pieceIds.includes(p.id),
+            bg: v.pieceIds.includes(p.id) ? 'rgb(255,251,248)' : 'rgb(255,255,255)',
+            sub: p.serie + (p.coloris ? ' · ' + p.coloris : ''),
+            toggle: () => this.setState(st => {
+              const ids = st.vente.pieceIds.includes(p.id) ? st.vente.pieceIds.filter(x => x!==p.id) : st.vente.pieceIds.concat([p.id]);
+              const err = Object.assign({}, st.venteErr); delete err.pieces;
+              return {vente:Object.assign({}, st.vente, {pieceIds:ids}), venteErr:err};
+            })})),
+          noVentePieces: list.length===0,
+          noVentePiecesText: avail.length ? 'Aucune pièce disponible ne correspond à ce filtre.' : 'Aucune pièce n\'est disponible à la vente dans le registre.',
           ventePiecesShadow: ve.pieces ? 'inset 0 0 0 2px rgb(155,24,33)' : 'inset 0 0 0 1px rgba(0,0,0,.12)',
           venteSelected: selected, venteNoneSelected: selected.length===0,
-          venteSelectedGrouped: Array.from(new Set(selected.map(p => p.modele))).map(modele => {
-            const ps = selected.filter(p => p.modele===modele);
-            const main = ps.find(p => p.hasPhoto) || ps[0];
-            const subtotal = ps.reduce((t,p) => t + (Number(p.prix) || 0), 0);
-            return {modele, qty: ps.length, hasPhoto: !!(main && main.hasPhoto), photoSrc: main ? main.photoSrc : '',
-              sub: ps.length>1 ? ps.length + ' pièces' : ps[0].serie, subtotalLabel: fmtFcfa(subtotal)};
-          }),
           venteSuggested: suggested ? fmtNumber(suggested) : 'Ex. 420 000',
           venteTotalLabel: fmtFcfa(isNaN(total) ? 0 : total),
           venteErr: ve,
