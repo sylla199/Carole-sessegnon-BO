@@ -30,6 +30,11 @@
   /* Barre latérale : collée à l'écran sur bureau, tiroir sur mobile */
   .bo-aside{position:sticky;top:0;height:100vh}
   .bo-menu-btn,.bo-scrim{display:none}
+  .bo-table th{white-space:nowrap}
+  .bo-filters{display:contents}
+  .bo-only-mobile{display:none !important}
+  .bo-split{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);gap:24px;align-items:start;max-width:1180px}
+  @media (max-width:1100px){.bo-split{grid-template-columns:minmax(0,1fr)}}
   @media (max-width:900px){
     .bo-shell{grid-template-columns:1fr !important}
     .bo-aside{position:fixed;left:0;top:0;bottom:0;width:280px;z-index:60;transform:translateX(-100%);transition:transform .25s ease}
@@ -38,6 +43,11 @@
     .bo-menu-btn{display:flex}
     .bo-collapse,.bo-hide-mobile{display:none !important}
     .bo-header{padding:16px 20px !important}
+    /* Filtres repliés derrière un bouton, pour que la liste démarre plus haut */
+    .bo-only-mobile{display:inline-flex !important}
+    .bo-filters{display:flex;flex-direction:column;gap:10px;width:100%}
+    .bo-filters.is-collapsed{display:none}
+    .bo-filters > *{width:100%;flex:none !important}
 
     /* Tableaux → cartes empilées */
     .bo-table{min-width:0 !important}
@@ -230,7 +240,7 @@
               <sc-for list="{{ stockByModel }}" as="m" hint-placeholder-count="5">
                 <div style="padding:14px 16px;background:rgb(252,249,248)">
                   <p style="margin:0;font-size:14px;color:rgb(0,0,0)">{{ m.modele }}</p>
-                  <p style="margin:6px 0 2px;font-family:var(--font-display);font-size:28px;color:rgb(71,29,27)">{{ m.dispo }}</p>
+                  <p style="margin:6px 0 2px;font-family:var(--font-display);font-size:28px;color:{{ m.numColor }}">{{ m.dispo }}</p>
                   <p style="margin:0;font-size:12px;color:rgb(94,94,94)">{{ m.detail }}</p>
                 </div>
               </sc-for>
@@ -288,20 +298,23 @@
         <sc-if value="{{ isPieces }}">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:20px">
             <div style="display:flex;gap:10px;flex-wrap:wrap;flex:1 1 420px;min-width:0">
-              <input type="search" aria-label="Rechercher une pièce" value="{{ search }}" onChange="{{ setSearch }}" placeholder="Rechercher un modèle, un n° de série…" style="flex:1 1 240px;min-width:0;height:46px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);color:rgb(0,0,0);font-size:14px">
-              <select aria-label="Filtrer par statut" value="{{ statutFilter }}" onChange="{{ setStatutFilter }}" style="flex:1 1 160px;height:46px;padding:0 12px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);color:rgb(0,0,0);font-size:14px">
-                <option value="tous">Tous les statuts</option>
-                <option value="disponible">Disponible</option>
-                <option value="bientot">Bientôt disponible</option>
-                <option value="vendue">Vendue</option>
-                <option value="prototype">Prototype</option>
-                <option value="offerte">Offerte</option>
-              </select>
-              <select aria-label="Trier les pièces" value="{{ sortBy }}" onChange="{{ setSortBy }}" style="flex:1 1 180px;height:46px;padding:0 12px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);color:rgb(0,0,0);font-size:14px">
-                <option value="recent">Plus récentes d'abord</option>
-                <option value="ancien">Plus anciennes d'abord</option>
-                <option value="serie">Par n° de série</option>
-              </select>
+              <input type="search" aria-label="Rechercher une pièce" value="{{ search }}" onChange="{{ setSearch }}" placeholder="Rechercher un modèle, un n° de série…" style="flex:1 1 240px;min-width:0;height:46px;padding:0 12px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);color:rgb(0,0,0);font-size:14px;padding:0 16px">
+              <button type="button" class="bo-only-mobile" onClick="{{ toggleFilters }}" aria-expanded="{{ filtersOpen }}" aria-controls="bo-filters-pieces" style="height:46px;padding:0 16px;align-items:center;justify-content:center;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);color:rgb(0,0,0);cursor:pointer;font-size:14px">{{ piecesFiltersLabel }}</button>
+              <div id="bo-filters-pieces" class="{{ filtersClass }}">
+                <select aria-label="Filtrer par statut" value="{{ statutFilter }}" onChange="{{ setStatutFilter }}" style="flex:1 1 160px;height:46px;padding:0 12px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);color:rgb(0,0,0);font-size:14px">
+                  <option value="tous">Tous les statuts</option>
+                  <option value="disponible">Disponible</option>
+                  <option value="bientot">Bientôt disponible</option>
+                  <option value="vendue">Vendue</option>
+                  <option value="prototype">Prototype</option>
+                  <option value="offerte">Offerte</option>
+                </select>
+                <select aria-label="Trier les pièces" value="{{ sortBy }}" onChange="{{ setSortBy }}" style="flex:1 1 180px;height:46px;padding:0 12px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);color:rgb(0,0,0);font-size:14px">
+                  <option value="recent">Plus récentes d'abord</option>
+                  <option value="ancien">Plus anciennes d'abord</option>
+                  <option value="serie">Par n° de série</option>
+                </select>
+              </div>
             </div>
             <div style="display:flex;gap:10px;flex-wrap:wrap">
               <div data-registre style="position:relative">
@@ -369,7 +382,7 @@
 
         <sc-if value="{{ isPieceForm }}">
           <button type="button" onClick="{{ goPieces }}" style="background:none;border:0;padding:0;margin-bottom:22px;color:rgb(94,94,94);cursor:pointer;font-size:13px">← Retour aux pièces</button>
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:24px;align-items:start;max-width:1000px">
+          <div class="bo-split">
             <form onSubmit="{{ savePiece }}" noValidate style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:clamp(22px,3vw,32px);display:flex;flex-direction:column;gap:18px">
               <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:16px">
                 <label style="display:block;font-size:13px;color:rgb(70,70,70)">Modèle
@@ -387,6 +400,7 @@
                 <label style="display:block;font-size:13px;color:rgb(70,70,70)">Prix de vente (FCFA)
                   <input type="number" min="0" step="1000" inputMode="numeric" value="{{ form.prix }}" onChange="{{ setF.prix }}" aria-invalid="{{ fieldInvalid.prix }}" aria-describedby="err-prix" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:{{ fieldShadow.prix }};color:rgb(0,0,0);font-variant-numeric:tabular-nums">
                   <sc-if value="{{ fieldErr.prix }}"><span id="err-prix" style="display:block;margin-top:6px;font-size:12px;color:rgb(155,24,33)">{{ fieldErr.prix }}</span></sc-if>
+                  <sc-if value="{{ prixHint }}"><span style="display:block;margin-top:6px;font-size:12px;color:rgb(94,94,94);font-variant-numeric:tabular-nums">{{ prixHint }}</span></sc-if>
                 </label>
               </div>
 
@@ -406,7 +420,7 @@
                   <div style="font-size:13px;color:rgb(70,70,70)">
                     <div style="display:flex;justify-content:space-between;gap:10px">
                       <label for="bo-code">Code d'activation privé</label>
-                      <sc-if value="{{ isEditing }}">
+                      <sc-if value="{{ canToggleCode }}">
                         <button type="button" onClick="{{ toggleCode }}" aria-controls="bo-code" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);text-align:left;font-family:inherit;font-size:12px">{{ codeToggleLabel }}</button>
                       </sc-if>
                       <sc-if value="{{ canRegenCode }}">
@@ -415,7 +429,7 @@
                     </div>
                     <input id="bo-code" type="{{ codeType }}" autocomplete="off" value="{{ form.code }}" onChange="{{ setF.code }}" readOnly="{{ idsLocked }}" placeholder="8F3K-22QD" aria-invalid="{{ fieldInvalid.code }}" aria-describedby="err-code" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:{{ idsBg }};border:0;box-shadow:{{ fieldShadow.code }};color:rgb(0,0,0);letter-spacing:.06em">
                     <sc-if value="{{ fieldErr.code }}"><span id="err-code" style="display:block;margin-top:6px;font-size:12px;color:rgb(155,24,33)">{{ fieldErr.code }}</span></sc-if>
-                    <sc-if value="{{ isEditing }}"><span style="display:block;margin-top:6px;font-size:12px;color:rgb(94,94,94)">Chaque affichage du code est inscrit au journal d'audit.</span></sc-if>
+                    <sc-if value="{{ canToggleCode }}"><span style="display:block;margin-top:6px;font-size:12px;color:rgb(94,94,94)">Chaque affichage du code est inscrit au journal d'audit.</span></sc-if>
                   </div>
                 </div>
               </div>
@@ -454,7 +468,7 @@
               <sc-if value="{{ hasFieldErr }}">
                 <p role="alert" style="margin:0;font-size:13px;color:rgb(155,24,33)">La pièce n'a pas été enregistrée : corrigez les champs signalés.</p>
               </sc-if>
-              <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:6px;flex-wrap:wrap">
+              <div style="position:sticky;bottom:0;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin:6px calc(-1 * clamp(22px,3vw,32px)) calc(-1 * clamp(22px,3vw,32px));padding:14px clamp(22px,3vw,32px);background:rgb(255,255,255);box-shadow:inset 0 1px 0 rgba(0,0,0,.08)">
                 <x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="primary" dc-props="{{ btnUpperSm }}" hint-size="auto,46px">Enregistrer la pièce</x-import>
                 <sc-if value="{{ isEditing }}">
                   <button type="button" onClick="{{ deletePiece }}" style="background:none;border:0;padding:0;color:rgb(155,24,33);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(155,24,33)">Supprimer cette pièce</button>
@@ -505,23 +519,27 @@
         <sc-if value="{{ isCommandes }}">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:20px">
             <div style="display:flex;gap:10px;flex-wrap:wrap;flex:1 1 520px;min-width:0">
-              <input type="search" aria-label="Rechercher une commande" value="{{ orderSearch }}" onChange="{{ setOrderSearch }}" placeholder="Rechercher un client, une pièce, un n°…" style="flex:1 1 240px;min-width:0;height:46px;padding:0 12px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);color:rgb(0,0,0);font-size:14px;padding:0 16px">
-              <select aria-label="Filtrer par canal" value="{{ canalFilter }}" onChange="{{ setCanalFilter }}" style="flex:1 1 160px;height:46px;padding:0 12px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);color:rgb(0,0,0);font-size:14px">
-                <option value="tous">Tous les canaux</option>
-                <option value="en_ligne">En ligne</option>
-                <option value="popup">Pop-up</option>
-                <option value="directe">Vente directe</option>
-              </select>
-              <select aria-label="Filtrer par statut" value="{{ orderStatutFilter }}" onChange="{{ setOrderStatutFilter }}" style="flex:1 1 160px;height:46px;padding:0 12px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);color:rgb(0,0,0);font-size:14px">
-                <option value="tous">Tous les statuts</option>
-                <option value="preparation">En préparation</option>
-                <option value="expediee">Expédiée</option>
-                <option value="livree">Livrée</option>
-                <option value="annulee">Annulée</option>
-              </select>
+              <input type="search" aria-label="Rechercher une commande" value="{{ orderSearch }}" onChange="{{ setOrderSearch }}" placeholder="Client, pièce, n° de commande…" style="flex:1 1 240px;min-width:0;height:46px;padding:0 12px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);color:rgb(0,0,0);font-size:14px;padding:0 16px">
+              <button type="button" class="bo-only-mobile" onClick="{{ toggleFilters }}" aria-expanded="{{ filtersOpen }}" aria-controls="bo-filters-orders" style="height:46px;padding:0 16px;align-items:center;justify-content:center;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);color:rgb(0,0,0);cursor:pointer;font-size:14px">{{ ordersFiltersLabel }}</button>
+              <div id="bo-filters-orders" class="{{ filtersClass }}">
+                <select aria-label="Filtrer par canal" value="{{ canalFilter }}" onChange="{{ setCanalFilter }}" style="flex:1 1 160px;height:46px;padding:0 12px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);color:rgb(0,0,0);font-size:14px">
+                  <option value="tous">Tous les canaux</option>
+                  <option value="en_ligne">En ligne</option>
+                  <option value="popup">Pop-up</option>
+                  <option value="directe">Vente directe</option>
+                </select>
+                <select aria-label="Filtrer par statut" value="{{ orderStatutFilter }}" onChange="{{ setOrderStatutFilter }}" style="flex:1 1 160px;height:46px;padding:0 12px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);color:rgb(0,0,0);font-size:14px">
+                  <option value="tous">Tous les statuts</option>
+                  <option value="preparation">En préparation</option>
+                  <option value="expediee">Expédiée</option>
+                  <option value="livree">Livrée</option>
+                  <option value="annulee">Annulée</option>
+                </select>
+                <button type="button" class="bo-only-mobile" onClick="{{ exportOrdersCsv }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);text-align:left;font-family:inherit;min-height:44px;align-items:center">Exporter la liste (CSV)</button>
+              </div>
             </div>
             <div style="display:flex;gap:10px;flex-wrap:wrap">
-              <x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="secondary" onClick="{{ exportOrdersCsv }}" dc-props="{{ btnUpperSm }}" hint-size="auto,46px">Exporter</x-import>
+              <div class="bo-hide-mobile"><x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="secondary" onClick="{{ exportOrdersCsv }}" dc-props="{{ btnUpperSm }}" hint-size="auto,46px">Exporter</x-import></div>
               <x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="primary" onClick="{{ openVente }}" dc-props="{{ btnUpperSm }}" hint-size="auto,46px">Enregistrer une vente</x-import>
             </div>
           </div>
@@ -550,8 +568,12 @@
                         <sc-if value="{{ o.evenement }}"><span style="display:block;margin-top:2px;font-size:12px;color:rgb(94,94,94)">{{ o.evenement }}</span></sc-if>
                       </div>
                     </td>
-                    <td data-label="Client" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)">{{ o.clientLabel }}</td>
-                    <td data-label="Pièces" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)">{{ o.items }}</td>
+                    <td data-label="Client" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);white-space:nowrap">{{ o.clientLabel }}</td>
+                    <td data-label="Pièces" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)">
+                      <div style="display:flex;flex-direction:column;align-items:inherit;gap:2px">
+                        <sc-for list="{{ o.itemList }}" as="it" hint-placeholder-count="1"><span style="white-space:nowrap">{{ it.label }}</span></sc-for>
+                      </div>
+                    </td>
                     <td data-label="Total" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);font-variant-numeric:tabular-nums;white-space:nowrap">{{ o.totalLabel }}</td>
                     <td data-label="Date" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);white-space:nowrap">{{ o.dateLabel }}</td>
                     <td data-label="Statut" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)"><span style="display:inline-block;white-space:nowrap;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ o.statutBg }};color:{{ o.statutFg }};box-shadow:{{ o.statutShadow }}">{{ o.statutLabel }}</span></td>
@@ -573,12 +595,11 @@
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:24px;align-items:start;max-width:1000px">
             <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:clamp(22px,3vw,32px)">
               <p style="margin:0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);margin-bottom:4px">{{ viewOrder.kindLabel }}</p>
-              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 22px">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 6px">
                 <p style="margin:0;font-family:var(--font-display);font-size:24px;color:rgb(71,29,27)">{{ viewOrder.no }}</p>
                 <span style="display:inline-block;white-space:nowrap;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ viewOrder.statutBg }};color:{{ viewOrder.statutFg }};box-shadow:{{ viewOrder.statutShadow }}">{{ viewOrder.statutLabel }}</span>
               </div>
-              <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Canal</span><span style="text-align:right">{{ viewOrder.canalLabel }}</span></div>
-              <sc-if value="{{ viewOrder.evenement }}"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Événement</span><span style="text-align:right">{{ viewOrder.evenement }}</span></div></sc-if>
+              <p style="margin:0 0 22px;font-size:13px;color:rgb(94,94,94)">{{ viewOrder.subline }}</p>
               <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Client</span><span style="text-align:right">{{ viewOrder.clientLabel }}</span></div>
               <sc-if value="{{ viewOrder.email }}"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">E-mail</span><span style="overflow-wrap:anywhere;text-align:right">{{ viewOrder.email }}</span></div></sc-if>
               <sc-if value="{{ viewOrder.telephone }}"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Téléphone</span><span style="text-align:right">{{ viewOrder.telephone }}</span></div></sc-if>
@@ -863,7 +884,7 @@
                       </div>
                     </td>
                     <td data-label="Pièce" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)">
-                      <button type="button" onClick="{{ o.openPiece }}" aria-label="{{ o.pieceAria }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);text-align:left;font-family:inherit;color:rgb(0,0,0);border-bottom-color:rgba(0,0,0,.35)">{{ o.pieceLabel }}</button>
+                      <button type="button" onClick="{{ o.openPiece }}" aria-label="{{ o.pieceAria }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);text-align:left;font-family:inherit">{{ o.pieceLabel }}</button>
                     </td>
                     <td data-label="Pays" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)">{{ o.pays }}</td>
                     <td data-label="Association" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);font-variant-numeric:tabular-nums">{{ o.date }}</td>
@@ -914,42 +935,59 @@
             </div>
 
             <div style="background:rgb(255,251,248);padding:clamp(22px,3vw,32px)">
-              <p style="margin:0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);margin-bottom:6px">Suivi après-vente</p>
-              <p style="margin:0 0 20px;font-size:13px;line-height:20px;color:rgb(70,70,70)">Les évènements s'ajoutent les uns aux autres et restent attachés à la pièce, même si elle change de propriétaire.</p>
-              <form onSubmit="{{ addSav }}" noValidate style="display:flex;flex-direction:column;gap:14px">
-                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:16px">
-                  <label style="display:block;font-size:13px;color:rgb(70,70,70)">Évènement
-                    <select value="{{ savForm.type }}" onChange="{{ setSav.type }}" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
-                      <option value="en_reparation">En réparation</option>
-                      <option value="reparee">Réparée</option>
-                      <option value="irreparable">Irréparable</option>
-                      <option value="remplacee">Remplacée</option>
-                      <option value="remboursee">Remboursée</option>
-                      <option value="restituee">Restituée</option>
-                    </select>
-                  </label>
-                  <label style="display:block;font-size:13px;color:rgb(70,70,70)">Date
-                    <input type="date" value="{{ savForm.date }}" onChange="{{ setSav.date }}" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
-                  </label>
-                </div>
-                <sc-if value="{{ savNeedsReplacement }}">
-                  <label style="display:block;font-size:13px;color:rgb(70,70,70)">Pièce de remplacement <span style="color:rgb(94,94,94)">(facultatif)</span>
-                    <select value="{{ savForm.replacementId }}" onChange="{{ setSav.replacementId }}" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
-                      <option value="">Aucune pour l'instant</option>
-                      <sc-for list="{{ savReplacementOptions }}" as="r" hint-placeholder-count="2">
-                        <option value="{{ r.id }}">{{ r.label }}</option>
-                      </sc-for>
-                    </select>
-                    <span style="display:block;margin-top:6px;font-size:12px;line-height:18px;color:rgb(94,94,94)">La pièce choisie sort du stock et passe en « Offerte ».</span>
-                  </label>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:6px">
+                <p style="margin:0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">Suivi après-vente</p>
+                <sc-if value="{{ savFormHidden }}">
+                  <button type="button" onClick="{{ openSavForm }}" style="height:46px;padding:0 20px;display:inline-flex;align-items:center;justify-content:center;background:transparent;border:0;box-shadow:inset 0 0 0 2px rgb(71,29,27);color:rgb(71,29,27);cursor:pointer;font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap">Ajouter un évènement</button>
                 </sc-if>
-                <label style="display:block;font-size:13px;color:rgb(70,70,70)">Précision <span style="color:rgb(94,94,94)">(facultatif)</span>
-                  <textarea value="{{ savForm.note }}" onChange="{{ setSav.note }}" rows="3" placeholder="Ex. fermoir à remplacer, devis envoyé le…" style="margin-top:8px;width:100%;padding:14px 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0);resize:vertical;font-family:var(--font-body);font-size:15px;line-height:22px"></textarea>
-                </label>
-                <div><x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="primary" dc-props="{{ btnUpperSm }}" hint-size="auto,46px">Ajouter au suivi</x-import></div>
-              </form>
+              </div>
+              <p style="margin:0 0 20px;font-size:13px;line-height:20px;color:rgb(70,70,70)">Les évènements s'ajoutent les uns aux autres et restent attachés à la pièce, même si elle change de propriétaire.</p>
+              <sc-if value="{{ savFormShown }}">
+                <form onSubmit="{{ addSav }}" noValidate style="display:flex;flex-direction:column;gap:14px;padding:20px;margin-bottom:20px;background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)">
+                  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:16px">
+                    <label style="display:block;font-size:13px;color:rgb(70,70,70)">Évènement
+                      <select data-sav-first value="{{ savForm.type }}" onChange="{{ setSav.type }}" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+                        <option value="en_reparation">En réparation</option>
+                        <option value="reparee">Réparée</option>
+                        <option value="irreparable">Irréparable</option>
+                        <option value="remplacee">Remplacée</option>
+                        <option value="remboursee">Remboursée</option>
+                        <option value="restituee">Restituée</option>
+                      </select>
+                    </label>
+                    <label style="display:block;font-size:13px;color:rgb(70,70,70)">Date
+                      <input type="date" value="{{ savForm.date }}" onChange="{{ setSav.date }}" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+                    </label>
+                  </div>
+                  <sc-if value="{{ savNoEffect }}">
+                    <p style="margin:0;padding:12px 14px;background:rgb(255,251,248);font-size:12px;line-height:18px;color:rgb(70,70,70)">Cet évènement est une trace dans l'historique : il ne remet pas la pièce en stock et ne dissocie pas le passeport. Pour la remettre en vente, annulez sa commande d'origine.
+                      <sc-if value="{{ viewOwner.hasOrder }}"><button type="button" onClick="{{ viewOwner.openOrder }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);text-align:left;font-family:inherit;display:block;margin-top:6px;font-size:12px">Ouvrir la commande {{ viewOwner.orderLabel }}</button></sc-if>
+                    </p>
+                  </sc-if>
+                  <sc-if value="{{ savNeedsReplacement }}">
+                    <label style="display:block;font-size:13px;color:rgb(70,70,70)">Pièce de remplacement <span style="color:rgb(94,94,94)">(facultatif)</span>
+                      <select value="{{ savForm.replacementId }}" onChange="{{ setSav.replacementId }}" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+                        <option value="">Aucune pour l'instant</option>
+                        <sc-for list="{{ savReplacementOptions }}" as="r" hint-placeholder-count="2">
+                          <option value="{{ r.id }}">{{ r.label }}</option>
+                        </sc-for>
+                      </select>
+                      <span style="display:block;margin-top:6px;font-size:12px;line-height:18px;color:rgb(94,94,94)">La pièce choisie sort du stock et passe en « Offerte ». Retirer cet évènement la remet en « Disponible ».</span>
+                    </label>
+                  </sc-if>
+                  <label style="display:block;font-size:13px;color:rgb(70,70,70)">Précision <span style="color:rgb(94,94,94)">(facultatif)</span>
+                    <textarea value="{{ savForm.note }}" onChange="{{ setSav.note }}" rows="3" placeholder="Ex. fermoir à remplacer, devis envoyé le…" style="margin-top:8px;width:100%;padding:14px 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0);resize:vertical;font-family:var(--font-body);font-size:15px;line-height:22px"></textarea>
+                  </label>
+                  <div class="bo-modal-actions" style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+                    <x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="primary" dc-props="{{ btnUpperSm }}" hint-size="auto,46px">Ajouter au suivi</x-import>
+                    <sc-if value="{{ savCanCancel }}">
+                      <button type="button" onClick="{{ closeSavForm }}" style="height:46px;padding:0 20px;display:inline-flex;align-items:center;justify-content:center;background:transparent;border:0;box-shadow:inset 0 0 0 2px rgb(71,29,27);color:rgb(71,29,27);cursor:pointer;font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap">Annuler</button>
+                    </sc-if>
+                  </div>
+                </form>
+              </sc-if>
 
-              <div style="margin-top:26px">
+              <div>
                 <sc-for list="{{ ownerSav }}" as="e" hint-placeholder-count="2">
                   <div style="padding:14px 0;border-top:1px solid rgba(0,0,0,.1)">
                     <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
@@ -1053,8 +1091,11 @@
           <p id="bo-confirm-body" style="margin:0 0 26px;font-size:14px;line-height:22px;color:rgb(70,70,70)">{{ confirm.body }}</p>
           <div class="bo-modal-actions" style="display:flex;justify-content:flex-end;gap:12px;flex-wrap:wrap">
             <button type="button" data-confirm-cancel onClick="{{ confirmCancel }}" style="height:46px;padding:0 20px;background:transparent;border:0;box-shadow:inset 0 0 0 2px rgb(71,29,27);color:rgb(71,29,27);cursor:pointer;font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase">{{ confirm.cancelLabel }}</button>
-            <sc-if value="{{ confirm.okLabel }}">
+            <sc-if value="{{ confirm.isDanger }}">
               <x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="primary" onClick="{{ confirmOk }}" dc-props="{{ btnUpperSmDanger }}" hint-size="auto,46px">{{ confirm.okLabel }}</x-import>
+            </sc-if>
+            <sc-if value="{{ confirm.isPrimary }}">
+              <x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="primary" onClick="{{ confirmOk }}" dc-props="{{ btnUpperSmModal }}" hint-size="auto,46px">{{ confirm.okLabel }}</x-import>
             </sc-if>
           </div>
         </div>
@@ -1132,15 +1173,18 @@ const SEED_OWNERS = [
 ];
 
 // Un seul jeu de badges pour tout le back-office :
-// neutre (en attente) · en cours (contour) · terminé (fond bordeaux clair) · alerte.
+// neutre (en attente) · en cours (contour) · terminé (fond bordeaux clair) · alerte ·
+// bronze plein / bronze contour = pièces hors vente (Offerte / Prototype), jamais confondues avec « Vendue ».
 const BADGE = {
   neutral:  {statutBg:'rgba(0,0,0,.06)',       statutFg:'rgb(70,70,70)',   statutShadow:'none'},
   progress: {statutBg:'rgb(255,255,255)',      statutFg:'rgb(71,29,27)',   statutShadow:'inset 0 0 0 1px rgb(71,29,27)'},
   done:     {statutBg:'rgba(71,29,27,.1)',     statutFg:'rgb(71,29,27)',   statutShadow:'none'},
-  alert:    {statutBg:'rgba(155,24,33,.08)',   statutFg:'rgb(155,24,33)',  statutShadow:'none'}
+  alert:    {statutBg:'rgba(155,24,33,.08)',   statutFg:'rgb(155,24,33)',  statutShadow:'none'},
+  offsale:     {statutBg:'rgb(250,241,235)',   statutFg:'rgb(115,60,8)',   statutShadow:'inset 0 0 0 1px rgb(233,199,176)'},
+  offsaleLine: {statutBg:'rgb(255,255,255)',   statutFg:'rgb(149,83,28)',  statutShadow:'inset 0 0 0 1px rgb(202,150,114)'}
 };
 const STATUT_LABEL = {disponible:'Disponible', vendue:'Vendue', bientot:'Bientôt disponible', prototype:'Prototype', offerte:'Offerte'};
-const STATUT_KIND = {disponible:'progress', vendue:'done', bientot:'neutral', prototype:'neutral', offerte:'done'};
+const STATUT_KIND = {disponible:'progress', vendue:'done', bientot:'neutral', prototype:'offsaleLine', offerte:'offsale'};
 const CANAL_LABEL = {en_ligne:'En ligne', popup:'Pop-up', directe:'Vente directe'};
 const SAV_LABEL = {en_reparation:'En réparation', reparee:'Réparée', irreparable:'Irréparable', remplacee:'Remplacée', remboursee:'Remboursée', restituee:'Restituée'};
 const SAV_KIND = {en_reparation:'progress', reparee:'done', irreparable:'alert', remplacee:'neutral', remboursee:'neutral', restituee:'neutral'};
@@ -1180,10 +1224,10 @@ const displayName = t => t.nom || t.email || 'Collaborateur sans nom';
 const fmtFcfa = n => (n===''||n===null||n===undefined||isNaN(Number(n))) ? '—' : fmtNumber(Math.round(Number(n))) + ' FCFA';
 const yearOf = iso => (iso && /^\d{4}/.test(iso)) ? iso.slice(0,4) : String(new Date().getFullYear());
 const refFromModele = m => (m || '').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^A-Za-z]/g, '').slice(0, 3).toUpperCase();
-const nextSerie = (pieces, iso) => {
-  const max = pieces.reduce((m, p) => { const x = /^CS-(\d{4})-/.exec(p.serie || ''); return x ? Math.max(m, Number(x[1])) : m; }, 0);
-  return 'CS-' + String(max + 1).padStart(4, '0') + '-' + yearOf(iso);
-};
+const serieNo = p => { const x = /^CS-(\d{4})-/.exec((p && p.serie) || ''); return x ? Number(x[1]) : 0; };
+const maxSerie = pieces => pieces.reduce((m, p) => Math.max(m, serieNo(p)), 0);
+// Le compteur (issuedMax) ne redescend jamais : un numéro déjà émis, donc peut-être imprimé, n'est jamais réattribué.
+const nextSerie = (pieces, iso, issuedMax) => 'CS-' + String(Math.max(maxSerie(pieces), issuedMax || 0) + 1).padStart(4, '0') + '-' + yearOf(iso);
 const genCode = pieces => {
   const used = new Set(pieces.map(p => (p.code || '').toUpperCase()));
   for (;;) {
@@ -1214,7 +1258,8 @@ class Component extends DCLogic {
     search:'', statutFilter:'tous', sortBy:'recent', registreOpen:false,
     ownerSearch:'', orderSearch:'', orderStatutFilter:'tous', canalFilter:'tous',
     vente:null, venteErr:{}, venteSearch:'',
-    viewOwnerId:null, savForm:this._emptySav(),
+    viewOwnerId:null, savForm:this._emptySav(), savFormOpen:false, filtersOpen:false,
+    serieMax:maxSerie(SEED_PIECES),
     teamTab:'membres', auditSearch:'', auditAuteur:'tous',
     viewOrderId:null, orderDraft:{statut:'', tracking:''},
     editId:null, form:this._emptyForm(), fieldErr:{}, codeRevealed:false,
@@ -1290,7 +1335,7 @@ class Component extends DCLogic {
   _emptyVente(){ return {canal:'popup', date:isoToday(), evenement:'', pieceIds:[], client:'', email:'', telephone:'', montant:'', paiement:'Espèces', note:''}; }
 
   go(route, extra){
-    this.setState(Object.assign({route, navOpen:false, registreOpen:false}, extra||{}));
+    this.setState(Object.assign({route, navOpen:false, registreOpen:false, filtersOpen:false}, extra||{}));
     try{window.scrollTo(0,0);}catch(e){}
   }
 
@@ -1424,6 +1469,8 @@ class Component extends DCLogic {
       const canalLabel = CANAL_LABEL[o.canal] || 'En ligne';
       return {...o, ...BADGE[ORDER_STATUT_KIND[o.statut]], statutLabel:ORDER_STATUT_LABEL[o.statut],
         items, canalLabel, isOnline: o.canal==='en_ligne',
+        itemList: ps.length ? ps.map(p => ({label: p ? p.modele + ' (' + p.serie + ')' : 'Pièce supprimée'})) : [{label:'—'}],
+        subline: canalLabel + (o.evenement ? ' · ' + o.evenement : '') + ' · ' + fmtIsoDate(o.dateIso),
         kindLabel: o.canal==='en_ligne' ? 'Commande en ligne' : 'Vente hors site',
         clientLabel: o.client || 'Client non renseigné',
         clientLine: (o.client || 'Client non renseigné') + ' · ' + canalLabel,
@@ -1446,16 +1493,25 @@ class Component extends DCLogic {
       replacementLabel: e.replacementId ? pieceLabel(pieceById(e.replacementId)) : '',
       openReplacement: () => { const r = pieceById(e.replacementId); if (r) openPiece(r); },
       removeAria: 'Retirer l\'évènement ' + (SAV_LABEL[e.type] || '') + ' du ' + fmtIsoDate(e.date),
-      remove: () => this.askConfirm({
-        title:'Retirer cet évènement\u00a0?',
-        body:'« ' + (SAV_LABEL[e.type] || e.type) + ' » du ' + fmtIsoDate(e.date) + ' sera retiré du suivi de ' + pieceLabel(p) + '.',
-        okLabel:'Retirer', cancelLabel:'Garder',
-        onOk: () => {
-          this.setState(st => ({pieces: st.pieces.map(x => x.id===p.id ? Object.assign({}, x, {sav:(x.sav||[]).filter(y => y.id!==e.id)}) : x)}));
-          this.logAudit('Après-vente retiré — ' + pieceLabel(p) + ' : ' + (SAV_LABEL[e.type] || e.type));
-          this.showFlash('Évènement retiré du suivi.');
-        }
-      })});
+      remove: () => {
+        // La pièce de remplacement n'est remise en stock que si elle est toujours « Offerte » et n'a pas été vendue depuis.
+        const repl = e.replacementId ? pieceById(e.replacementId) : null;
+        const revert = !!repl && repl.statut==='offerte' && !saleOf(repl.id, s.orders);
+        this.askConfirm({
+          title:'Retirer cet évènement\u00a0?',
+          body:'« ' + (SAV_LABEL[e.type] || e.type) + ' » du ' + fmtIsoDate(e.date) + ' sera retiré du suivi de ' + pieceLabel(p) + '.'
+            + (revert ? ' La pièce de remplacement « ' + pieceLabel(repl) + ' » repassera en « Disponible ».' : ''),
+          okLabel:'Retirer', cancelLabel:'Garder',
+          onOk: () => {
+            this.setState(st => ({pieces: st.pieces.map(x =>
+              x.id===p.id ? Object.assign({}, x, {sav:(x.sav||[]).filter(y => y.id!==e.id)}) :
+              (revert && x.id===repl.id ? Object.assign({}, x, {statut:e.replacementPrev || 'disponible'}) : x))}));
+            this.logAudit('Après-vente retiré — ' + pieceLabel(p) + ' : ' + (SAV_LABEL[e.type] || e.type));
+            if (revert) this.logAudit('Pièce de remplacement remise en stock — ' + pieceLabel(repl));
+            this.showFlash('Évènement retiré du suivi' + (revert ? ' — ' + pieceLabel(repl) + ' est de nouveau disponible.' : '.'));
+          }
+        });
+      }});
     const savSorted = p => (p && p.sav ? p.sav.slice() : []).sort((a,b) => (b.date||'').localeCompare(a.date||'') || (b.id||'').localeCompare(a.id||''));
     const decOwners = s.owners.map(o => {
       const p = pieceById(o.pieceId);
@@ -1467,12 +1523,13 @@ class Component extends DCLogic {
         openAria: 'Ouvrir la fiche de ' + o.owner,
         hasSav: !!last, noSav: !last, sav: last ? decSav(p, last) : {},
         sale,
-        open: () => this.go('proprietaire', {viewOwnerId:o.id, savForm:this._emptySav()}),
+        open: () => this.go('proprietaire', {viewOwnerId:o.id, savForm:this._emptySav(), savFormOpen:false}),
         openPiece: e => { if (e && e.stopPropagation) e.stopPropagation(); if (p) openPiece(p); }};
     });
     const oq = s.ownerSearch.trim().toLowerCase();
     const filteredOwners = oq ? decOwners.filter(o => (o.owner+' '+o.pieceLabel+' '+o.email+' '+o.pays).toLowerCase().includes(oq)) : decOwners;
     const viewOwnerRaw = decOwners.find(o => o.id===s.viewOwnerId);
+    const ownerHasSav = !!(viewOwnerRaw && viewOwnerRaw.piece && (viewOwnerRaw.piece.sav||[]).length);
     const viewOrder = decOrders.find(o => o.id===s.viewOrderId);
     const orderDirty = !!viewOrder && (s.orderDraft.statut!==viewOrder.statut || s.orderDraft.tracking.trim()!==(viewOrder.tracking||''));
 
@@ -1555,7 +1612,10 @@ class Component extends DCLogic {
 
       flash: s.flash, closeFlash: () => { clearTimeout(this._flashT); this.setState({flash:''}); },
 
-      hasConfirm: !!s.confirm, confirm: s.confirm || {},
+      hasConfirm: !!s.confirm,
+      confirm: Object.assign({}, s.confirm || {}, {
+        isDanger: !!(s.confirm && s.confirm.okLabel) && s.confirm.tone!=='primary',
+        isPrimary: !!(s.confirm && s.confirm.okLabel) && s.confirm.tone==='primary'}),
       confirmCancel: () => this.setState({confirm:null}),
       confirmOk: () => { const c = s.confirm; this.setState({confirm:null}); if (c && c.onOk) c.onOk(); },
       stopClick: e => e.stopPropagation(),
@@ -1572,6 +1632,11 @@ class Component extends DCLogic {
       goPieces: () => this.go('pieces'),
       goCommandes: () => this.go('commandes'),
       goProprietaires: () => this.go('proprietaires'),
+      toggleFilters: () => this.setState(st => ({filtersOpen:!st.filtersOpen})),
+      filtersOpen: s.filtersOpen,
+      filtersClass: 'bo-filters' + (s.filtersOpen ? '' : ' is-collapsed'),
+      ordersFiltersLabel: (n => 'Filtres' + (n ? ' (' + n + ')' : ''))((s.canalFilter!=='tous' ? 1 : 0) + (s.orderStatutFilter!=='tous' ? 1 : 0)),
+      piecesFiltersLabel: (n => 'Filtres' + (n ? ' (' + n + ')' : ''))((s.statutFilter!=='tous' ? 1 : 0) + (s.sortBy!=='recent' ? 1 : 0)),
 
       crumb: ({'piece-form':'Pièces', 'commande-detail':'Commandes', 'vente-form':'Commandes', 'proprietaire':'Propriétaires'})[s.route] || '',
       crumbGo: () => this.go(NAV_PARENT[s.route] || 'dashboard'),
@@ -1742,6 +1807,15 @@ class Component extends DCLogic {
           });
           return;
         }
+        if (d.statut==='expediee' && o.statut!=='expediee' && o.isOnline && !d.tracking) {
+          this.askConfirm({
+            title:'Aucun code de suivi saisi',
+            body:'Vous passez la commande ' + o.no + ' en « Expédiée » sans code de suivi : ' + (o.client ? o.client : 'le client') + ' ne pourra pas suivre son colis. Vous pourrez saisir le code plus tard.',
+            okLabel:'Marquer expédiée', cancelLabel:'Saisir le code', tone:'primary',
+            onOk: apply
+          });
+          return;
+        }
         apply();
       },
 
@@ -1818,7 +1892,12 @@ class Component extends DCLogic {
           openPiece: () => { if (p) openPiece(p); }};
       })(),
       ownerSav: viewOwnerRaw && viewOwnerRaw.piece ? savSorted(viewOwnerRaw.piece).map(e => decSav(viewOwnerRaw.piece, e)) : [],
-      noSav: !(viewOwnerRaw && viewOwnerRaw.piece && (viewOwnerRaw.piece.sav||[]).length),
+      noSav: !ownerHasSav,
+      // Historique d'abord : le formulaire n'est ouvert d'emblée que s'il n'y a encore aucun évènement.
+      savFormShown: s.savFormOpen || !ownerHasSav, savFormHidden: !(s.savFormOpen || !ownerHasSav), savCanCancel: ownerHasSav && s.savFormOpen,
+      openSavForm: () => { this.setState({savFormOpen:true}); setTimeout(() => { try { document.querySelector('[data-sav-first]').focus(); } catch(e){} }, 40); },
+      closeSavForm: () => this.setState({savFormOpen:false, savForm:this._emptySav()}),
+      savNoEffect: ['remboursee','restituee'].includes(s.savForm.type),
       savForm: s.savForm,
       setSav: Object.fromEntries(Object.keys(this._emptySav()).map(key => [key, e => {
         const v = e.target.value; this.setState(st => ({savForm:Object.assign({}, st.savForm, {[key]:v})}));
@@ -1831,12 +1910,12 @@ class Component extends DCLogic {
         const o = viewOwnerRaw; if (!o || !o.piece) return;
         const f = s.savForm;
         const entry = {id:'s' + Date.now(), type:f.type, date:f.date || isoToday(), note:f.note.trim(), auteur:displayName(me),
-          replacementId: f.type==='remplacee' ? (f.replacementId || '') : ''};
+          replacementId: f.type==='remplacee' ? (f.replacementId || '') : '', replacementPrev:'disponible'};
         const repl = entry.replacementId ? pieceById(entry.replacementId) : null;
         this.setState(st => ({pieces: st.pieces.map(x =>
           x.id===o.piece.id ? Object.assign({}, x, {sav:(x.sav||[]).concat([entry])}) :
           (repl && x.id===repl.id ? Object.assign({}, x, {statut:'offerte'}) : x)),
-          savForm:Object.assign(this._emptySav(), {type:f.type})}));
+          savForm:this._emptySav(), savFormOpen:false}));
         this.logAudit('Après-vente — ' + pieceLabel(o.piece) + ' : ' + SAV_LABEL[entry.type] + (entry.note ? ' (' + entry.note + ')' : ''));
         if (repl) this.logAudit('Pièce de remplacement attribuée — ' + pieceLabel(repl) + ' passée en « Offerte » pour ' + o.owner);
         this.showFlash('« ' + SAV_LABEL[entry.type] + ' » ajouté au suivi de ' + pieceLabel(o.piece) + (repl ? ' — ' + pieceLabel(repl) + ' sort du stock.' : '.'));
@@ -1866,6 +1945,7 @@ class Component extends DCLogic {
           m[p.eff==='disponible' ? 'dispo' : p.eff] += 1;
         });
         return Object.values(by).sort((a,b) => b.dispo-a.dispo || a.modele.localeCompare(b.modele)).map(m => ({...m,
+          numColor: m.dispo ? 'rgb(71,29,27)' : 'rgb(164,164,164)',
           detail: [m.vendue ? m.vendue + (m.vendue>1 ? ' vendues' : ' vendue') : '', m.bientot ? m.bientot + ' bientôt' : ''].filter(Boolean).join(' · ') || 'Disponible'}));
       })(),
       goPiecesDispo: () => this.go('pieces', {statutFilter:'disponible'}),
@@ -1890,8 +1970,8 @@ class Component extends DCLogic {
       piecesCount: (filteredPieces.length===s.pieces.length
         ? s.pieces.length + ' pièces au registre'
         : filteredPieces.length + ' sur ' + s.pieces.length + ' pièces') + ' · ' + decPieces.filter(p => p.eff==='disponible').length + ' disponibles à la vente',
-      newPiece: () => this.go('piece-form', {editId:null, fieldErr:{}, codeRevealed:true,
-        form:Object.assign(this._emptyForm(), {autoIds:true, serie:nextSerie(s.pieces, ''), code:genCode(s.pieces)})}),
+      newPiece: () => this.go('piece-form', {editId:null, fieldErr:{}, codeRevealed:false,
+        form:Object.assign(this._emptyForm(), {autoIds:true, serie:nextSerie(s.pieces, '', s.serieMax), code:genCode(s.pieces)})}),
       registreOpen: s.registreOpen,
       registreChevron: s.registreOpen ? 'rotate(180deg)' : 'none',
       toggleRegistre: () => this.setState(st => ({registreOpen:!st.registreOpen})),
@@ -1919,11 +1999,11 @@ class Component extends DCLogic {
       idsHint: isEditing
         ? 'Le n° de série et le code sont figés une fois la pièce enregistrée : ils sont imprimés sur le certificat et encodés dans le QR code.'
         : (s.form.autoIds
-          ? 'Générés automatiquement : n° de série CS-numéro d\'ordre-année de fabrication, code aléatoire de 8 caractères sans 0/O ni 1/I, unique au registre.'
+          ? 'Générés automatiquement : n° de série CS-numéro d\'ordre-année de fabrication (un numéro n\'est jamais réattribué, même après suppression), code aléatoire de 8 caractères sans 0/O ni 1/I, unique au registre.'
           : 'Saisie manuelle : à réserver aux pièces déjà numérotées (registre papier ou fichier Excel existant).'),
       toggleAutoIds: () => this.setState(st => st.form.autoIds
         ? {form:Object.assign({}, st.form, {autoIds:false})}
-        : {form:Object.assign({}, st.form, {autoIds:true, serie:nextSerie(st.pieces, st.form.dateFab), code:genCode(st.pieces)}), fieldErr:{}}),
+        : {form:Object.assign({}, st.form, {autoIds:true, serie:nextSerie(st.pieces, st.form.dateFab, st.serieMax), code:genCode(st.pieces)}), fieldErr:{}, codeRevealed:false}),
       regenCode: () => this.setState(st => ({form:Object.assign({}, st.form, {code:genCode(st.pieces)})})),
       ...(() => {
         const cur = isEditing ? pieceById(s.editId) : null;
@@ -1938,7 +2018,9 @@ class Component extends DCLogic {
         };
       })(),
       formSlot: isEditing ? 'bo-p-' + s.editId : 'bo-p-new',
-      codeType: s.codeRevealed ? 'text' : 'password',
+      canToggleCode: isEditing || !!s.form.autoIds,
+      codeType: (s.codeRevealed || (!isEditing && !s.form.autoIds)) ? 'text' : 'password',
+      prixHint: (String(s.form.prix).trim()!=='' && Number(s.form.prix) >= 0) ? '= ' + fmtFcfa(s.form.prix) : '',
       codeToggleLabel: s.codeRevealed ? 'Masquer' : 'Afficher',
       toggleCode: () => {
         if (!s.codeRevealed) this.logAudit('Consultation du code d\'activation — ' + (s.form.serie || 'pièce sans numéro'));
@@ -1950,12 +2032,12 @@ class Component extends DCLogic {
           const fe = Object.assign({}, st.fieldErr); delete fe[key];
           const patch = {[key]: v};
           // En génération automatique, l'année du n° de série suit la date de fabrication.
-          if (key==='dateFab' && st.form.autoIds && !st.editId) patch.serie = (st.form.serie || nextSerie(st.pieces, v)).replace(/-\d{4}$/, '-' + yearOf(v));
+          if (key==='dateFab' && st.form.autoIds && !st.editId) patch.serie = (st.form.serie || nextSerie(st.pieces, v, st.serieMax)).replace(/-\d{4}$/, '-' + yearOf(v));
           return {form: Object.assign({}, st.form, patch), fieldErr: fe};
         });
       }])),
       hasOwnerForForm: !!ownerForForm, noOwnerForForm: isEditing && !ownerForForm,
-      formOwner: ownerForForm ? Object.assign({}, ownerForForm, {open: () => this.go('proprietaire', {viewOwnerId:ownerForForm.id, savForm:this._emptySav()})}) : {},
+      formOwner: ownerForForm ? Object.assign({}, ownerForForm, {open: () => this.go('proprietaire', {viewOwnerId:ownerForForm.id, savForm:this._emptySav(), savFormOpen:false})}) : {},
       savePiece: e => {
         e.preventDefault();
         const raw = this.state.form;
@@ -1970,7 +2052,7 @@ class Component extends DCLogic {
         const editing = !!this.state.editId;
         this.setState(st => editing
           ? {pieces: st.pieces.map(p => p.id===st.editId ? Object.assign({}, p, f, {id:st.editId, serie:p.serie, code:p.code}) : p), route:'pieces', fieldErr:{}}
-          : {pieces: st.pieces.concat([Object.assign({id:'p' + Date.now(), sav:[]}, f)]), route:'pieces', fieldErr:{}});
+          : {pieces: st.pieces.concat([Object.assign({id:'p' + Date.now(), sav:[]}, f)]), route:'pieces', fieldErr:{}, serieMax:Math.max(st.serieMax, serieNo(f))});
         const nom = f.modele || 'sans nom';
         this.logAudit((editing ? 'Pièce modifiée — ' : 'Pièce créée — ') + nom + (f.serie ? ', ' + f.serie : ''));
         this.showFlash('Pièce « ' + nom + ' » ' + (editing ? 'enregistrée.' : 'ajoutée au registre.'));
@@ -2001,7 +2083,7 @@ class Component extends DCLogic {
           body:'La pièce ' + p.serie + ' et son code d\'activation seront retirés du registre. Cette action est définitive.',
           okLabel:'Supprimer la pièce',
           onOk: () => {
-            this.setState(st => ({pieces: st.pieces.filter(x => x.id!==p.id), route:'pieces'}));
+            this.setState(st => ({pieces: st.pieces.filter(x => x.id!==p.id), route:'pieces', serieMax:Math.max(st.serieMax, serieNo(p))}));
             this.logAudit('Pièce supprimée — ' + p.modele + ', ' + p.serie);
             this.showFlash('Pièce « ' + p.modele + ' » supprimée du registre.');
           }
