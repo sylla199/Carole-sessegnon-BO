@@ -316,6 +316,7 @@
                   <option value="disponible">Disponible</option>
                   <option value="bientot">Bientôt disponible</option>
                   <option value="vendue">Vendue</option>
+                  <option value="reserve">Réservée (en fabrication)</option>
                   <option value="prototype">Prototype</option>
                   <option value="offerte">Offerte</option>
                 </select>
@@ -340,6 +341,7 @@
                   </div>
                 </sc-if>
               </div>
+              <x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="secondary" onClick="{{ openLot }}" dc-props="{{ btnUpperSm }}" hint-size="auto,46px">Générer un lot</x-import>
               <x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="primary" onClick="{{ newPiece }}" dc-props="{{ btnUpperSm }}" hint-size="auto,46px">Ajouter une pièce</x-import>
             </div>
           </div>
@@ -456,6 +458,7 @@
                     <select value="{{ form.statut }}" onChange="{{ setF.statut }}" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
                       <option value="bientot">Bientôt disponible</option>
                       <option value="disponible">Disponible</option>
+                      <option value="reserve">Réservée (en fabrication)</option>
                       <option value="prototype">Prototype</option>
                       <option value="offerte">Offerte</option>
                     </select>
@@ -564,6 +567,46 @@
               </sc-if>
             </div>
           </div>
+        </sc-if>
+
+        <sc-if value="{{ isLotForm }}">
+          <button type="button" onClick="{{ goPieces }}" style="background:none;border:0;padding:0;margin-bottom:22px;color:rgb(94,94,94);cursor:pointer;font-size:13px">← Retour aux pièces</button>
+          <form onSubmit="{{ generateLot }}" noValidate style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:clamp(22px,3vw,32px);display:flex;flex-direction:column;gap:18px;max-width:640px">
+            <p style="margin:0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">Préparer un lot avant fabrication</p>
+            <p style="margin:0;font-size:13px;line-height:20px;color:rgb(94,94,94)">Les numéros de série et codes d'activation sont générés automatiquement, à la suite des derniers émis : aucun doublon possible, même en plusieurs lots séparés dans le temps. Chaque pièce entre au registre avec le statut « Réservée (en fabrication) » et n'apparaît pas à la vente tant qu'elle n'est pas reçue de l'atelier.</p>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:16px">
+              <label style="display:block;font-size:13px;color:rgb(70,70,70)">Modèle
+                <input value="{{ lotForm.modele }}" onChange="{{ setLot.modele }}" aria-invalid="{{ lotInvalid.modele }}" aria-describedby="err-lot-modele" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:{{ lotShadow.modele }};color:rgb(0,0,0)">
+                <sc-if value="{{ lotErr.modele }}"><span id="err-lot-modele" style="display:block;margin-top:6px;font-size:12px;color:rgb(155,24,33)">{{ lotErr.modele }}</span></sc-if>
+              </label>
+              <label style="display:block;font-size:13px;color:rgb(70,70,70)">Coloris <span style="color:rgb(94,94,94)">(facultatif)</span>
+                <input value="{{ lotForm.coloris }}" onChange="{{ setLot.coloris }}" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+              </label>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:16px">
+              <label style="display:block;font-size:13px;color:rgb(70,70,70)">Référence article <span style="color:rgb(94,94,94)">(facultatif)</span>
+                <input value="{{ lotForm.reference }}" onChange="{{ setLot.reference }}" placeholder="{{ lotRefPlaceholder }}" autocomplete="off" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0);text-transform:uppercase;letter-spacing:.06em">
+              </label>
+              <label style="display:block;font-size:13px;color:rgb(70,70,70)">Prix de vente (FCFA) <span style="color:rgb(94,94,94)">(facultatif)</span>
+                <input type="number" min="0" step="1000" inputMode="numeric" value="{{ lotForm.prix }}" onChange="{{ setLot.prix }}" aria-invalid="{{ lotInvalid.prix }}" aria-describedby="err-lot-prix" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:{{ lotShadow.prix }};color:rgb(0,0,0);font-variant-numeric:tabular-nums">
+                <sc-if value="{{ lotErr.prix }}"><span id="err-lot-prix" style="display:block;margin-top:6px;font-size:12px;color:rgb(155,24,33)">{{ lotErr.prix }}</span></sc-if>
+              </label>
+            </div>
+            <label style="display:block;font-size:13px;color:rgb(70,70,70)">Matière <span style="color:rgb(94,94,94)">(facultatif)</span>
+              <input value="{{ lotForm.matiere }}" onChange="{{ setLot.matiere }}" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+            </label>
+            <label style="display:block;font-size:13px;color:rgb(70,70,70);max-width:220px">Quantité à générer
+              <input type="number" min="1" step="1" inputMode="numeric" value="{{ lotForm.quantite }}" onChange="{{ setLot.quantite }}" aria-invalid="{{ lotInvalid.quantite }}" aria-describedby="err-lot-quantite" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:{{ lotShadow.quantite }};color:rgb(0,0,0);font-variant-numeric:tabular-nums">
+              <sc-if value="{{ lotErr.quantite }}"><span id="err-lot-quantite" style="display:block;margin-top:6px;font-size:12px;color:rgb(155,24,33)">{{ lotErr.quantite }}</span></sc-if>
+            </label>
+            <p style="margin:-6px 0 0;font-size:12px;color:rgb(94,94,94)">Prochain numéro de série à émettre : <span style="font-variant-numeric:tabular-nums">{{ lotNextSerie }}</span></p>
+            <sc-if value="{{ hasLotErr }}">
+              <p role="alert" style="margin:0;font-size:13px;color:rgb(155,24,33)">Le lot n'a pas été généré : corrigez les champs signalés.</p>
+            </sc-if>
+            <div style="display:flex;justify-content:flex-end">
+              <x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="primary" dc-props="{{ btnUpperSm }}" hint-size="auto,46px">Générer le lot</x-import>
+            </div>
+          </form>
         </sc-if>
 
         <sc-if value="{{ isCommandes }}">
@@ -1260,8 +1303,8 @@ const BADGE = {
   offsale:     {statutBg:'rgb(250,241,235)',   statutFg:'rgb(115,60,8)',   statutShadow:'inset 0 0 0 1px rgb(233,199,176)'},
   offsaleLine: {statutBg:'rgb(255,255,255)',   statutFg:'rgb(149,83,28)',  statutShadow:'inset 0 0 0 1px rgb(202,150,114)'}
 };
-const STATUT_LABEL = {disponible:'Disponible', vendue:'Vendue', bientot:'Bientôt disponible', prototype:'Prototype', offerte:'Offerte'};
-const STATUT_KIND = {disponible:'progress', vendue:'done', bientot:'neutral', prototype:'offsaleLine', offerte:'offsale'};
+const STATUT_LABEL = {disponible:'Disponible', vendue:'Vendue', bientot:'Bientôt disponible', prototype:'Prototype', offerte:'Offerte', reserve:'Réservée (en fabrication)'};
+const STATUT_KIND = {disponible:'progress', vendue:'done', bientot:'neutral', prototype:'offsaleLine', offerte:'offsale', reserve:'neutral'};
 const CANAL_LABEL = {en_ligne:'En ligne', popup:'Pop-up', directe:'Vente directe'};
 // Étapes de « Enregistrer une vente » ; fields = erreurs vérifiées par l'étape
 const VENTE_STEPS = [
@@ -1368,6 +1411,7 @@ class Component extends DCLogic {
     teamTab:'membres', auditSearch:'', auditAuteur:'tous',
     viewOrderId:null, orderDraft:{statut:'', tracking:''},
     editId:null, form:this._emptyForm(), fieldErr:{}, codeRevealed:false, photoBusy:false, photoErr:'', photoNotice:null,
+    lotForm:this._emptyLot(), lotErr:{},
     flash:'', confirm:null,
     meId:ME_ID, invite:null,
     acceptToken:'', accept:this._emptyAccept()
@@ -1437,6 +1481,7 @@ class Component extends DCLogic {
   }
 
   _emptyForm(){ return {modele:'', coloris:'', reference:'', prix:'', serie:'', code:'', matiere:'', dateFab:'', statut:'disponible', autoIds:false, photos:[]}; }
+  _emptyLot(){ return {modele:'', coloris:'', reference:'', prix:'', matiere:'', quantite:''}; }
   _emptySav(){ return {type:'en_reparation', date:isoToday(), note:'', replacementId:''}; }
   _emptyVente(){ return {canal:'popup', date:isoToday(), evenement:'', pieceIds:[], client:'', email:'', telephone:'', montant:'', paiement:'Espèces', note:''}; }
 
@@ -1678,7 +1723,7 @@ class Component extends DCLogic {
       {key:'proprietaires', label:'Propriétaires', icon:'owners'},
       {key:'equipe', label:'Équipe', icon:'team'}
     ];
-    const NAV_PARENT = {'piece-form':'pieces', 'commande-detail':'commandes', 'vente-form':'commandes', 'proprietaire':'proprietaires'};
+    const NAV_PARENT = {'piece-form':'pieces', 'lot-form':'pieces', 'commande-detail':'commandes', 'vente-form':'commandes', 'proprietaire':'proprietaires'};
     const activeNav = NAV_PARENT[s.route] || s.route;
 
     const activeDirection = s.team.filter(t => t.role==='direction' && t.statut==='actif').length;
@@ -1761,6 +1806,7 @@ class Component extends DCLogic {
       isDashboard: s.route==='dashboard',
       isPieces: s.route==='pieces',
       isPieceForm: s.route==='piece-form',
+      isLotForm: s.route==='lot-form',
       isProprietaires: s.route==='proprietaires',
       isCommandes: s.route==='commandes',
       isCommandeDetail: s.route==='commande-detail',
@@ -1776,11 +1822,12 @@ class Component extends DCLogic {
       ordersFiltersLabel: (n => 'Filtres' + (n ? ' (' + n + ')' : ''))((s.canalFilter!=='tous' ? 1 : 0) + (s.orderStatutFilter!=='tous' ? 1 : 0)),
       piecesFiltersLabel: (n => 'Filtres' + (n ? ' (' + n + ')' : ''))((s.statutFilter!=='tous' ? 1 : 0) + (s.sortBy!=='recent' ? 1 : 0)),
 
-      crumb: ({'piece-form':'Pièces', 'commande-detail':'Commandes', 'vente-form':'Commandes', 'proprietaire':'Propriétaires'})[s.route] || '',
+      crumb: ({'piece-form':'Pièces', 'lot-form':'Pièces', 'commande-detail':'Commandes', 'vente-form':'Commandes', 'proprietaire':'Propriétaires'})[s.route] || '',
       crumbGo: () => this.go(NAV_PARENT[s.route] || 'dashboard'),
       pageTitle: ({
         dashboard:'Tableau de bord', pieces:'Pièces', commandes:'Commandes', equipe:'Équipe et accès', proprietaires:'Propriétaires',
         'piece-form': isEditing ? 'Modifier la pièce' : 'Ajouter une pièce',
+        'lot-form': 'Générer un lot de pièces',
         'commande-detail': viewOrder ? viewOrder.no : 'Commande',
         'vente-form': 'Enregistrer une vente',
         'proprietaire': viewOwnerRaw ? viewOwnerRaw.owner : 'Propriétaire'
@@ -2132,15 +2179,34 @@ class Component extends DCLogic {
       filteredPieces, noPieces: filteredPieces.length===0,
       piecesCount: (filteredPieces.length===s.pieces.length
         ? s.pieces.length + ' pièces au registre'
-        : filteredPieces.length + ' sur ' + s.pieces.length + ' pièces') + ' · ' + decPieces.filter(p => p.eff==='disponible').length + ' disponibles à la vente',
+        : filteredPieces.length + ' sur ' + s.pieces.length + ' pièces') + ' · ' + decPieces.filter(p => p.eff==='disponible').length + ' disponibles à la vente'
+        + (decPieces.some(p => p.eff==='reserve') ? ' · ' + decPieces.filter(p => p.eff==='reserve').length + ' réservées en fabrication' : ''),
       newPiece: () => this.go('piece-form', {editId:null, fieldErr:{}, codeRevealed:false,
         form:Object.assign(this._emptyForm(), {autoIds:true, serie:nextSerie(s.pieces, '', s.serieMax), code:genCode(s.pieces)})}),
+      openLot: () => this.go('lot-form', {lotForm:this._emptyLot(), lotErr:{}}),
       registreOpen: s.registreOpen,
       registreChevron: s.registreOpen ? 'rotate(180deg)' : 'none',
       toggleRegistre: () => this.setState(st => ({registreOpen:!st.registreOpen})),
       registreItems: [
         {label:'Importer le registre (Excel)', run: () => { this.setState({registreOpen:false}); this.showFlash('Démonstration — import du registre Excel (numéros de série et codes d\'activation existants) non branché ici.', 7000); }},
-        {label:'Générer la planche de QR codes', run: () => { this.setState({registreOpen:false}); this.showFlash('Démonstration — génération de la planche de QR codes prête pour l\'imprimeur non branchée ici.', 7000); }},
+        {label:'Exporter les n° de série à fabriquer (CSV)', run: () => {
+          this.setState({registreOpen:false});
+          const aFabriquer = decPieces.filter(p => p.eff==='reserve');
+          if (!aFabriquer.length) { this.showFlash('Aucune pièce réservée en fabrication pour le moment.', 6000); return; }
+          this.downloadCsv('lot-a-fabriquer-carole-sessegnon.csv',
+            [['Référence','Modèle','Coloris','Numéro de série']]
+              .concat(aFabriquer.map(p => [p.reference||'',p.modele,p.coloris,p.serie])));
+        }},
+        {label:'Exporter pour les certificats (CSV)', run: () => {
+          this.setState({registreOpen:false});
+          const aCertifier = decPieces.filter(p => p.eff==='reserve');
+          if (!aCertifier.length) { this.showFlash('Aucune pièce réservée en fabrication pour le moment.', 6000); return; }
+          this.downloadCsv('certificats-carole-sessegnon.csv',
+            [['Référence','Modèle','Numéro de série','Code d\'activation','Lien d\'authentification (QR)']]
+              .concat(aCertifier.map(p => [p.reference||'',p.modele,p.serie,p.code,
+                'https://authentification.carole-sessegnon.com/verifier?serie=' + encodeURIComponent(p.serie) + '&code=' + encodeURIComponent(p.code)])));
+          this.logAudit('Export certificats — ' + aCertifier.length + (aCertifier.length>1 ? ' pièces' : ' pièce') + ' (numéros de série et codes d\'activation inclus)');
+        }},
         {label:'Exporter la liste (CSV)', run: () => {
           this.setState({registreOpen:false});
           // Les codes d'activation restent hors de l'export : ils ne quittent pas le back-office.
@@ -2282,6 +2348,54 @@ class Component extends DCLogic {
             this.showFlash('Pièce « ' + p.modele + ' » supprimée du registre.');
           }
         });
+      },
+
+      // Lot de pièces (identifiants préparés en amont de la fabrication)
+      lotForm: s.lotForm || this._emptyLot(),
+      lotRefPlaceholder: refFromModele((s.lotForm || this._emptyLot()).modele) ? 'Ex. ' + refFromModele((s.lotForm || this._emptyLot()).modele) : 'Ex. HUP',
+      lotNextSerie: nextSerie(s.pieces, '', s.serieMax),
+      setLot: Object.fromEntries(Object.keys(this._emptyLot()).map(key => [key, e => {
+        const v = e.target.value;
+        this.setState(st => {
+          const le = Object.assign({}, st.lotErr); delete le[key];
+          return {lotForm:Object.assign({}, st.lotForm, {[key]:v}), lotErr:le};
+        });
+      }])),
+      lotErr: s.lotErr || {}, hasLotErr: Object.keys(s.lotErr || {}).length>0,
+      lotInvalid: {modele:!!(s.lotErr||{}).modele, prix:!!(s.lotErr||{}).prix, quantite:!!(s.lotErr||{}).quantite},
+      lotShadow: {
+        modele: (s.lotErr||{}).modele ? FIELD_ERR : FIELD_OK,
+        prix: (s.lotErr||{}).prix ? FIELD_ERR : FIELD_OK,
+        quantite: (s.lotErr||{}).quantite ? FIELD_ERR : FIELD_OK
+      },
+      generateLot: e => {
+        e.preventDefault();
+        const raw = s.lotForm || this._emptyLot();
+        const modele = raw.modele.trim();
+        const quantiteNum = Number(raw.quantite);
+        const err = {};
+        if (!modele) err.modele = 'Indiquez le modèle à préparer.';
+        if (!raw.quantite || !Number.isInteger(quantiteNum) || quantiteNum < 1) err.quantite = 'Indiquez un nombre entier de pièces à générer (1 ou plus).';
+        else if (quantiteNum > 500) err.quantite = 'Générez au plus 500 pièces à la fois.';
+        if (String(raw.prix).trim()!=='' && !(Number(raw.prix) >= 0)) err.prix = 'Indiquez un montant en FCFA (chiffres uniquement).';
+        if (Object.keys(err).length) { this.setState({lotErr:err}); return; }
+        const reference = (raw.reference.trim() || refFromModele(modele)).toUpperCase();
+        const coloris = raw.coloris.trim(), matiere = raw.matiere.trim();
+        const prix = String(raw.prix).trim()==='' ? '' : Number(raw.prix);
+        const batch = [];
+        let counter = Math.max(maxSerie(s.pieces), s.serieMax);
+        for (let i = 0; i < quantiteNum; i++) {
+          counter++;
+          const code = genCode(s.pieces.concat(batch));
+          batch.push({id:'p' + Date.now() + '-' + i, reference, modele, coloris, matiere, prix,
+            serie:'CS-' + String(counter).padStart(4, '0') + '-' + yearOf(''),
+            code, dateFab:'', statut:'reserve', sav:[], photos:[]});
+        }
+        const first = batch[0].serie, last = batch[batch.length - 1].serie;
+        this.setState(st => ({pieces: st.pieces.concat(batch), serieMax:counter,
+          route:'pieces', lotErr:{}, statutFilter:'reserve', search:reference, sortBy:'serie'}));
+        this.logAudit('Lot généré — ' + quantiteNum + ' × ' + modele + ' (' + first + ' → ' + last + ')');
+        this.showFlash(quantiteNum + ' pièces « ' + modele + ' » générées (' + first + ' → ' + last + '), prêtes pour la fabrication.', 7000);
       },
 
       // Propriétaires
