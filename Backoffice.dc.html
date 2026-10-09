@@ -31,6 +31,8 @@
   .bo-aside{position:sticky;top:0;height:100vh}
   .bo-menu-btn,.bo-scrim{display:none}
   .bo-table th{white-space:nowrap}
+  /* Onglets qui débordent horizontalement : dégradé au bord pour signaler qu'il y a plus à voir */
+  .bo-tabs-scroll{mask-image:linear-gradient(to right, black calc(100% - 28px), transparent 100%);-webkit-mask-image:linear-gradient(to right, black calc(100% - 28px), transparent 100%)}
   .bo-filters{display:contents}
   .bo-only-mobile{display:none !important}
   /* Photos de la pièce : la vignette entière est le bouton « photo principale » */
@@ -264,8 +266,9 @@
               </div>
               <sc-for list="{{ recentPieces }}" as="p" hint-placeholder-count="4">
                 <button type="button" onClick="{{ p.open }}" style="display:flex;width:100%;align-items:center;gap:14px;padding:12px 0;border-top:1px solid rgba(0,0,0,.08);background:none;border-left:0;border-right:0;border-bottom:0;text-align:left;cursor:pointer;font-family:inherit" style-hover="opacity:.7">
-                  <div style="flex:0 0 44px;width:44px;height:44px;border-radius:50%;overflow:hidden;outline:1px solid oklch(0 0 0 / 0.1);outline-offset:-1px">
+                  <div style="flex:0 0 44px;width:44px;height:44px;border-radius:50%;overflow:hidden;outline:1px solid oklch(0 0 0 / 0.1);outline-offset:-1px;display:flex;align-items:center;justify-content:center">
                     <sc-if value="{{ p.hasPhoto }}"><img src="{{ p.photoSrc }}" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></sc-if>
+                          <sc-if value="{{ p.noPhoto }}"><svg aria-hidden="true" viewBox="0 0 24 24" style="width:40%;height:40%;opacity:.3" fill="none" stroke="rgb(164,164,164)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h12l1 12H5L6 8Z"></path><path d="M9 8V6a3 3 0 0 1 6 0v2"></path></svg></sc-if>
                   </div>
                   <div style="flex:1;min-width:0">
                     <p style="margin:0;font-size:14px;color:rgb(0,0,0)">{{ p.modele }}</p>
@@ -364,8 +367,9 @@
                   <tr onClick="{{ p.open }}" style="cursor:pointer;transition:background-color .15s" style-hover="background:rgb(255,251,248)">
                     <td style="padding:14px 18px;border-bottom:1px solid rgba(0,0,0,.06)">
                       <div style="display:flex;align-items:center;gap:12px">
-                        <div style="flex:0 0 36px;width:36px;height:36px;border-radius:50%;overflow:hidden;outline:1px solid oklch(0 0 0 / 0.1);outline-offset:-1px">
+                        <div style="flex:0 0 36px;width:36px;height:36px;border-radius:50%;overflow:hidden;outline:1px solid oklch(0 0 0 / 0.1);outline-offset:-1px;display:flex;align-items:center;justify-content:center">
                           <sc-if value="{{ p.hasPhoto }}"><img src="{{ p.photoSrc }}" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></sc-if>
+                          <sc-if value="{{ p.noPhoto }}"><svg aria-hidden="true" viewBox="0 0 24 24" style="width:40%;height:40%;opacity:.3" fill="none" stroke="rgb(164,164,164)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h12l1 12H5L6 8Z"></path><path d="M9 8V6a3 3 0 0 1 6 0v2"></path></svg></sc-if>
                         </div>
                         <div>
                           <span style="display:block;font-size:14px;color:rgb(0,0,0)">{{ p.modele }}</span>
@@ -374,8 +378,8 @@
                       </div>
                     </td>
                     <td data-label="N° de série" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);font-variant-numeric:tabular-nums;border-bottom:1px solid rgba(0,0,0,.06)">{{ p.serie }}</td>
-                    <td data-label="Prix" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);font-variant-numeric:tabular-nums;white-space:nowrap;border-bottom:1px solid rgba(0,0,0,.06)">{{ p.prixLabel }}</td>
-                    <td data-label="Fabrication" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)">{{ p.dateFabLabel }}</td>
+                    <td data-label="Prix" style="padding:14px 18px;font-size:13px;color:{{ p.prixColor }};font-variant-numeric:tabular-nums;white-space:nowrap;border-bottom:1px solid rgba(0,0,0,.06)">{{ p.prixLabel }}</td>
+                    <td data-label="Fabrication" style="padding:14px 18px;font-size:13px;color:{{ p.dateFabColor }};border-bottom:1px solid rgba(0,0,0,.06)">{{ p.dateFabLabel }}</td>
                     <td data-label="Statut" style="padding:14px 18px;border-bottom:1px solid rgba(0,0,0,.06)">
                       <span style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ p.statutBg }};color:{{ p.statutFg }};box-shadow:{{ p.statutShadow }}">{{ p.statutLabel }}</span>
                     </td>
@@ -481,7 +485,7 @@
               <sc-if value="{{ hasFieldErr }}">
                 <p role="alert" style="margin:0;font-size:13px;color:rgb(155,24,33)">La pièce n'a pas été enregistrée : corrigez les champs signalés.</p>
               </sc-if>
-              <div style="position:sticky;bottom:0;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin:6px calc(-1 * clamp(22px,3vw,32px)) calc(-1 * clamp(22px,3vw,32px));padding:14px clamp(22px,3vw,32px);background:rgb(255,255,255);box-shadow:inset 0 1px 0 rgba(0,0,0,.08)">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding-top:14px;border-top:1px solid rgba(0,0,0,.08)">
                 <x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="primary" dc-props="{{ btnUpperSm }}" hint-size="auto,46px">Enregistrer la pièce</x-import>
                 <sc-if value="{{ isEditing }}">
                   <button type="button" onClick="{{ deletePiece }}" style="background:none;border:0;padding:0;color:rgb(155,24,33);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(155,24,33)">Supprimer cette pièce</button>
@@ -655,10 +659,10 @@
                 <sc-for list="{{ filteredOrders }}" as="o" hint-placeholder-count="5">
                   <tr onClick="{{ o.open }}" style="cursor:pointer;transition:background-color .15s" style-hover="background:rgb(255,251,248)">
                     <td style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);font-size:14px;color:rgb(0,0,0);font-variant-numeric:tabular-nums;white-space:nowrap">{{ o.no }}</td>
-                    <td data-label="Canal" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)">
+                    <td data-label="Canal" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);max-width:160px">
                       <div>
                         <span style="display:block">{{ o.canalLabel }}</span>
-                        <sc-if value="{{ o.evenement }}"><span style="display:block;margin-top:2px;font-size:12px;color:rgb(94,94,94)">{{ o.evenement }}</span></sc-if>
+                        <sc-if value="{{ o.evenement }}"><span title="{{ o.evenement }}" style="display:block;margin-top:2px;font-size:12px;color:rgb(94,94,94);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ o.evenement }}</span></sc-if>
                       </div>
                     </td>
                     <td data-label="Client" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);white-space:nowrap">{{ o.clientLabel }}</td>
@@ -739,7 +743,7 @@
           <button type="button" onClick="{{ goCommandes }}" style="background:none;border:0;padding:0;margin-bottom:22px;color:rgb(94,94,94);cursor:pointer;font-size:13px">← Retour aux commandes</button>
           <form onSubmit="{{ saveVente }}" noValidate style="display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start;max-width:1100px">
             <div style="flex:999 1 520px;min-width:0;background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:clamp(22px,3vw,32px);display:flex;flex-direction:column;gap:18px">
-              <div role="tablist" aria-label="Étapes de la vente" style="display:flex;gap:28px;overflow-x:auto;box-shadow:inset 0 -1px 0 rgba(0,0,0,.1)">
+              <div role="tablist" aria-label="Étapes de la vente" class="bo-tabs-scroll" style="display:flex;gap:28px;overflow-x:auto;box-shadow:inset 0 -1px 0 rgba(0,0,0,.1)">
                 <sc-for list="{{ venteSteps }}" as="st" hint-placeholder-count="4">
                   <button type="button" role="tab" aria-selected="{{ st.selected }}" disabled="{{ st.locked }}" onClick="{{ st.select }}" style="flex:0 0 auto;display:flex;align-items:baseline;gap:8px;background:none;border:0;padding:12px 0;cursor:{{ st.cursor }};font-size:13px;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;color:{{ st.color }};opacity:{{ st.opacity }};box-shadow:{{ st.underline }}"><span style="font-family:var(--font-display);font-size:15px;letter-spacing:0">{{ st.num }}</span>{{ st.label }}<sc-if value="{{ st.done }}"><span aria-label="terminée" style="color:rgb(177,115,69);letter-spacing:0">✓</span></sc-if></button>
                 </sc-for>
@@ -758,8 +762,9 @@
                     <sc-for list="{{ ventePieces }}" as="v" hint-placeholder-count="4">
                       <label style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid rgba(0,0,0,.06);cursor:pointer;background:{{ v.bg }}">
                         <input type="checkbox" checked="{{ v.checked }}" onChange="{{ v.toggle }}" aria-describedby="err-vente-pieces" style="flex:0 0 auto;width:18px;height:18px;margin:0;accent-color:rgb(71,29,27)">
-                        <div style="flex:0 0 40px;width:40px;height:40px;border-radius:50%;overflow:hidden;background:rgb(252,249,248);outline:1px solid oklch(0 0 0 / 0.1);outline-offset:-1px">
+                        <div style="flex:0 0 40px;width:40px;height:40px;border-radius:50%;overflow:hidden;background:rgb(252,249,248);outline:1px solid oklch(0 0 0 / 0.1);outline-offset:-1px;display:flex;align-items:center;justify-content:center">
                           <sc-if value="{{ v.hasPhoto }}"><img src="{{ v.photoSrc }}" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></sc-if>
+                          <sc-if value="{{ v.noPhoto }}"><svg aria-hidden="true" viewBox="0 0 24 24" style="width:40%;height:40%;opacity:.3" fill="none" stroke="rgb(164,164,164)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h12l1 12H5L6 8Z"></path><path d="M9 8V6a3 3 0 0 1 6 0v2"></path></svg></sc-if>
                         </div>
                         <span style="flex:1;min-width:0">
                           <span style="display:block;font-size:14px;color:rgb(0,0,0)">{{ v.modele }}</span>
@@ -839,8 +844,9 @@
               <p style="margin:0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">Récapitulatif</p>
               <sc-for list="{{ venteSelected }}" as="v" hint-placeholder-count="1">
                 <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px">
-                  <div style="flex:0 0 36px;width:36px;height:36px;border-radius:50%;overflow:hidden;background:rgb(252,249,248);outline:1px solid oklch(0 0 0 / 0.1);outline-offset:-1px">
+                  <div style="flex:0 0 36px;width:36px;height:36px;border-radius:50%;overflow:hidden;background:rgb(252,249,248);outline:1px solid oklch(0 0 0 / 0.1);outline-offset:-1px;display:flex;align-items:center;justify-content:center">
                     <sc-if value="{{ v.hasPhoto }}"><img src="{{ v.photoSrc }}" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></sc-if>
+                          <sc-if value="{{ v.noPhoto }}"><svg aria-hidden="true" viewBox="0 0 24 24" style="width:40%;height:40%;opacity:.3" fill="none" stroke="rgb(164,164,164)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h12l1 12H5L6 8Z"></path><path d="M9 8V6a3 3 0 0 1 6 0v2"></path></svg></sc-if>
                   </div>
                   <span style="flex:1;min-width:0">{{ v.modele }} <span style="display:block;font-size:12px;color:rgb(94,94,94)">{{ v.serie }}</span></span>
                   <span style="flex:0 0 auto;font-variant-numeric:tabular-nums;white-space:nowrap">{{ v.prixLabel }}</span>
@@ -859,7 +865,7 @@
         </sc-if>
 
         <sc-if value="{{ isEquipe }}">
-          <div role="tablist" aria-label="Équipe" style="display:flex;gap:28px;overflow-x:auto;margin-bottom:24px;box-shadow:inset 0 -1px 0 rgba(0,0,0,.1)">
+          <div role="tablist" aria-label="Équipe" class="bo-tabs-scroll" style="display:flex;gap:28px;overflow-x:auto;margin-bottom:24px;box-shadow:inset 0 -1px 0 rgba(0,0,0,.1)">
             <sc-for list="{{ teamTabs }}" as="tab" hint-placeholder-count="3">
               <button type="button" role="tab" aria-selected="{{ tab.selected }}" onClick="{{ tab.select }}" style="flex:0 0 auto;background:none;border:0;padding:12px 0;cursor:pointer;font-size:13px;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;color:{{ tab.color }};box-shadow:{{ tab.underline }}">{{ tab.label }}</button>
             </sc-for>
@@ -1042,8 +1048,9 @@
               </div>
 
               <button type="button" onClick="{{ viewOwner.openPiece }}" style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);border:0;padding:clamp(22px,3vw,32px);display:flex;align-items:center;gap:18px;text-align:left;cursor:pointer;font-family:inherit;width:100%" style-hover="box-shadow:inset 0 0 0 1px rgb(71,29,27)">
-                <div style="flex:0 0 64px;width:64px;height:64px;border-radius:50%;overflow:hidden;outline:1px solid oklch(0 0 0 / 0.1);outline-offset:-1px">
+                <div style="flex:0 0 64px;width:64px;height:64px;border-radius:50%;overflow:hidden;outline:1px solid oklch(0 0 0 / 0.1);outline-offset:-1px;display:flex;align-items:center;justify-content:center">
                   <sc-if value="{{ viewOwner.hasPhoto }}"><img src="{{ viewOwner.photoSrc }}" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></sc-if>
+                          <sc-if value="{{ viewOwner.noPhoto }}"><svg aria-hidden="true" viewBox="0 0 24 24" style="width:40%;height:40%;opacity:.3" fill="none" stroke="rgb(164,164,164)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h12l1 12H5L6 8Z"></path><path d="M9 8V6a3 3 0 0 1 6 0v2"></path></svg></sc-if>
                 </div>
                 <div style="flex:1;min-width:0">
                   <p style="margin:0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);margin-bottom:6px">Pièce associée</p>
@@ -1299,6 +1306,7 @@ const BADGE = {
   neutral:  {statutBg:'rgba(0,0,0,.06)',       statutFg:'rgb(70,70,70)',   statutShadow:'none'},
   progress: {statutBg:'rgb(255,255,255)',      statutFg:'rgb(71,29,27)',   statutShadow:'inset 0 0 0 1px rgb(71,29,27)'},
   done:     {statutBg:'rgba(71,29,27,.1)',     statutFg:'rgb(71,29,27)',   statutShadow:'none'},
+  doneFilled:  {statutBg:'rgb(71,29,27)',      statutFg:'rgb(255,255,255)', statutShadow:'none'},
   alert:    {statutBg:'rgba(155,24,33,.08)',   statutFg:'rgb(155,24,33)',  statutShadow:'none'},
   offsale:     {statutBg:'rgb(250,241,235)',   statutFg:'rgb(115,60,8)',   statutShadow:'inset 0 0 0 1px rgb(233,199,176)'},
   offsaleLine: {statutBg:'rgb(255,255,255)',   statutFg:'rgb(149,83,28)',  statutShadow:'inset 0 0 0 1px rgb(202,150,114)'}
@@ -1340,7 +1348,7 @@ const readPhoto = file => new Promise((resolve, reject) => {
 });
 const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 const ORDER_STATUT_LABEL = {preparation:'En préparation', expediee:'Expédiée', livree:'Livrée', annulee:'Annulée'};
-const ORDER_STATUT_KIND = {preparation:'neutral', expediee:'progress', livree:'done', annulee:'alert'};
+const ORDER_STATUT_KIND = {preparation:'neutral', expediee:'progress', livree:'doneFilled', annulee:'alert'};
 const TEAM_STATUT_LABEL = {actif:'Actif', invite:'Invitation envoyée', expiree:'Invitation expirée', desactive:'Désactivé'};
 const TEAM_STATUT_KIND = {actif:'done', invite:'neutral', expiree:'alert', desactive:'neutral'};
 
@@ -1421,12 +1429,21 @@ class Component extends DCLogic {
   _emptyAccept(){ return {nom:null, pass:'', pass2:'', err:'', done:false, doneName:'', doneId:null}; }
 
   persist(){
-    try { localStorage.setItem(STORE_KEY, JSON.stringify({team:this.state.team, audit:this.state.audit})); } catch(e) {}
+    try { localStorage.setItem(STORE_KEY, JSON.stringify({
+      team:this.state.team, audit:this.state.audit,
+      pieces:this.state.pieces, orders:this.state.orders, owners:this.state.owners, serieMax:this.state.serieMax
+    })); } catch(e) {}
   }
   loadStored(){
     try {
       const saved = JSON.parse(localStorage.getItem(STORE_KEY) || 'null');
-      if (saved && Array.isArray(saved.team)) this.setState({team:saved.team, audit:Array.isArray(saved.audit) ? saved.audit : SEED_AUDIT});
+      if (saved && Array.isArray(saved.team)) this.setState({
+        team:saved.team, audit:Array.isArray(saved.audit) ? saved.audit : SEED_AUDIT,
+        pieces:Array.isArray(saved.pieces) ? saved.pieces : SEED_PIECES,
+        orders:Array.isArray(saved.orders) ? saved.orders : SEED_ORDERS,
+        owners:Array.isArray(saved.owners) ? saved.owners : SEED_OWNERS,
+        serieMax: typeof saved.serieMax==='number' ? saved.serieMax : maxSerie(saved.pieces || SEED_PIECES)
+      });
     } catch(e) {}
   }
   readHash(){
@@ -1621,9 +1638,11 @@ class Component extends DCLogic {
     const decPieces = s.pieces.map(p => {
       const eff = effStatut(p, s.orders);
       const mainPh = (p.photos || [])[0];
-      return {...p, eff, hasPhoto:!!mainPh, photoSrc: mainPh ? mainPh.src : '', ...BADGE[STATUT_KIND[eff] || 'neutral'],
+      return {...p, eff, hasPhoto:!!mainPh, noPhoto:!mainPh, photoSrc: mainPh ? mainPh.src : '', ...BADGE[STATUT_KIND[eff] || 'neutral'],
         statutLabel:STATUT_LABEL[eff] || eff, dateFabLabel:fmtIsoDate(p.dateFab),
+        dateFabColor: p.dateFab ? 'rgb(70,70,70)' : 'rgb(164,164,164)',
         prixLabel: fmtFcfa(p.prix),
+        prixColor: String(p.prix).trim()!=='' ? 'rgb(70,70,70)' : 'rgb(164,164,164)',
         refLabel: [p.reference, p.coloris].filter(Boolean).join(' · '),
         editLabel:'Modifier ' + p.modele + ' ' + p.serie,
         open: () => openPiece(p)};
@@ -1688,7 +1707,7 @@ class Component extends DCLogic {
           onOk: () => {
             this.setState(st => ({pieces: st.pieces.map(x =>
               x.id===p.id ? Object.assign({}, x, {sav:(x.sav||[]).filter(y => y.id!==e.id)}) :
-              (revert && x.id===repl.id ? Object.assign({}, x, {statut:e.replacementPrev || 'disponible'}) : x))}));
+              (revert && x.id===repl.id ? Object.assign({}, x, {statut:e.replacementPrev || 'disponible'}) : x))}), () => this.persist());
             this.logAudit('Après-vente retiré — ' + pieceLabel(p) + ' : ' + (SAV_LABEL[e.type] || e.type));
             if (revert) this.logAudit('Pièce de remplacement remise en stock — ' + pieceLabel(repl));
             this.showFlash('Évènement retiré du suivi' + (revert ? ' — ' + pieceLabel(repl) + ' est de nouveau disponible.' : '.'));
@@ -1976,7 +1995,7 @@ class Component extends DCLogic {
           }
         }
         const apply = () => {
-          this.setState(st => ({orders: st.orders.map(x => x.id===o.id ? Object.assign({}, x, d) : x)}));
+          this.setState(st => ({orders: st.orders.map(x => x.id===o.id ? Object.assign({}, x, d) : x)}), () => this.persist());
           if (d.statut==='annulee' && o.statut!=='annulee') this.logAudit('Commande annulée — ' + o.no + ' : pièces remises en stock (' + piecesTxt + ')');
           else if (o.statut==='annulee' && d.statut!=='annulee') this.logAudit('Commande réactivée — ' + o.no + ' : pièces repassées en « Vendue » (' + piecesTxt + ')');
           else if (d.statut!==o.statut) this.logAudit('Statut modifié — commande ' + o.no + ' : ' + ORDER_STATUT_LABEL[o.statut] + ' → ' + ORDER_STATUT_LABEL[d.statut]);
@@ -2081,7 +2100,7 @@ class Component extends DCLogic {
               pieceIds:ids, total: String(v.montant).trim()!=='' ? Number(v.montant) : suggested, dateIso:v.date || isoToday(),
               mode:'Remise en main propre', paiement:v.paiement, statut:'livree', tracking:'', note:v.note.trim()};
             const labels = ids.map(id => pieceLabel(pieceById(id))).join(', ');
-            this.setState(st => ({orders: st.orders.concat([order])}));
+            this.setState(st => ({orders: st.orders.concat([order])}), () => this.persist());
             this.logAudit('Vente hors site enregistrée — ' + order.no + ' (' + CANAL_LABEL[order.canal] + (order.evenement ? ', ' + order.evenement : '') + ') : ' + labels);
             this.go('commande-detail', {viewOrderId:order.id, orderDraft:{statut:order.statut, tracking:''}, vente:null, venteErr:{}, venteStep:0, venteMax:0});
             this.showFlash('Vente ' + order.no + ' enregistrée — ' + (ids.length>1 ? ids.length + ' pièces passées' : '1 pièce passée') + ' en « Vendue ».', 6000);
@@ -2095,7 +2114,7 @@ class Component extends DCLogic {
         if (!o) return {};
         const p = o.piece;
         return {...o,
-          hasPhoto: !!(p && p.photos && p.photos[0]), photoSrc: (p && p.photos && p.photos[0]) ? p.photos[0].src : '', pieceModele: p ? p.modele : 'Pièce introuvable', pieceSerie: p ? p.serie : '',
+          hasPhoto: !!(p && p.photos && p.photos[0]), noPhoto: !(p && p.photos && p.photos[0]), photoSrc: (p && p.photos && p.photos[0]) ? p.photos[0].src : '', pieceModele: p ? p.modele : 'Pièce introuvable', pieceSerie: p ? p.serie : '',
           hasOrder: !!o.sale, noOrder: !o.sale,
           orderLabel: o.sale ? o.sale.no + ' · ' + (CANAL_LABEL[o.sale.canal] || '') : '',
           openOrder: () => { if (o.sale) openOrder(o.sale); },
@@ -2125,7 +2144,7 @@ class Component extends DCLogic {
         this.setState(st => ({pieces: st.pieces.map(x =>
           x.id===o.piece.id ? Object.assign({}, x, {sav:(x.sav||[]).concat([entry])}) :
           (repl && x.id===repl.id ? Object.assign({}, x, {statut:'offerte'}) : x)),
-          savForm:this._emptySav(), savFormOpen:false}));
+          savForm:this._emptySav(), savFormOpen:false}), () => this.persist());
         this.logAudit('Après-vente — ' + pieceLabel(o.piece) + ' : ' + SAV_LABEL[entry.type] + (entry.note ? ' (' + entry.note + ')' : ''));
         if (repl) this.logAudit('Pièce de remplacement attribuée — ' + pieceLabel(repl) + ' passée en « Offerte » pour ' + o.owner);
         this.showFlash('« ' + SAV_LABEL[entry.type] + ' » ajouté au suivi de ' + pieceLabel(o.piece) + (repl ? ' — ' + pieceLabel(repl) + ' sort du stock.' : '.'));
@@ -2312,7 +2331,8 @@ class Component extends DCLogic {
         const editing = !!this.state.editId;
         this.setState(st => editing
           ? {pieces: st.pieces.map(p => p.id===st.editId ? Object.assign({}, p, f, {id:st.editId, serie:p.serie, code:p.code}) : p), route:'pieces', fieldErr:{}}
-          : {pieces: st.pieces.concat([Object.assign({id:'p' + Date.now(), sav:[]}, f)]), route:'pieces', fieldErr:{}, serieMax:Math.max(st.serieMax, serieNo(f))});
+          : {pieces: st.pieces.concat([Object.assign({id:'p' + Date.now(), sav:[]}, f)]), route:'pieces', fieldErr:{}, serieMax:Math.max(st.serieMax, serieNo(f))},
+          () => this.persist());
         const nom = f.modele || 'sans nom';
         this.logAudit((editing ? 'Pièce modifiée — ' : 'Pièce créée — ') + nom + (f.serie ? ', ' + f.serie : '') + ((f.photos || []).length ? ' · ' + f.photos.length + (f.photos.length>1 ? ' photos' : ' photo') : ''));
         this.showFlash('Pièce « ' + nom + ' » ' + (editing ? 'enregistrée.' : 'ajoutée au registre.'));
@@ -2343,7 +2363,7 @@ class Component extends DCLogic {
           body:'La pièce ' + p.serie + ' et son code d\'activation seront retirés du registre. Cette action est définitive.',
           okLabel:'Supprimer la pièce',
           onOk: () => {
-            this.setState(st => ({pieces: st.pieces.filter(x => x.id!==p.id), route:'pieces', serieMax:Math.max(st.serieMax, serieNo(p))}));
+            this.setState(st => ({pieces: st.pieces.filter(x => x.id!==p.id), route:'pieces', serieMax:Math.max(st.serieMax, serieNo(p))}), () => this.persist());
             this.logAudit('Pièce supprimée — ' + p.modele + ', ' + p.serie);
             this.showFlash('Pièce « ' + p.modele + ' » supprimée du registre.');
           }
@@ -2393,7 +2413,7 @@ class Component extends DCLogic {
         }
         const first = batch[0].serie, last = batch[batch.length - 1].serie;
         this.setState(st => ({pieces: st.pieces.concat(batch), serieMax:counter,
-          route:'pieces', lotErr:{}, statutFilter:'reserve', search:reference, sortBy:'serie'}));
+          route:'pieces', lotErr:{}, statutFilter:'reserve', search:reference, sortBy:'serie'}), () => this.persist());
         this.logAudit('Lot généré — ' + quantiteNum + ' × ' + modele + ' (' + first + ' → ' + last + ')');
         this.showFlash(quantiteNum + ' pièces « ' + modele + ' » générées (' + first + ' → ' + last + '), prêtes pour la fabrication.', 7000);
       },
