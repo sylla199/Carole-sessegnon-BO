@@ -391,7 +391,7 @@
                       <span style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ p.statutBg }};color:{{ p.statutFg }};box-shadow:{{ p.statutShadow }}">{{ p.statutLabel }}</span>
                     </td>
                     <td style="padding:14px 18px;text-align:right;border-bottom:1px solid rgba(0,0,0,.06)">
-                      <button type="button" onClick="{{ p.open }}" aria-label="{{ p.editLabel }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27)">Modifier</button>
+                      <button type="button" onClick="{{ p.edit }}" aria-label="{{ p.editLabel }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27)">Modifier</button>
                     </td>
                   </tr>
                 </sc-for>
@@ -580,6 +580,69 @@
           </div>
         </sc-if>
 
+        <sc-if value="{{ isPieceDetail }}">
+          <button type="button" onClick="{{ goPieces }}" style="background:none;border:0;padding:0;margin-bottom:22px;color:rgb(94,94,94);cursor:pointer;font-size:13px">← Retour aux pièces</button>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:24px;align-items:start;max-width:1000px">
+            <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:clamp(22px,3vw,32px);display:flex;flex-direction:column;gap:18px">
+              <div style="display:flex;align-items:center;gap:16px">
+                <div style="flex:0 0 72px;width:72px;height:72px;border-radius:50%;overflow:hidden;background:rgb(252,249,248);outline:1px solid oklch(0 0 0 / 0.1);outline-offset:-1px;display:flex;align-items:center;justify-content:center">
+                  <sc-if value="{{ viewPiece.hasPhotos }}"><img src="{{ viewPiece.mainPhotoSrc }}" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></sc-if>
+                  <sc-if value="{{ viewPiece.noPhotos }}"><svg aria-hidden="true" viewBox="0 0 24 24" style="width:38%;height:38%;opacity:.3" fill="none" stroke="rgb(164,164,164)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h12l1 12H5L6 8Z"></path><path d="M9 8V6a3 3 0 0 1 6 0v2"></path></svg></sc-if>
+                </div>
+                <div style="min-width:0">
+                  <p style="margin:0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">{{ viewPiece.refLabel }}</p>
+                  <p style="margin:2px 0 0;font-family:var(--font-display);font-size:24px;color:rgb(71,29,27)">{{ viewPiece.modele }}</p>
+                  <span style="display:inline-block;margin-top:6px;white-space:nowrap;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ viewPiece.statutBg }};color:{{ viewPiece.statutFg }};box-shadow:{{ viewPiece.statutShadow }}">{{ viewPiece.statutLabel }}</span>
+                </div>
+              </div>
+
+              <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Numéro de série</span><span style="font-variant-numeric:tabular-nums">{{ viewPiece.serie }}</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px">
+                <span style="color:rgb(94,94,94)">Code d'activation</span>
+                <span style="display:flex;align-items:center;gap:10px">
+                  <span style="font-variant-numeric:tabular-nums;letter-spacing:.04em">{{ viewPiece.codeMasked }}</span>
+                  <button type="button" onClick="{{ viewPiece.toggleCode }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:12px;border-bottom:1px solid rgb(71,29,27)">{{ viewPiece.codeToggleLabel }}</button>
+                </span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Prix</span><span style="font-variant-numeric:tabular-nums">{{ viewPiece.prixLabel }}</span></div>
+              <sc-if value="{{ viewPiece.matiere }}"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Matière</span><span style="text-align:right">{{ viewPiece.matiere }}</span></div></sc-if>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Fabrication</span><span>{{ viewPiece.dateFabLabel }}</span></div>
+              <sc-if value="{{ viewPiece.hasOrder }}"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Commande</span><button type="button" onClick="{{ viewPiece.openOrder }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:14px;border-bottom:1px solid rgb(71,29,27);text-align:right">{{ viewPiece.orderLabel }}</button></div></sc-if>
+              <sc-if value="{{ viewPiece.hasOwner }}"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Propriétaire</span><button type="button" onClick="{{ viewPiece.openOwner }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:14px;border-bottom:1px solid rgb(71,29,27);text-align:right">{{ viewPiece.ownerName }}</button></div></sc-if>
+              <div style="border-top:1px solid rgba(0,0,0,.08)"></div>
+
+              <sc-if value="{{ viewPiece.photos.length }}">
+                <div>
+                  <p style="margin:0 0 10px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">Photos</p>
+                  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:10px">
+                    <sc-for list="{{ viewPiece.photos }}" as="ph" hint-placeholder-count="2">
+                      <div style="aspect-ratio:1;overflow:hidden;background:rgb(252,249,248)"><img src="{{ ph.src }}" alt="{{ ph.alt }}" style="width:100%;height:100%;object-fit:cover;display:block"></div>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ viewPiece.hasSav }}">
+                <div>
+                  <p style="margin:0 0 6px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">Suivi après-vente</p>
+                  <sc-for list="{{ viewPiece.sav }}" as="e" hint-placeholder-count="2">
+                    <div style="padding:10px 0;border-top:1px solid rgba(0,0,0,.08)">
+                      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><span style="display:inline-block;white-space:nowrap;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ e.statutBg }};color:{{ e.statutFg }};box-shadow:{{ e.statutShadow }}">{{ e.statutLabel }}</span><span style="font-size:12px;color:rgb(94,94,94)">{{ e.dateLabel }}</span></div>
+                      <sc-if value="{{ e.note }}"><p style="margin:8px 0 0;font-size:13px;line-height:20px;color:rgb(70,70,70)">{{ e.note }}</p></sc-if>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:14px">
+              <x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="primary" onClick="{{ viewPiece.edit }}" dc-props="{{ btnBlock }}" hint-size="100%,58px">Modifier la pièce</x-import>
+              <x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="secondary" onClick="{{ viewPiece.print }}" dc-props="{{ btnBlock }}" hint-size="100%,58px">Imprimer le certificat</x-import>
+              <button type="button" onClick="{{ viewPiece.remove }}" style="background:none;border:0;padding:12px 0;color:rgb(155,24,33);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(155,24,33);align-self:flex-start">Supprimer cette pièce</button>
+            </div>
+          </div>
+        </sc-if>
+
         <sc-if value="{{ isLotForm }}">
           <button type="button" onClick="{{ goPieces }}" style="background:none;border:0;padding:0;margin-bottom:22px;color:rgb(94,94,94);cursor:pointer;font-size:13px">← Retour aux pièces</button>
           <form onSubmit="{{ generateLot }}" noValidate style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:clamp(22px,3vw,32px);display:flex;flex-direction:column;gap:18px;max-width:640px">
@@ -625,7 +688,7 @@
             <button type="button" onClick="{{ goPieces }}" style="background:none;border:0;padding:0;color:rgb(94,94,94);cursor:pointer;font-size:13px">← Retour aux pièces</button>
             <x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="primary" onClick="{{ printQrSheet }}" dc-props="{{ btnUpperSm }}" hint-size="auto,46px">Imprimer</x-import>
           </div>
-          <p class="bo-no-print" style="margin:0 0 22px;font-size:13px;line-height:20px;color:rgb(94,94,94);max-width:64ch">Un certificat par pièce réservée en fabrication : numéro de série, code d'activation et QR code vers la page d'authentification. Le code d'activation quitte le back-office sur cette planche — gardez-la hors de vue du public avant la remise en main propre.</p>
+          <p class="bo-no-print" style="margin:0 0 22px;font-size:13px;line-height:20px;color:rgb(94,94,94);max-width:64ch">Numéro de série, code d'activation et QR code vers la page d'authentification. Le code d'activation quitte le back-office sur cette planche — gardez-la hors de vue du public avant la remise en main propre.</p>
           <sc-if value="{{ noQrPieces }}">
             <p style="margin:0;font-size:14px;color:rgb(94,94,94)">Aucune pièce réservée en fabrication pour le moment : générez un lot avant de préparer des certificats.</p>
           </sc-if>
@@ -1450,6 +1513,7 @@ class Component extends DCLogic {
     teamTab:'membres', auditSearch:'', auditAuteur:'tous',
     viewOrderId:null, orderDraft:{statut:'', tracking:''},
     editId:null, form:this._emptyForm(), fieldErr:{}, codeRevealed:false, photoBusy:false, photoErr:'', photoNotice:null,
+    viewPieceId:null, pieceCodeRevealed:false, qrOnlyId:null,
     lotForm:this._emptyLot(), lotErr:{},
     flash:'', confirm:null,
     meId:ME_ID, invite:null,
@@ -1625,6 +1689,39 @@ class Component extends DCLogic {
     setTimeout(() => { try { document.querySelector('[data-confirm-cancel]').focus(); } catch(e){} }, 30);
   }
 
+  // Partagée entre le formulaire d'édition et la fiche de détail d'une pièce.
+  deletePieceConfirm(p){
+    if (!p) return;
+    const sale = saleOf(p.id, this.state.orders);
+    if (sale) {
+      this.askConfirm({
+        title:'Suppression impossible',
+        body:'« ' + p.modele + ' » (' + p.serie + ') figure dans la commande ' + sale.no + '. Annulez d\'abord cette commande si la vente n\'a pas eu lieu.',
+        cancelLabel:'Compris'
+      });
+      return;
+    }
+    const owner = this.state.owners.find(o => o.pieceId===p.id);
+    if (owner) {
+      this.askConfirm({
+        title:'Suppression impossible',
+        body:'« ' + p.modele + ' » (' + p.serie + ') est associée au passeport de ' + owner.owner + '. La supprimer rendrait son certificat invérifiable. Pour la retirer de la vente, changez plutôt son statut.',
+        cancelLabel:'Compris'
+      });
+      return;
+    }
+    this.askConfirm({
+      title:'Supprimer « ' + p.modele + ' » ?',
+      body:'La pièce ' + p.serie + ' et son code d\'activation seront retirés du registre. Cette action est définitive.',
+      okLabel:'Supprimer la pièce',
+      onOk: () => {
+        this.setState(st => ({pieces: st.pieces.filter(x => x.id!==p.id), route:'pieces', serieMax:Math.max(st.serieMax, serieNo(p))}), () => this.persist());
+        this.logAudit('Pièce supprimée — ' + p.modele + ', ' + p.serie);
+        this.showFlash('Pièce « ' + p.modele + ' » supprimée du registre.');
+      }
+    });
+  }
+
   submitLogin(e){
     e.preventDefault();
     // Démonstration : aucun champ n'est obligatoire, toute saisie (même vide) ouvre l'espace.
@@ -1665,7 +1762,8 @@ class Component extends DCLogic {
     // Pièces
     const ownerOf = id => s.owners.find(o => o.pieceId===id);
     const pieceById = id => s.pieces.find(p => p.id===id);
-    const openPiece = p => this.go('piece-form', {editId:p.id, form:Object.assign(this._emptyForm(), p, {prix: p.prix===undefined ? '' : p.prix}), fieldErr:{}, codeRevealed:false});
+    const openPieceEdit = p => this.go('piece-form', {editId:p.id, form:Object.assign(this._emptyForm(), p, {prix: p.prix===undefined ? '' : p.prix}), fieldErr:{}, codeRevealed:false});
+    const viewPiece = p => this.go('piece-detail', {viewPieceId:p.id, pieceCodeRevealed:false});
     const decPieces = s.pieces.map(p => {
       const eff = effStatut(p, s.orders);
       const mainPh = (p.photos || [])[0];
@@ -1676,7 +1774,8 @@ class Component extends DCLogic {
         prixColor: String(p.prix).trim()!=='' ? 'rgb(70,70,70)' : 'rgb(164,164,164)',
         refLabel: [p.reference, p.coloris].filter(Boolean).join(' · '),
         editLabel:'Modifier ' + p.modele + ' ' + p.serie,
-        open: () => openPiece(p)};
+        open: () => viewPiece(p),
+        edit: e => { if (e && e.stopPropagation) e.stopPropagation(); openPieceEdit(p); }};
     });
     const q = s.search.trim().toLowerCase();
     let filteredPieces = decPieces.filter(p =>
@@ -1711,7 +1810,7 @@ class Component extends DCLogic {
         paiementLabel: o.paiement || '—',
         trackingLabel: o.tracking || '—',
         detailLabel: 'Détail de la commande ' + o.no,
-        pieces: ps.filter(Boolean).map(p => ({label: pieceLabel(p), open: () => openPiece(p)})),
+        pieces: ps.filter(Boolean).map(p => ({label: pieceLabel(p), open: () => viewPiece(p)})),
         open: () => openOrder(o)};
     });
     const oSq = s.orderSearch.trim().toLowerCase();
@@ -1724,7 +1823,7 @@ class Component extends DCLogic {
     const decSav = (p, e) => ({...e, ...BADGE[SAV_KIND[e.type] || 'neutral'], statutLabel:SAV_LABEL[e.type] || e.type,
       dateLabel: fmtIsoDate(e.date),
       replacementLabel: e.replacementId ? pieceLabel(pieceById(e.replacementId)) : '',
-      openReplacement: () => { const r = pieceById(e.replacementId); if (r) openPiece(r); },
+      openReplacement: () => { const r = pieceById(e.replacementId); if (r) viewPiece(r); },
       removeAria: 'Retirer l\'évènement ' + (SAV_LABEL[e.type] || '') + ' du ' + fmtIsoDate(e.date),
       remove: () => {
         // La pièce de remplacement n'est remise en stock que si elle est toujours « Offerte » et n'a pas été vendue depuis.
@@ -1757,7 +1856,7 @@ class Component extends DCLogic {
         hasSav: !!last, noSav: !last, sav: last ? decSav(p, last) : {},
         sale,
         open: () => this.go('proprietaire', {viewOwnerId:o.id, savForm:this._emptySav(), savFormOpen:false}),
-        openPiece: e => { if (e && e.stopPropagation) e.stopPropagation(); if (p) openPiece(p); }};
+        openPiece: e => { if (e && e.stopPropagation) e.stopPropagation(); if (p) viewPiece(p); }};
     });
     const oq = s.ownerSearch.trim().toLowerCase();
     const filteredOwners = oq ? decOwners.filter(o => (o.owner+' '+o.pieceLabel+' '+o.email+' '+o.pays).toLowerCase().includes(oq)) : decOwners;
@@ -1773,7 +1872,7 @@ class Component extends DCLogic {
       {key:'proprietaires', label:'Propriétaires', icon:'owners'},
       {key:'equipe', label:'Équipe', icon:'team'}
     ];
-    const NAV_PARENT = {'piece-form':'pieces', 'lot-form':'pieces', 'qr-sheet':'pieces', 'commande-detail':'commandes', 'vente-form':'commandes', 'proprietaire':'proprietaires'};
+    const NAV_PARENT = {'piece-form':'pieces', 'piece-detail':'pieces', 'lot-form':'pieces', 'qr-sheet':'pieces', 'commande-detail':'commandes', 'vente-form':'commandes', 'proprietaire':'proprietaires'};
     const activeNav = NAV_PARENT[s.route] || s.route;
 
     const activeDirection = s.team.filter(t => t.role==='direction' && t.statut==='actif').length;
@@ -1856,6 +1955,7 @@ class Component extends DCLogic {
       isDashboard: s.route==='dashboard',
       isPieces: s.route==='pieces',
       isPieceForm: s.route==='piece-form',
+      isPieceDetail: s.route==='piece-detail' && !!pieceById(s.viewPieceId),
       isLotForm: s.route==='lot-form',
       isQrSheet: s.route==='qr-sheet',
       isProprietaires: s.route==='proprietaires',
@@ -1873,11 +1973,12 @@ class Component extends DCLogic {
       ordersFiltersLabel: (n => 'Filtres' + (n ? ' (' + n + ')' : ''))((s.canalFilter!=='tous' ? 1 : 0) + (s.orderStatutFilter!=='tous' ? 1 : 0)),
       piecesFiltersLabel: (n => 'Filtres' + (n ? ' (' + n + ')' : ''))((s.statutFilter!=='tous' ? 1 : 0) + (s.sortBy!=='recent' ? 1 : 0)),
 
-      crumb: ({'piece-form':'Pièces', 'lot-form':'Pièces', 'qr-sheet':'Pièces', 'commande-detail':'Commandes', 'vente-form':'Commandes', 'proprietaire':'Propriétaires'})[s.route] || '',
+      crumb: ({'piece-form':'Pièces', 'piece-detail':'Pièces', 'lot-form':'Pièces', 'qr-sheet':'Pièces', 'commande-detail':'Commandes', 'vente-form':'Commandes', 'proprietaire':'Propriétaires'})[s.route] || '',
       crumbGo: () => this.go(NAV_PARENT[s.route] || 'dashboard'),
       pageTitle: ({
         dashboard:'Tableau de bord', pieces:'Pièces', commandes:'Commandes', equipe:'Équipe et accès', proprietaires:'Propriétaires',
         'piece-form': isEditing ? 'Modifier la pièce' : 'Ajouter une pièce',
+        'piece-detail': pieceById(s.viewPieceId) ? pieceById(s.viewPieceId).modele : 'Pièce',
         'lot-form': 'Générer un lot de pièces',
         'qr-sheet': 'Planche de QR codes',
         'commande-detail': viewOrder ? viewOrder.no : 'Commande',
@@ -2151,7 +2252,7 @@ class Component extends DCLogic {
           hasOrder: !!o.sale, noOrder: !o.sale,
           orderLabel: o.sale ? o.sale.no + ' · ' + (CANAL_LABEL[o.sale.canal] || '') : '',
           openOrder: () => { if (o.sale) openOrder(o.sale); },
-          openPiece: () => { if (p) openPiece(p); }};
+          openPiece: () => { if (p) viewPiece(p); }};
       })(),
       ownerSav: viewOwnerRaw && viewOwnerRaw.piece ? savSorted(viewOwnerRaw.piece).map(e => decSav(viewOwnerRaw.piece, e)) : [],
       noSav: !ownerHasSav,
@@ -2237,16 +2338,20 @@ class Component extends DCLogic {
         form:Object.assign(this._emptyForm(), {autoIds:true, serie:nextSerie(s.pieces, '', s.serieMax), code:genCode(s.pieces)})}),
       openLot: () => this.go('lot-form', {lotForm:this._emptyLot(), lotErr:{}}),
       printQrSheet: () => { try { window.print(); } catch(e) {} },
-      qrPieces: s.route!=='qr-sheet' ? [] : decPieces.filter(p => p.eff==='reserve').map(p => {
-        let qrDataUrl = '';
-        try {
-          const link = 'https://authentification.carole-sessegnon.com/verifier?serie=' + encodeURIComponent(p.serie) + '&code=' + encodeURIComponent(p.code);
-          const qr = qrcode(0, 'M'); qr.addData(link); qr.make();
-          qrDataUrl = qr.createDataURL(5, 8);
-        } catch(e) {}
-        return {reference:p.reference||'', modele:p.modele, serie:p.serie, code:p.code, qrDataUrl};
-      }),
-      noQrPieces: s.route==='qr-sheet' && decPieces.filter(p => p.eff==='reserve').length===0,
+      qrPieces: (() => {
+        if (s.route!=='qr-sheet') return [];
+        const scope = s.qrOnlyId ? decPieces.filter(p => p.id===s.qrOnlyId) : decPieces.filter(p => p.eff==='reserve');
+        return scope.map(p => {
+          let qrDataUrl = '';
+          try {
+            const link = 'https://authentification.carole-sessegnon.com/verifier?serie=' + encodeURIComponent(p.serie) + '&code=' + encodeURIComponent(p.code);
+            const qr = qrcode(0, 'M'); qr.addData(link); qr.make();
+            qrDataUrl = qr.createDataURL(5, 8);
+          } catch(e) {}
+          return {reference:p.reference||'', modele:p.modele, serie:p.serie, code:p.code, qrDataUrl};
+        });
+      })(),
+      noQrPieces: s.route==='qr-sheet' && !s.qrOnlyId && decPieces.filter(p => p.eff==='reserve').length===0,
       registreOpen: s.registreOpen,
       registreChevron: s.registreOpen ? 'rotate(180deg)' : 'none',
       toggleRegistre: () => this.setState(st => ({registreOpen:!st.registreOpen})),
@@ -2261,7 +2366,7 @@ class Component extends DCLogic {
             [['Référence','Modèle','Coloris','Numéro de série']]
               .concat(aFabriquer.map(p => [p.reference||'',p.modele,p.coloris,p.serie])));
         }},
-        {label:'Imprimer la planche de QR codes', run: () => { this.setState({registreOpen:false}); this.go('qr-sheet'); }},
+        {label:'Imprimer la planche de QR codes', run: () => { this.setState({registreOpen:false}); this.go('qr-sheet', {qrOnlyId:null}); }},
         {label:'Exporter pour les certificats (CSV, sans QR)', run: () => {
           this.setState({registreOpen:false});
           const aCertifier = decPieces.filter(p => p.eff==='reserve');
@@ -2383,38 +2488,39 @@ class Component extends DCLogic {
         this.logAudit((editing ? 'Pièce modifiée — ' : 'Pièce créée — ') + nom + (f.serie ? ', ' + f.serie : '') + ((f.photos || []).length ? ' · ' + f.photos.length + (f.photos.length>1 ? ' photos' : ' photo') : ''));
         this.showFlash('Pièce « ' + nom + ' » ' + (editing ? 'enregistrée.' : 'ajoutée au registre.'));
       },
-      deletePiece: () => {
-        const p = s.pieces.find(x => x.id===s.editId);
-        if (!p) return;
+      deletePiece: () => this.deletePieceConfirm(s.pieces.find(x => x.id===s.editId)),
+
+      // Fiche pièce (lecture) — le clic sur une pièce ouvre ceci, jamais directement l'édition.
+      viewPiece: (() => {
+        const p = pieceById(s.viewPieceId);
+        if (!p) return {};
+        const eff = effStatut(p, s.orders);
         const sale = saleOf(p.id, s.orders);
-        if (sale) {
-          this.askConfirm({
-            title:'Suppression impossible',
-            body:'« ' + p.modele + ' » (' + p.serie + ') figure dans la commande ' + sale.no + '. Annulez d\'abord cette commande si la vente n\'a pas eu lieu.',
-            cancelLabel:'Compris'
-          });
-          return;
-        }
         const owner = ownerOf(p.id);
-        if (owner) {
-          this.askConfirm({
-            title:'Suppression impossible',
-            body:'« ' + p.modele + ' » (' + p.serie + ') est associée au passeport de ' + owner.owner + '. La supprimer rendrait son certificat invérifiable. Pour la retirer de la vente, changez plutôt son statut.',
-            cancelLabel:'Compris'
-          });
-          return;
-        }
-        this.askConfirm({
-          title:'Supprimer « ' + p.modele + ' »\u00a0?',
-          body:'La pièce ' + p.serie + ' et son code d\'activation seront retirés du registre. Cette action est définitive.',
-          okLabel:'Supprimer la pièce',
-          onOk: () => {
-            this.setState(st => ({pieces: st.pieces.filter(x => x.id!==p.id), route:'pieces', serieMax:Math.max(st.serieMax, serieNo(p))}), () => this.persist());
-            this.logAudit('Pièce supprimée — ' + p.modele + ', ' + p.serie);
-            this.showFlash('Pièce « ' + p.modele + ' » supprimée du registre.');
-          }
-        });
-      },
+        const photos = p.photos || [];
+        return {...p, eff,
+          statutLabel:STATUT_LABEL[eff] || eff, ...BADGE[STATUT_KIND[eff] || 'neutral'],
+          refLabel: [p.reference, p.coloris].filter(Boolean).join(' · '),
+          prixLabel: fmtFcfa(p.prix), dateFabLabel: fmtIsoDate(p.dateFab),
+          photos: photos.map((ph,i) => ({src:ph.src, alt:p.modele + ' — photo ' + (i+1)})),
+          hasPhotos: photos.length>0, noPhotos: photos.length===0,
+          mainPhotoSrc: photos[0] ? photos[0].src : '',
+          codeMasked: s.pieceCodeRevealed ? (p.code || '—') : '••••-••••',
+          codeToggleLabel: s.pieceCodeRevealed ? 'Masquer' : 'Afficher',
+          toggleCode: () => {
+            if (!s.pieceCodeRevealed) this.logAudit('Consultation du code d\'activation — ' + (p.serie || 'pièce sans numéro'));
+            this.setState({pieceCodeRevealed:!s.pieceCodeRevealed});
+          },
+          isSold: eff==='vendue', hasOrder: !!sale,
+          orderLabel: sale ? sale.no + ' · ' + fmtIsoDate(sale.dateIso) : '',
+          openOrder: () => { if (sale) openOrder(sale); },
+          hasOwner: !!owner, ownerName: owner ? owner.owner : '',
+          openOwner: () => { if (owner) this.go('proprietaire', {viewOwnerId:owner.id, savForm:this._emptySav(), savFormOpen:false}); },
+          sav: savSorted(p).map(e => decSav(p, e)), hasSav: (p.sav||[]).length>0,
+          edit: () => openPieceEdit(p),
+          print: () => this.go('qr-sheet', {qrOnlyId:p.id}),
+          remove: () => this.deletePieceConfirm(p)};
+      })(),
 
       // Lot de pièces (identifiants préparés en amont de la fabrication)
       lotForm: s.lotForm || this._emptyLot(),
