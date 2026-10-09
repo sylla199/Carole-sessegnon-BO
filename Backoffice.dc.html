@@ -219,10 +219,17 @@
 
       <div style="padding:clamp(20px,3vw,44px)">
 
+        <sc-if value="{{ saveWarn }}">
+          <div role="alert" class="bo-no-print" style="margin:0 0 20px;padding:14px 18px;background:rgb(255,235,233);box-shadow:inset 3px 0 0 rgb(155,24,33);font-size:14px;line-height:21px;color:rgb(109,10,18)">La sauvegarde du navigateur est pleine ou indisponible : vos dernières modifications ne seront pas conservées si vous rechargez la page. Retirez des photos ou des données anciennes, puis refaites une modification pour relancer la sauvegarde.</div>
+        </sc-if>
+
         <sc-if value="{{ flash }}">
           <div role="status" class="bo-no-print" style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin:0 0 20px;padding:14px 18px;background:rgb(255,255,255);box-shadow:inset 3px 0 0 rgb(71,29,27),inset 0 0 0 1px rgba(0,0,0,.08);font-size:14px;color:rgb(71,29,27);animation:bo-in .2s ease">
             <span>{{ flash }}</span>
-            <button type="button" onClick="{{ closeFlash }}" aria-label="Fermer le message" style="flex:0 0 auto;background:none;border:0;padding:0 2px;cursor:pointer;color:rgb(94,94,94);font-size:18px;line-height:1">×</button>
+            <div style="flex:0 0 auto;display:flex;align-items:center;gap:16px">
+              <sc-if value="{{ flashActionLabel }}"><button type="button" onClick="{{ runFlashAction }}" style="background:none;border:0;padding:0;min-height:24px;color:rgb(71,29,27);font-weight:700;font-size:14px;cursor:pointer;text-decoration:underline;font-family:inherit">{{ flashActionLabel }}</button></sc-if>
+              <button type="button" onClick="{{ closeFlash }}" aria-label="Fermer le message" style="background:none;border:0;padding:0 2px;cursor:pointer;color:rgb(94,94,94);font-size:18px;line-height:1">×</button>
+            </div>
           </div>
         </sc-if>
 
@@ -363,6 +370,12 @@
             </div>
           </div>
 
+          <sc-if value="{{ lotFocusOn }}">
+            <div class="bo-no-print" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:0 0 12px;padding:10px 14px;background:rgb(255,251,248);box-shadow:inset 3px 0 0 rgb(71,29,27),inset 0 0 0 1px rgba(0,0,0,.08);font-size:13px;color:rgb(71,29,27)">
+              <span><strong style="font-weight:700">{{ lotFocusLabel }}</strong> · {{ lotFocusDetail }}</span>
+              <button type="button" onClick="{{ clearLotFocus }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);text-align:left;font-family:inherit">Afficher tout le registre</button>
+            </div>
+          </sc-if>
           <p style="margin:0 0 10px;font-size:13px;color:rgb(94,94,94)">{{ piecesCount }}</p>
           <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);overflow:auto">
             <table class="bo-table" style="width:100%;border-collapse:collapse;min-width:760px">
@@ -675,11 +688,18 @@
             <label style="display:block;font-size:13px;color:rgb(70,70,70)">Matière <span style="color:rgb(94,94,94)">(facultatif)</span>
               <input value="{{ lotForm.matiere }}" onChange="{{ setLot.matiere }}" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
             </label>
-            <label style="display:block;font-size:13px;color:rgb(70,70,70);max-width:220px">Quantité à générer
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:16px;max-width:460px">
+            <label style="display:block;font-size:13px;color:rgb(70,70,70)">Quantité à générer
               <input type="number" min="1" step="1" inputMode="numeric" value="{{ lotForm.quantite }}" onChange="{{ setLot.quantite }}" aria-invalid="{{ lotInvalid.quantite }}" aria-describedby="err-lot-quantite" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:{{ lotShadow.quantite }};color:rgb(0,0,0);font-variant-numeric:tabular-nums">
               <sc-if value="{{ lotErr.quantite }}"><span id="err-lot-quantite" style="display:block;margin-top:6px;font-size:12px;color:rgb(155,24,33)">{{ lotErr.quantite }}</span></sc-if>
             </label>
-            <p style="margin:-6px 0 0;font-size:12px;color:rgb(94,94,94)">Prochain numéro de série à émettre : <span style="font-variant-numeric:tabular-nums">{{ lotNextSerie }}</span></p>
+              <label style="display:block;font-size:13px;color:rgb(70,70,70)">Année de fabrication prévue
+                <select value="{{ lotForm.annee }}" onChange="{{ setLot.annee }}" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+                  <sc-for list="{{ lotYears }}" as="y" hint-placeholder-count="2"><option value="{{ y.value }}">{{ y.label }}</option></sc-for>
+                </select>
+              </label>
+            </div>
+            <p aria-live="polite" style="margin:-6px 0 0;font-size:12px;line-height:18px;color:rgb(94,94,94)">{{ lotRangeText }}</p>
             <sc-if value="{{ hasLotErr }}">
               <p role="alert" style="margin:0;font-size:13px;color:rgb(155,24,33)">Le lot n'a pas été généré : corrigez les champs signalés.</p>
             </sc-if>
@@ -1516,13 +1536,45 @@ const REG_ICONS = {
   export:   '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1"><path d="M10 12V3M6.5 6.5 10 3l3.5 3.5M3.5 14.5V17h13v-2.5"></path></svg>'
 };
 const REG_META = {
-  "Générer un lot d'identifiants":               {icon:'lot',     desc:"Réserver des n° de série avant fabrication"},
+  "Générer un lot de pièces":                    {icon:'lot',     desc:"Réserver des n° de série avant fabrication"},
   "Importer le registre (Excel)":                {icon:'import',  desc:"Reprendre un fichier existant"},
   "Exporter les n° de série à fabriquer (CSV)":  {icon:'atelier', desc:"Liste des pièces à fabriquer, pour l'atelier", divider:true},
   "Imprimer la planche de QR codes":             {icon:'qr',      desc:"Planche prête pour l'imprimeur"},
   "Exporter pour les certificats (CSV, sans QR)":{icon:'cert',    desc:"Avec les codes d'activation : ne pas diffuser", warn:true},
   "Exporter la liste (CSV)":                     {icon:'export',  desc:"Toutes les pièces, sans les codes"}
 };
+
+// Les photos sont gardées dans IndexedDB (plusieurs centaines de Mo) ; localStorage ne garde que leur référence.
+// Avant, elles saturaient localStorage (~5 Mo) et toute la sauvegarde cessait, sans message.
+const PH_DB = 'cs-bo-photos';
+let _phDbP = null;
+const phDb = () => _phDbP || (_phDbP = new Promise((res, rej) => {
+  try {
+    const r = indexedDB.open(PH_DB, 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('photos');
+    r.onsuccess = () => res(r.result);
+    r.onerror = () => rej(r.error);
+    r.onblocked = () => rej(new Error('blocked'));
+  } catch (e) { rej(e); }
+}));
+const phPut = (id, src) => phDb().then(db => new Promise((res, rej) => {
+  const tx = db.transaction('photos', 'readwrite'); tx.objectStore('photos').put(src, id);
+  tx.oncomplete = () => res(); tx.onerror = () => rej(tx.error); tx.onabort = () => rej(tx.error);
+}));
+const phDelete = id => phDb().then(db => new Promise(res => {
+  const tx = db.transaction('photos', 'readwrite'); tx.objectStore('photos').delete(id);
+  tx.oncomplete = () => res(); tx.onerror = () => res(); tx.onabort = () => res();
+})).catch(() => {});
+const phGetMany = ids => phDb().then(db => new Promise(res => {
+  const out = {}; const tx = db.transaction('photos', 'readonly'); const st = tx.objectStore('photos');
+  ids.forEach(id => { const r = st.get(id); r.onsuccess = () => { if (r.result) out[id] = r.result; }; });
+  tx.oncomplete = () => res(out); tx.onerror = () => res(out); tx.onabort = () => res(out);
+})).catch(() => ({}));
+const phPrune = keep => phDb().then(db => new Promise(res => {
+  const tx = db.transaction('photos', 'readwrite'); const st = tx.objectStore('photos'); const r = st.getAllKeys();
+  r.onsuccess = () => r.result.forEach(k => { if (!keep.has(k)) st.delete(k); });
+  tx.oncomplete = () => res(); tx.onerror = () => res(); tx.onabort = () => res();
+})).catch(() => {});
 
 class Component extends DCLogic {
   state = {
@@ -1539,7 +1591,7 @@ class Component extends DCLogic {
     editId:null, form:this._emptyForm(), fieldErr:{}, codeRevealed:false, photoBusy:false, photoErr:'', photoNotice:null,
     viewPieceId:null, pieceCodeRevealed:false, qrOnlyId:null, viewPhotoIndex:0,
     lotForm:this._emptyLot(), lotErr:{},
-    flash:'', confirm:null,
+    flash:'', flashAction:null, saveWarn:false, lotFocus:null, confirm:null,
     meId:ME_ID, invite:null,
     acceptToken:'', accept:this._emptyAccept()
   };
@@ -1547,23 +1599,67 @@ class Component extends DCLogic {
   _emptyInvite(){ return {step:'form', nom:'', email:'', role:'commandes', message:'', emailErr:'', sentId:null, copied:false}; }
   _emptyAccept(){ return {nom:null, pass:'', pass2:'', err:'', done:false, doneName:'', doneId:null}; }
 
+  _phStored = new Set();   // photos déjà écrites dans IndexedDB
+  _phCache = {};           // photos déjà en mémoire (id -> données)
+  _loaded = false;         // la sauvegarde a-t-elle déjà été relue ? (évite de l'écraser par les données de départ)
+  _persistPending = false;
+  _phPending = 0;          // écritures de photos en cours (la page demande confirmation avant de se fermer)
+
   persist(){
-    try { localStorage.setItem(STORE_KEY, JSON.stringify({
-      team:this.state.team, audit:this.state.audit,
-      pieces:this.state.pieces, orders:this.state.orders, owners:this.state.owners, serieMax:this.state.serieMax
-    })); } catch(e) {}
+    if (!this._loaded) { this._persistPending = true; return; }
+    let ok = true;
+    try {
+      localStorage.setItem(STORE_KEY, JSON.stringify({
+        team:this.state.team, audit:this.state.audit,
+        pieces:this.state.pieces.map(p => (p.photos && p.photos.length)
+          ? Object.assign({}, p, {photos:p.photos.map(ph => ({id:ph.id, name:ph.name}))}) : p),
+        orders:this.state.orders, owners:this.state.owners, serieMax:this.state.serieMax
+      }));
+    } catch(e) { ok = false; }
+    this.phSync();
+    if (this.state.saveWarn === ok) this.setState({saveWarn:!ok});
+  }
+  // Écrit dans IndexedDB les photos nouvelles et supprime celles qui ne sont plus utilisées.
+  phSync(){
+    const cur = new Map();
+    this.state.pieces.forEach(p => (p.photos || []).forEach(ph => { if (ph.src) cur.set(ph.id, ph.src); }));
+    cur.forEach((src, id) => {
+      this._phCache[id] = src;
+      if (this._phStored.has(id)) return;
+      this._phStored.add(id);
+      this._phPending++;
+      phPut(id, src).then(() => { this._phPending--; }, () => { this._phPending--; this._phStored.delete(id); if (!this.state.saveWarn) this.setState({saveWarn:true}); });
+    });
+    Array.from(this._phStored).forEach(id => {
+      if (!cur.has(id)) { this._phStored.delete(id); delete this._phCache[id]; phDelete(id); }
+    });
   }
   loadStored(){
-    try {
-      const saved = JSON.parse(localStorage.getItem(STORE_KEY) || 'null');
-      if (saved && Array.isArray(saved.team)) this.setState({
+    let saved = null;
+    try { saved = JSON.parse(localStorage.getItem(STORE_KEY) || 'null'); } catch(e) {}
+    const finish = () => { this._loaded = true; if (this._persistPending) { this._persistPending = false; this.persist(); } };
+    if (!(saved && Array.isArray(saved.team))) { finish(); return; }
+    const pieces = Array.isArray(saved.pieces) ? saved.pieces : SEED_PIECES;
+    const need = [];
+    pieces.forEach(p => (p.photos || []).forEach(ph => { if (!ph.src && !this._phCache[ph.id]) need.push(ph.id); }));
+    const apply = found => {
+      const restored = pieces.map(p => (p.photos && p.photos.length) ? Object.assign({}, p, {photos:p.photos.map(ph => {
+        const src = ph.src || this._phCache[ph.id] || found[ph.id];
+        return src ? Object.assign({}, ph, {src}) : null;
+      }).filter(Boolean)}) : p);
+      Object.keys(found).forEach(id => { this._phStored.add(id); this._phCache[id] = found[id]; });
+      this.setState({
         team:saved.team, audit:Array.isArray(saved.audit) ? saved.audit : SEED_AUDIT,
-        pieces:Array.isArray(saved.pieces) ? saved.pieces : SEED_PIECES,
+        pieces:restored,
         orders:Array.isArray(saved.orders) ? saved.orders : SEED_ORDERS,
         owners:Array.isArray(saved.owners) ? saved.owners : SEED_OWNERS,
-        serieMax: typeof saved.serieMax==='number' ? saved.serieMax : maxSerie(saved.pieces || SEED_PIECES)
+        serieMax: typeof saved.serieMax==='number' ? saved.serieMax : maxSerie(restored)
       });
-    } catch(e) {}
+      finish();
+      const keep = new Set(); restored.forEach(p => (p.photos || []).forEach(ph => keep.add(ph.id)));
+      phPrune(keep);
+    };
+    if (!need.length) apply({}); else phGetMany(need).then(apply);
   }
   readHash(){
     const m = (location.hash || '').match(/invitation=([A-Za-z0-9_-]+)/);
@@ -1604,6 +1700,9 @@ class Component extends DCLogic {
     this._onStorage = e => { if (e.key===STORE_KEY) this.loadStored(); };
     window.addEventListener('hashchange', this._onHash);
     window.addEventListener('storage', this._onStorage);
+    // Fermer ou recharger la page pendant l'écriture des photos les ferait perdre : on demande confirmation.
+    this._onBeforeUnload = e => { if (this._phPending > 0) { e.preventDefault(); e.returnValue = ''; return ''; } };
+    window.addEventListener('beforeunload', this._onBeforeUnload);
   }
 
   componentWillUnmount(){
@@ -1612,12 +1711,13 @@ class Component extends DCLogic {
     document.removeEventListener('mousedown', this._onDown);
     window.removeEventListener('hashchange', this._onHash);
     window.removeEventListener('storage', this._onStorage);
+    window.removeEventListener('beforeunload', this._onBeforeUnload);
     clearTimeout(this._flashT);
     clearTimeout(this._photoT);
   }
 
   _emptyForm(){ return {modele:'', coloris:'', reference:'', prix:'', serie:'', code:'', matiere:'', dateFab:'', statut:'disponible', autoIds:false, photos:[]}; }
-  _emptyLot(){ return {modele:'', coloris:'', reference:'', prix:'', matiere:'', quantite:''}; }
+  _emptyLot(){ return {modele:'', coloris:'', reference:'', prix:'', matiere:'', quantite:'', annee:String(new Date().getFullYear())}; }
   _emptySav(){ return {type:'en_reparation', date:isoToday(), note:'', replacementId:''}; }
   _emptyVente(){ return {canal:'popup', date:isoToday(), evenement:'', pieceIds:[], client:'', email:'', telephone:'', montant:'', paiement:'Espèces', note:''}; }
 
@@ -1653,14 +1753,33 @@ class Component extends DCLogic {
   }
 
   go(route, extra){
-    this.setState(Object.assign({route, navOpen:false, registreOpen:false, filtersOpen:false, photoErr:'', photoBusy:false, photoNotice:null}, extra||{}));
+    this.setState(Object.assign({route, navOpen:false, registreOpen:false, filtersOpen:false, photoErr:'', photoBusy:false, photoNotice:null, lotFocus:null}, extra||{}));
     try{window.scrollTo(0,0);}catch(e){}
   }
 
-  showFlash(msg, ms){
+  showFlash(msg, ms, action){
     clearTimeout(this._flashT);
-    this.setState({flash:msg});
-    this._flashT = setTimeout(() => this.setState({flash:''}), ms || 5000);
+    this.setState({flash:msg, flashAction:action || null});
+    this._flashT = setTimeout(() => this.setState({flash:'', flashAction:null}), ms || 5000);
+  }
+
+  // Place le focus sur le premier champ signalé en erreur (clavier et lecteurs d'écran).
+  focusFirstInvalid(){
+    setTimeout(() => { try { const el = document.querySelector('form [aria-invalid="true"]'); if (el) el.focus(); } catch(e) {} }, 40);
+  }
+
+  // Annule un lot tout juste généré, tant qu'aucune de ses pièces n'a été modifiée ou vendue.
+  undoLot(lotId, prevMax, counter){
+    const st = this.state;
+    const mine = st.pieces.filter(p => p.lotId===lotId);
+    if (!mine.length) return;
+    const touched = mine.filter(p => p.statut!=='reserve' || (p.photos || []).length || (p.sav || []).length || st.orders.some(o => (o.pieceIds || []).includes(p.id)));
+    if (touched.length) { this.showFlash('Ce lot ne peut plus être annulé : ' + touched.length + (touched.length>1 ? ' pièces ont été modifiées ou vendues.' : ' pièce a été modifiée ou vendue.'), 7000); return; }
+    const reusable = st.serieMax===counter;
+    const first = mine[0].serie, last = mine[mine.length - 1].serie;
+    this.setState(s2 => ({pieces:s2.pieces.filter(p => p.lotId!==lotId), serieMax: s2.serieMax===counter ? prevMax : s2.serieMax, lotFocus:null}), () => this.persist());
+    this.logAudit('Lot annulé — ' + mine.length + ' × ' + mine[0].modele + ' (' + (first===last ? first : first + ' → ' + last) + ')' + (reusable ? ' ; numéros remis à disposition' : ' ; numéros non réutilisés'));
+    this.showFlash('Lot annulé : ' + mine.length + (mine.length>1 ? ' pièces retirées' : ' pièce retirée') + (reusable ? ', numéros de série remis à disposition.' : '. Les numéros de série restent consommés (d\'autres pièces ont été créées depuis).'), 7000);
   }
 
   logAudit(action, auteur){
@@ -1802,12 +1921,15 @@ class Component extends DCLogic {
         edit: e => { if (e && e.stopPropagation) e.stopPropagation(); openPieceEdit(p); }};
     });
     const q = s.search.trim().toLowerCase();
-    let filteredPieces = decPieces.filter(p =>
+    // Juste après la génération d'un lot, on n'affiche que ce lot (bandeau « Afficher tout le registre »)
+    // sans modifier la recherche ni les filtres de l'utilisateur.
+    let filteredPieces = s.lotFocus ? decPieces.filter(p => p.lotId===s.lotFocus.id) : decPieces.filter(p =>
       (!q || (p.modele+' '+p.serie+' '+p.matiere+' '+(p.reference||'')).toLowerCase().includes(q)) &&
       (s.statutFilter==='tous' || p.eff===s.statutFilter));
+    const sortKey = s.lotFocus ? 'serie' : s.sortBy;
     filteredPieces = filteredPieces.slice().sort((a,b) =>
-      s.sortBy==='serie' ? a.serie.localeCompare(b.serie) :
-      s.sortBy==='ancien' ? (a.dateFab||'').localeCompare(b.dateFab||'') :
+      sortKey==='serie' ? a.serie.localeCompare(b.serie) :
+      sortKey==='ancien' ? (a.dateFab||'').localeCompare(b.dateFab||'') :
       (b.dateFab||'').localeCompare(a.dateFab||''));
 
     const isEditing = !!s.editId;
@@ -1966,7 +2088,10 @@ class Component extends DCLogic {
         go: () => this.go(n.key)
       })),
 
-      flash: s.flash, closeFlash: () => { clearTimeout(this._flashT); this.setState({flash:''}); },
+      flash: s.flash, closeFlash: () => { clearTimeout(this._flashT); this.setState({flash:'', flashAction:null}); },
+      flashActionLabel: s.flashAction ? s.flashAction.label : '',
+      runFlashAction: () => { const a = s.flashAction; clearTimeout(this._flashT); this.setState({flash:'', flashAction:null}); if (a && a.run) a.run(); },
+      saveWarn: s.saveWarn,
 
       hasConfirm: !!s.confirm,
       confirm: Object.assign({}, s.confirm || {}, {
@@ -2354,10 +2479,14 @@ class Component extends DCLogic {
       statutFilter: s.statutFilter, setStatutFilter: e => this.setState({statutFilter:e.target.value}),
       sortBy: s.sortBy, setSortBy: e => this.setState({sortBy:e.target.value}),
       filteredPieces, noPieces: filteredPieces.length===0,
-      piecesCount: (filteredPieces.length===s.pieces.length
-        ? s.pieces.length + ' pièces au registre'
-        : filteredPieces.length + ' sur ' + s.pieces.length + ' pièces') + ' · ' + decPieces.filter(p => p.eff==='disponible').length + ' disponibles à la vente'
-        + (decPieces.some(p => p.eff==='reserve') ? ' · ' + decPieces.filter(p => p.eff==='reserve').length + ' réservées en fabrication' : ''),
+      piecesCount: (() => {
+        const nDispo = decPieces.filter(p => p.eff==='disponible').length;
+        const nRes = decPieces.filter(p => p.eff==='reserve').length;
+        const nTot = s.pieces.length, nVis = filteredPieces.length;
+        return (nVis===nTot ? nTot + (nTot>1 ? ' pièces au registre' : ' pièce au registre') : nVis + ' sur ' + nTot + (nTot>1 ? ' pièces' : ' pièce'))
+          + ' · ' + nDispo + (nDispo>1 ? ' disponibles à la vente' : ' disponible à la vente')
+          + (nRes ? ' · ' + nRes + (nRes>1 ? ' réservées en fabrication' : ' réservée en fabrication') : '');
+      })(),
       newPiece: () => this.go('piece-form', {editId:null, fieldErr:{}, codeRevealed:false,
         form:Object.assign(this._emptyForm(), {autoIds:true, serie:nextSerie(s.pieces, '', s.serieMax), code:genCode(s.pieces)})}),
       openLot: () => this.go('lot-form', {lotForm:this._emptyLot(), lotErr:{}}),
@@ -2380,7 +2509,7 @@ class Component extends DCLogic {
       registreChevron: s.registreOpen ? 'rotate(180deg)' : 'none',
       toggleRegistre: () => this.setState(st => ({registreOpen:!st.registreOpen})),
       registreItems: [
-        {label:'Générer un lot d\'identifiants', run: () => { this.setState({registreOpen:false}); this.go('lot-form', {lotForm:this._emptyLot(), lotErr:{}}); }},
+        {label:'Générer un lot de pièces', run: () => { this.setState({registreOpen:false}); this.go('lot-form', {lotForm:this._emptyLot(), lotErr:{}}); }},
         {label:'Importer le registre (Excel)', run: () => { this.setState({registreOpen:false}); this.showFlash('Démonstration — import du registre Excel (numéros de série et codes d\'activation existants) non branché ici.', 7000); }},
         {label:'Exporter les n° de série à fabriquer (CSV)', run: () => {
           this.setState({registreOpen:false});
@@ -2508,7 +2637,7 @@ class Component extends DCLogic {
           prix: String(raw.prix).trim()==='' ? '' : Number(raw.prix)
         });
         const err = this.validatePiece(f);
-        if (Object.keys(err).length) { this.setState({fieldErr:err}); return; }
+        if (Object.keys(err).length) { this.setState({fieldErr:err}, () => this.focusFirstInvalid()); return; }
         delete f.autoIds;
         const editing = !!this.state.editId;
         this.setState(st => editing
@@ -2560,7 +2689,23 @@ class Component extends DCLogic {
       // Lot de pièces (identifiants préparés en amont de la fabrication)
       lotForm: s.lotForm || this._emptyLot(),
       lotRefPlaceholder: refFromModele((s.lotForm || this._emptyLot()).modele) ? 'Ex. ' + refFromModele((s.lotForm || this._emptyLot()).modele) : 'Ex. HUP',
-      lotNextSerie: nextSerie(s.pieces, '', s.serieMax),
+      lotYears: (() => { const y = new Date().getFullYear(); return [{value:String(y), label:String(y)}, {value:String(y+1), label:(y+1) + ' (année prochaine)'}]; })(),
+      lotRangeText: (() => {
+        const lf = s.lotForm || this._emptyLot();
+        const yr = /^\d{4}$/.test(lf.annee) ? lf.annee : String(new Date().getFullYear());
+        const n = Number(lf.quantite);
+        const start = Math.max(maxSerie(s.pieces), s.serieMax) + 1;
+        const first = 'CS-' + String(start).padStart(4, '0') + '-' + yr;
+        if (lf.quantite && Number.isInteger(n) && n >= 1 && n <= 500) {
+          const last = 'CS-' + String(start + n - 1).padStart(4, '0') + '-' + yr;
+          return n === 1 ? 'Numéro de série émis : ' + first + '.' : 'Numéros de série émis : ' + first + ' → ' + last + ' (' + n + ' pièces).';
+        }
+        return 'Prochain numéro de série à émettre : ' + first + '.';
+      })(),
+      lotFocusOn: !!s.lotFocus,
+      lotFocusLabel: s.lotFocus ? 'Lot « ' + s.lotFocus.modele + ' »' : '',
+      lotFocusDetail: s.lotFocus ? s.lotFocus.count + (s.lotFocus.count>1 ? ' pièces' : ' pièce') + ' · ' + (s.lotFocus.first===s.lotFocus.last ? s.lotFocus.first : s.lotFocus.first + ' → ' + s.lotFocus.last) : '',
+      clearLotFocus: () => this.setState({lotFocus:null}),
       setLot: Object.fromEntries(Object.keys(this._emptyLot()).map(key => [key, e => {
         const v = e.target.value;
         this.setState(st => {
@@ -2585,24 +2730,43 @@ class Component extends DCLogic {
         if (!raw.quantite || !Number.isInteger(quantiteNum) || quantiteNum < 1) err.quantite = 'Indiquez un nombre entier de pièces à générer (1 ou plus).';
         else if (quantiteNum > 500) err.quantite = 'Générez au plus 500 pièces à la fois.';
         if (String(raw.prix).trim()!=='' && !(Number(raw.prix) >= 0)) err.prix = 'Indiquez un montant en FCFA (chiffres uniquement).';
-        if (Object.keys(err).length) { this.setState({lotErr:err}); return; }
-        const reference = (raw.reference.trim() || refFromModele(modele)).toUpperCase();
-        const coloris = raw.coloris.trim(), matiere = raw.matiere.trim();
-        const prix = String(raw.prix).trim()==='' ? '' : Number(raw.prix);
-        const batch = [];
-        let counter = Math.max(maxSerie(s.pieces), s.serieMax);
-        for (let i = 0; i < quantiteNum; i++) {
-          counter++;
-          const code = genCode(s.pieces.concat(batch));
-          batch.push({id:'p' + Date.now() + '-' + i, reference, modele, coloris, matiere, prix,
-            serie:'CS-' + String(counter).padStart(4, '0') + '-' + yearOf(''),
-            code, dateFab:'', statut:'reserve', sav:[], photos:[]});
+        if (Object.keys(err).length) { this.setState({lotErr:err}, () => this.focusFirstInvalid()); return; }
+        const annee = /^\d{4}$/.test(raw.annee) ? raw.annee : String(new Date().getFullYear());
+        const startNo = Math.max(maxSerie(s.pieces), s.serieMax) + 1;
+        const serieOf = no => 'CS-' + String(no).padStart(4, '0') + '-' + annee;
+        const doLot = () => {
+          const lotId = 'L' + Date.now().toString(36);
+          const prevMax = s.serieMax;
+          const reference = (raw.reference.trim() || refFromModele(modele)).toUpperCase();
+          const coloris = raw.coloris.trim(), matiere = raw.matiere.trim();
+          const prix = String(raw.prix).trim()==='' ? '' : Number(raw.prix);
+          const batch = [];
+          let counter = Math.max(maxSerie(s.pieces), s.serieMax);
+          for (let i = 0; i < quantiteNum; i++) {
+            counter++;
+            const code = genCode(s.pieces.concat(batch));
+            batch.push({id:'p' + Date.now() + '-' + i, lotId, reference, modele, coloris, matiere, prix,
+              serie:serieOf(counter), code, dateFab:'', statut:'reserve', sav:[], photos:[]});
+          }
+          const first = batch[0].serie, last = batch[batch.length - 1].serie;
+          this.setState(st => ({pieces: st.pieces.concat(batch), serieMax:counter, route:'pieces', lotErr:{},
+            lotFocus:{id:lotId, modele, count:quantiteNum, first, last}}), () => this.persist());
+          this.logAudit('Lot généré — ' + quantiteNum + ' × ' + modele + ' (' + (first===last ? first : first + ' → ' + last) + ')');
+          this.showFlash(quantiteNum>1
+            ? quantiteNum + ' pièces « ' + modele + ' » générées (' + first + ' → ' + last + '), prêtes pour la fabrication.'
+            : '1 pièce « ' + modele + ' » générée (' + first + '), prête pour la fabrication.',
+            12000, {label:'Annuler le lot', run: () => this.undoLot(lotId, prevMax, counter)});
+        };
+        if (quantiteNum > 20) {
+          this.askConfirm({
+            title:'Générer ' + quantiteNum + ' pièces ?',
+            body:'Les numéros de série ' + serieOf(startNo) + ' → ' + serieOf(startNo + quantiteNum - 1) + ' seront émis pour ' + quantiteNum + ' pièces « ' + modele + ' » et ne pourront plus être réattribués. Vous pourrez annuler le lot juste après.',
+            okLabel:'Générer ' + quantiteNum + ' pièces', cancelLabel:'Modifier la quantité', tone:'primary',
+            onOk: doLot
+          });
+          return;
         }
-        const first = batch[0].serie, last = batch[batch.length - 1].serie;
-        this.setState(st => ({pieces: st.pieces.concat(batch), serieMax:counter,
-          route:'pieces', lotErr:{}, statutFilter:'reserve', search:reference, sortBy:'serie'}), () => this.persist());
-        this.logAudit('Lot généré — ' + quantiteNum + ' × ' + modele + ' (' + first + ' → ' + last + ')');
-        this.showFlash(quantiteNum + ' pièces « ' + modele + ' » générées (' + first + ' → ' + last + '), prêtes pour la fabrication.', 7000);
+        doLot();
       },
 
       // Propriétaires
