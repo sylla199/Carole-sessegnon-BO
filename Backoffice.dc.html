@@ -67,7 +67,7 @@
     .bo-only-mobile{display:inline-flex !important}
     .bo-filters{display:flex;flex-direction:column;gap:10px;width:100%}
     .bo-filters.is-collapsed{display:none}
-    .bo-filters > *{width:100%;flex:none !important}
+    .bo-filters > *{width:100% !important;flex:none !important}
 
     /* Tableaux → cartes empilées */
     .bo-table{min-width:0 !important}
@@ -317,12 +317,12 @@
         </sc-if>
 
         <sc-if value="{{ isPieces }}">
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:20px">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:20px">
             <div style="display:flex;gap:10px;flex-wrap:wrap;flex:1 1 420px;min-width:0">
               <input type="search" aria-label="Rechercher une pièce" value="{{ search }}" onChange="{{ setSearch }}" placeholder="Rechercher un modèle, un n° de série…" style="flex:1 1 240px;min-width:0;height:46px;padding:0 12px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);color:rgb(0,0,0);font-size:14px;padding:0 16px">
               <button type="button" class="bo-only-mobile" onClick="{{ toggleFilters }}" aria-expanded="{{ filtersOpen }}" aria-controls="bo-filters-pieces" style="height:46px;padding:0 16px;align-items:center;justify-content:center;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);color:rgb(0,0,0);cursor:pointer;font-size:14px">{{ piecesFiltersLabel }}</button>
               <div id="bo-filters-pieces" class="{{ filtersClass }}">
-                <select aria-label="Filtrer par statut" value="{{ statutFilter }}" onChange="{{ setStatutFilter }}" style="flex:1 1 160px;height:46px;padding:0 12px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);color:rgb(0,0,0);font-size:14px">
+                <select aria-label="Filtrer par statut" value="{{ statutFilter }}" onChange="{{ setStatutFilter }}" style="flex:0 0 auto;width:208px;height:46px;padding:0 12px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);color:rgb(0,0,0);font-size:14px">
                   <option value="tous">Tous les statuts</option>
                   <option value="disponible">Disponible</option>
                   <option value="bientot">Bientôt disponible</option>
@@ -331,7 +331,7 @@
                   <option value="prototype">Prototype</option>
                   <option value="offerte">Offerte</option>
                 </select>
-                <select aria-label="Trier les pièces" value="{{ sortBy }}" onChange="{{ setSortBy }}" style="flex:1 1 180px;height:46px;padding:0 12px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);color:rgb(0,0,0);font-size:14px">
+                <select aria-label="Trier les pièces" value="{{ sortBy }}" onChange="{{ setSortBy }}" style="flex:0 0 auto;width:196px;height:46px;padding:0 12px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);color:rgb(0,0,0);font-size:14px">
                   <option value="recent">Plus récentes d'abord</option>
                   <option value="ancien">Plus anciennes d'abord</option>
                   <option value="serie">Par n° de série</option>
@@ -352,7 +352,6 @@
                   </div>
                 </sc-if>
               </div>
-              <x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="secondary" onClick="{{ openLot }}" dc-props="{{ btnUpperSm }}" hint-size="auto,46px">Générer un lot</x-import>
               <x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="primary" onClick="{{ newPiece }}" dc-props="{{ btnUpperSm }}" hint-size="auto,46px">Ajouter une pièce</x-import>
             </div>
           </div>
@@ -2252,6 +2251,7 @@ class Component extends DCLogic {
       registreChevron: s.registreOpen ? 'rotate(180deg)' : 'none',
       toggleRegistre: () => this.setState(st => ({registreOpen:!st.registreOpen})),
       registreItems: [
+        {label:'Générer un lot d\'identifiants', run: () => { this.setState({registreOpen:false}); this.go('lot-form', {lotForm:this._emptyLot(), lotErr:{}}); }},
         {label:'Importer le registre (Excel)', run: () => { this.setState({registreOpen:false}); this.showFlash('Démonstration — import du registre Excel (numéros de série et codes d\'activation existants) non branché ici.', 7000); }},
         {label:'Exporter les n° de série à fabriquer (CSV)', run: () => {
           this.setState({registreOpen:false});
