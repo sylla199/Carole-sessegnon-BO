@@ -16,6 +16,7 @@
 <link rel="stylesheet" href="_ds/carole-sessegnon-design-system-d86b2cd7-6c83-493c-afcb-c3661a83e17a/components/fig-assets.css">
 <link rel="stylesheet" href="_ds/carole-sessegnon-design-system-d86b2cd7-6c83-493c-afcb-c3661a83e17a/styles.css">
 <script src="_ds/carole-sessegnon-design-system-d86b2cd7-6c83-493c-afcb-c3661a83e17a/_ds_bundle.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 <style>
   *{box-sizing:border-box}
   html,body{margin:0;padding:0;background:rgb(252,249,248)}
@@ -31,6 +32,13 @@
   .bo-aside{position:sticky;top:0;height:100vh}
   .bo-menu-btn,.bo-scrim{display:none}
   .bo-table th{white-space:nowrap}
+  /* Planche de QR codes : chaque carte devient un certificat imprimable */
+  .bo-qr-card{break-inside:avoid;page-break-inside:avoid}
+  @media print{
+    .bo-aside,.bo-header,.bo-no-print{display:none !important}
+    .bo-qr-grid{display:grid !important;grid-template-columns:repeat(2,1fr) !important;gap:12mm !important}
+    html,body,.bo-shell{background:#fff !important}
+  }
   /* Onglets qui débordent horizontalement : dégradé au bord pour signaler qu'il y a plus à voir */
   .bo-tabs-scroll{mask-image:linear-gradient(to right, black calc(100% - 28px), transparent 100%);-webkit-mask-image:linear-gradient(to right, black calc(100% - 28px), transparent 100%)}
   .bo-filters{display:contents}
@@ -211,7 +219,7 @@
       <div style="padding:clamp(20px,3vw,44px)">
 
         <sc-if value="{{ flash }}">
-          <div role="status" style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin:0 0 20px;padding:14px 18px;background:rgb(255,255,255);box-shadow:inset 3px 0 0 rgb(71,29,27),inset 0 0 0 1px rgba(0,0,0,.08);font-size:14px;color:rgb(71,29,27);animation:bo-in .2s ease">
+          <div role="status" class="bo-no-print" style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin:0 0 20px;padding:14px 18px;background:rgb(255,255,255);box-shadow:inset 3px 0 0 rgb(71,29,27),inset 0 0 0 1px rgba(0,0,0,.08);font-size:14px;color:rgb(71,29,27);animation:bo-in .2s ease">
             <span>{{ flash }}</span>
             <button type="button" onClick="{{ closeFlash }}" aria-label="Fermer le message" style="flex:0 0 auto;background:none;border:0;padding:0 2px;cursor:pointer;color:rgb(94,94,94);font-size:18px;line-height:1">×</button>
           </div>
@@ -611,6 +619,30 @@
               <x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="primary" dc-props="{{ btnUpperSm }}" hint-size="auto,46px">Générer le lot</x-import>
             </div>
           </form>
+        </sc-if>
+
+        <sc-if value="{{ isQrSheet }}">
+          <div class="bo-no-print" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:22px">
+            <button type="button" onClick="{{ goPieces }}" style="background:none;border:0;padding:0;color:rgb(94,94,94);cursor:pointer;font-size:13px">← Retour aux pièces</button>
+            <x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="primary" onClick="{{ printQrSheet }}" dc-props="{{ btnUpperSm }}" hint-size="auto,46px">Imprimer</x-import>
+          </div>
+          <p class="bo-no-print" style="margin:0 0 22px;font-size:13px;line-height:20px;color:rgb(94,94,94);max-width:64ch">Un certificat par pièce réservée en fabrication : numéro de série, code d'activation et QR code vers la page d'authentification. Le code d'activation quitte le back-office sur cette planche — gardez-la hors de vue du public avant la remise en main propre.</p>
+          <sc-if value="{{ noQrPieces }}">
+            <p style="margin:0;font-size:14px;color:rgb(94,94,94)">Aucune pièce réservée en fabrication pour le moment : générez un lot avant de préparer des certificats.</p>
+          </sc-if>
+          <div class="bo-qr-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px">
+            <sc-for list="{{ qrPieces }}" as="q" hint-placeholder-count="4">
+              <div class="bo-qr-card" style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.12);padding:20px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center">
+                <div>
+                  <p style="margin:0;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">{{ q.reference }}</p>
+                  <p style="margin:2px 0 0;font-family:var(--font-display);font-size:18px;color:rgb(71,29,27)">{{ q.modele }}</p>
+                </div>
+                <img src="{{ q.qrDataUrl }}" alt="QR code d'authentification — {{ q.serie }}" width="140" height="140" style="width:140px;height:140px;image-rendering:pixelated">
+                <p style="margin:0;font-size:13px;letter-spacing:.04em;color:rgb(0,0,0);font-variant-numeric:tabular-nums">{{ q.serie }}</p>
+                <p style="margin:0;font-size:13px;letter-spacing:.04em;color:rgb(70,70,70);font-variant-numeric:tabular-nums">{{ q.code }}</p>
+              </div>
+            </sc-for>
+          </div>
         </sc-if>
 
         <sc-if value="{{ isCommandes }}">
@@ -1742,7 +1774,7 @@ class Component extends DCLogic {
       {key:'proprietaires', label:'Propriétaires', icon:'owners'},
       {key:'equipe', label:'Équipe', icon:'team'}
     ];
-    const NAV_PARENT = {'piece-form':'pieces', 'lot-form':'pieces', 'commande-detail':'commandes', 'vente-form':'commandes', 'proprietaire':'proprietaires'};
+    const NAV_PARENT = {'piece-form':'pieces', 'lot-form':'pieces', 'qr-sheet':'pieces', 'commande-detail':'commandes', 'vente-form':'commandes', 'proprietaire':'proprietaires'};
     const activeNav = NAV_PARENT[s.route] || s.route;
 
     const activeDirection = s.team.filter(t => t.role==='direction' && t.statut==='actif').length;
@@ -1826,6 +1858,7 @@ class Component extends DCLogic {
       isPieces: s.route==='pieces',
       isPieceForm: s.route==='piece-form',
       isLotForm: s.route==='lot-form',
+      isQrSheet: s.route==='qr-sheet',
       isProprietaires: s.route==='proprietaires',
       isCommandes: s.route==='commandes',
       isCommandeDetail: s.route==='commande-detail',
@@ -1841,12 +1874,13 @@ class Component extends DCLogic {
       ordersFiltersLabel: (n => 'Filtres' + (n ? ' (' + n + ')' : ''))((s.canalFilter!=='tous' ? 1 : 0) + (s.orderStatutFilter!=='tous' ? 1 : 0)),
       piecesFiltersLabel: (n => 'Filtres' + (n ? ' (' + n + ')' : ''))((s.statutFilter!=='tous' ? 1 : 0) + (s.sortBy!=='recent' ? 1 : 0)),
 
-      crumb: ({'piece-form':'Pièces', 'lot-form':'Pièces', 'commande-detail':'Commandes', 'vente-form':'Commandes', 'proprietaire':'Propriétaires'})[s.route] || '',
+      crumb: ({'piece-form':'Pièces', 'lot-form':'Pièces', 'qr-sheet':'Pièces', 'commande-detail':'Commandes', 'vente-form':'Commandes', 'proprietaire':'Propriétaires'})[s.route] || '',
       crumbGo: () => this.go(NAV_PARENT[s.route] || 'dashboard'),
       pageTitle: ({
         dashboard:'Tableau de bord', pieces:'Pièces', commandes:'Commandes', equipe:'Équipe et accès', proprietaires:'Propriétaires',
         'piece-form': isEditing ? 'Modifier la pièce' : 'Ajouter une pièce',
         'lot-form': 'Générer un lot de pièces',
+        'qr-sheet': 'Planche de QR codes',
         'commande-detail': viewOrder ? viewOrder.no : 'Commande',
         'vente-form': 'Enregistrer une vente',
         'proprietaire': viewOwnerRaw ? viewOwnerRaw.owner : 'Propriétaire'
@@ -2203,6 +2237,17 @@ class Component extends DCLogic {
       newPiece: () => this.go('piece-form', {editId:null, fieldErr:{}, codeRevealed:false,
         form:Object.assign(this._emptyForm(), {autoIds:true, serie:nextSerie(s.pieces, '', s.serieMax), code:genCode(s.pieces)})}),
       openLot: () => this.go('lot-form', {lotForm:this._emptyLot(), lotErr:{}}),
+      printQrSheet: () => { try { window.print(); } catch(e) {} },
+      qrPieces: s.route!=='qr-sheet' ? [] : decPieces.filter(p => p.eff==='reserve').map(p => {
+        let qrDataUrl = '';
+        try {
+          const link = 'https://authentification.carole-sessegnon.com/verifier?serie=' + encodeURIComponent(p.serie) + '&code=' + encodeURIComponent(p.code);
+          const qr = qrcode(0, 'M'); qr.addData(link); qr.make();
+          qrDataUrl = qr.createDataURL(5, 8);
+        } catch(e) {}
+        return {reference:p.reference||'', modele:p.modele, serie:p.serie, code:p.code, qrDataUrl};
+      }),
+      noQrPieces: s.route==='qr-sheet' && decPieces.filter(p => p.eff==='reserve').length===0,
       registreOpen: s.registreOpen,
       registreChevron: s.registreOpen ? 'rotate(180deg)' : 'none',
       toggleRegistre: () => this.setState(st => ({registreOpen:!st.registreOpen})),
@@ -2216,7 +2261,8 @@ class Component extends DCLogic {
             [['Référence','Modèle','Coloris','Numéro de série']]
               .concat(aFabriquer.map(p => [p.reference||'',p.modele,p.coloris,p.serie])));
         }},
-        {label:'Exporter pour les certificats (CSV)', run: () => {
+        {label:'Imprimer la planche de QR codes', run: () => { this.setState({registreOpen:false}); this.go('qr-sheet'); }},
+        {label:'Exporter pour les certificats (CSV, sans QR)', run: () => {
           this.setState({registreOpen:false});
           const aCertifier = decPieces.filter(p => p.eff==='reserve');
           if (!aCertifier.length) { this.showFlash('Aucune pièce réservée en fabrication pour le moment.', 6000); return; }
