@@ -63,6 +63,7 @@
     .bo-menu-btn{display:flex}
     .bo-collapse,.bo-hide-mobile{display:none !important}
     .bo-header{padding:16px 20px !important}
+    .bo-registre-menu{left:0 !important;right:auto !important;width:min(380px,calc(100vw - 40px)) !important;min-width:0 !important}
     /* Filtres repliés derrière un bouton, pour que la liste démarre plus haut */
     .bo-only-mobile{display:inline-flex !important}
     .bo-filters{display:flex;flex-direction:column;gap:10px;width:100%}
@@ -345,9 +346,15 @@
                   <svg aria-hidden="true" width="10" height="6" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.2" style="transform:{{ registreChevron }}"><path d="M1 1l4 4 4-4"></path></svg>
                 </button>
                 <sc-if value="{{ registreOpen }}">
-                  <div id="bo-registre-menu" role="menu" style="position:absolute;right:0;top:calc(100% + 6px);z-index:20;min-width:240px;background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.12),0 12px 24px -8px rgba(0,0,0,.12);padding:6px 0;animation:bo-in .15s ease">
+                  <div id="bo-registre-menu" class="bo-registre-menu" role="menu" style="position:absolute;right:0;top:calc(100% + 6px);z-index:20;min-width:380px;background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.12),0 12px 24px -8px rgba(0,0,0,.12);padding:6px 0;animation:bo-in .15s ease">
                     <sc-for list="{{ registreItems }}" as="m" hint-placeholder-count="3">
-                      <button type="button" role="menuitem" onClick="{{ m.run }}" style="display:block;width:100%;padding:12px 18px;background:none;border:0;text-align:left;cursor:pointer;font-size:14px;color:rgb(0,0,0)" style-hover="background:rgb(255,251,248)">{{ m.label }}</button>
+                      <button type="button" role="menuitem" onClick="{{ m.run }}" style="display:flex;align-items:flex-start;gap:14px;width:100%;min-height:44px;padding:12px 18px;background:none;border:0;border-top:{{ m.divider }};text-align:left;cursor:pointer;font-family:inherit;color:rgb(0,0,0)" style-hover="background:rgb(255,251,248)">
+                        <span aria-hidden="true" style="flex:0 0 20px;width:20px;height:20px;margin-top:0;color:rgb(71,29,27);display:flex" dangerouslySetInnerHTML="{{ m.iconHtml }}"></span>
+                        <span style="display:block;min-width:0">
+                          <span style="display:block;font-size:14px;line-height:20px;color:rgb(0,0,0)">{{ m.label }}</span>
+                          <span style="display:block;margin-top:2px;font-size:12px;line-height:17px;color:{{ m.descColor }}">{{ m.desc }}</span>
+                        </span>
+                      </button>
                     </sc-for>
                   </div>
                 </sc-if>
@@ -1500,6 +1507,24 @@ const nowLabel = () => {
     d.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
 };
 
+// Menu « Registre » : une icône et une courte description par opération.
+const REG_ICONS = {
+  lot:      '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="14" height="14"></rect><path d="M10 6.5v7M6.5 10h7"></path></svg>',
+  import:   '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1"><path d="M10 3v9M6.5 8.5 10 12l3.5-3.5M3.5 14.5V17h13v-2.5"></path></svg>',
+  atelier:  '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1"><rect x="4" y="3" width="12" height="14"></rect><path d="M7 7.5h6M7 10.5h6M7 13.5h3.5"></path></svg>',
+  qr:       '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="5.5" height="5.5"></rect><rect x="11.5" y="3" width="5.5" height="5.5"></rect><rect x="3" y="11.5" width="5.5" height="5.5"></rect><path d="M11.5 11.5h2.5v2.5M17 11.5v2M11.5 17h2.5M17 15.5V17h-1.5"></path></svg>',
+  cert:     '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1"><rect x="2.5" y="3" width="15" height="10.5"></rect><path d="M6 7h8M6 10h4"></path><circle cx="14" cy="15.5" r="2"></circle></svg>',
+  export:   '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1"><path d="M10 12V3M6.5 6.5 10 3l3.5 3.5M3.5 14.5V17h13v-2.5"></path></svg>'
+};
+const REG_META = {
+  "Générer un lot d'identifiants":               {icon:'lot',     desc:"Réserver des n° de série avant fabrication"},
+  "Importer le registre (Excel)":                {icon:'import',  desc:"Reprendre un fichier existant"},
+  "Exporter les n° de série à fabriquer (CSV)":  {icon:'atelier', desc:"Liste des pièces à fabriquer, pour l'atelier", divider:true},
+  "Imprimer la planche de QR codes":             {icon:'qr',      desc:"Planche prête pour l'imprimeur"},
+  "Exporter pour les certificats (CSV, sans QR)":{icon:'cert',    desc:"Avec les codes d'activation : ne pas diffuser", warn:true},
+  "Exporter la liste (CSV)":                     {icon:'export',  desc:"Toutes les pièces, sans les codes"}
+};
+
 class Component extends DCLogic {
   state = {
     authed:false, loginErr:'', loginInfo:'', route:'dashboard',
@@ -2384,7 +2409,14 @@ class Component extends DCLogic {
             [['Référence','Modèle','Coloris','Numéro de série','Prix (FCFA)','Matière','Date de fabrication','Statut']]
               .concat(decPieces.map(p => [p.reference||'',p.modele,p.coloris,p.serie,p.prix===''||p.prix===undefined?'':p.prix,p.matiere,p.dateFab,STATUT_LABEL[p.eff]])));
         }}
-      ],
+      ].map(m => {
+        const meta = REG_META[m.label] || {};
+        return Object.assign({}, m, {
+          iconHtml:{__html: REG_ICONS[meta.icon] || ''}, desc: meta.desc || '',
+          descColor: meta.warn ? 'rgb(155,24,33)' : 'rgb(94,94,94)',
+          divider: meta.divider ? '1px solid rgba(0,0,0,.08)' : '0'
+        });
+      }),
 
       // Formulaire pièce
       form: s.form, isEditing,
