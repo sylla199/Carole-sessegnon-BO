@@ -778,7 +778,7 @@
               <tbody>
                 <sc-for list="{{ filteredOrders }}" as="o" hint-placeholder-count="5">
                   <tr onClick="{{ o.open }}" style="cursor:pointer;transition:background-color .15s" style-hover="background:rgb(255,251,248)">
-                    <td style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);font-size:14px;color:rgb(0,0,0);font-variant-numeric:tabular-nums;white-space:nowrap">{{ o.no }}</td>
+                    <td style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);font-size:14px;color:rgb(0,0,0);font-variant-numeric:tabular-nums;white-space:nowrap">{{ o.no }}<sc-if value="{{ o.hasGift }}"><span style="display:inline-block;margin-left:8px;font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:3px 7px;background:rgb(255,251,248);color:rgb(71,29,27);box-shadow:inset 0 0 0 1px rgb(71,29,27)">Cadeau</span></sc-if></td>
                     <td data-label="Canal" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);max-width:160px">
                       <div>
                         <span style="display:block">{{ o.canalLabel }}</span>
@@ -833,6 +833,17 @@
               <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Réception</span><span style="text-align:right">{{ viewOrder.mode }}</span></div>
               <sc-if value="{{ viewOrder.isOnline }}"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Code de suivi</span><span style="text-align:right;letter-spacing:.04em">{{ viewOrder.trackingLabel }}</span></div></sc-if>
               <sc-if value="{{ viewOrder.note }}"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Note</span><span style="text-align:right;max-width:70%">{{ viewOrder.note }}</span></div></sc-if>
+              <sc-if value="{{ viewOrder.hasLivraison }}">
+                <sc-if value="{{ viewOrder.civiliteLabel }}"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Civilité</span><span style="text-align:right;max-width:70%">{{ viewOrder.civiliteLabel }}</span></div></sc-if>
+                <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Adresse de livraison</span><span style="text-align:right;max-width:70%">{{ viewOrder.livraisonLabel }}</span></div>
+              </sc-if>
+              <sc-if value="{{ viewOrder.hasGift }}">
+                <div style="margin-top:14px;padding:16px 18px;background:rgb(255,251,248);box-shadow:inset 0 0 0 1px rgb(71,29,27)">
+                  <p style="margin:0 0 6px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(71,29,27)">Cadeau · à glisser dans le coffret</p>
+                  <sc-if value="{{ viewOrder.giftTo }}"><p style="margin:0 0 8px;font-size:13px;color:rgb(94,94,94)">Pour {{ viewOrder.giftTo }}</p></sc-if>
+                  <p style="margin:0;font-family:var(--font-display);font-size:17px;line-height:1.5;color:rgb(71,29,27);white-space:pre-wrap;overflow-wrap:anywhere">{{ viewOrder.giftMessage }}</p>
+                </div>
+              </sc-if>
               <div style="border-top:1px solid rgba(0,0,0,.08)"></div>
             </div>
             <form onSubmit="{{ saveOrder }}" style="background:rgb(255,251,248);padding:clamp(22px,3vw,32px);display:flex;flex-direction:column;gap:18px">
@@ -1379,8 +1390,11 @@ const SEED_PIECES = [
 ];
 // Chaque commande, en ligne ou hors site, désigne les pièces vendues par leur id.
 const SEED_ORDERS = [
-  {id:'o5', no:'#CS-2026-9530', canal:'en_ligne', evenement:'', client:'Koffi Yao', email:'koffi.yao@exemple.ci', telephone:'', pieceIds:['p2'], total:380000, dateIso:'2026-09-21', mode:'Livraison à domicile', paiement:'Mobile Money', statut:'preparation', tracking:'', note:''},
-  {id:'o1', no:'#CS-2026-9482', canal:'en_ligne', evenement:'', client:'Awa Koné', email:'awa.kone@exemple.ci', telephone:'', pieceIds:['p1'], total:420000, dateIso:'2026-09-02', mode:'Livraison à domicile', paiement:'Carte bancaire', statut:'livree', tracking:'CIP-2093-AB', note:''},
+  {id:'o5', no:'#CS-2026-9530', canal:'en_ligne', evenement:'', client:'Koffi Yao', email:'koffi.yao@exemple.ci', telephone:'', pieceIds:['p2'], total:380000, dateIso:'2026-09-21', mode:'Livraison à domicile', paiement:'Mobile Money', statut:'preparation', tracking:'', note:'',
+   livraison:{civilite:'M.', adresse:'Cocody Angré, 8e tranche, villa 12', ville:'Abidjan', pays:'Côte d\'Ivoire'},
+   gift:{to:'Aya', message:'Joyeux anniversaire, Aya. Que ce bijou t\'accompagne longtemps. Avec toute mon affection, Koffi.'}},
+  {id:'o1', no:'#CS-2026-9482', canal:'en_ligne', evenement:'', client:'Awa Koné', email:'awa.kone@exemple.ci', telephone:'', pieceIds:['p1'], total:420000, dateIso:'2026-09-02', mode:'Livraison à domicile', paiement:'Carte bancaire', statut:'livree', tracking:'CIP-2093-AB', note:'',
+   livraison:{civilite:'Mme', adresse:'Riviera Palmeraie, rue des Jasmins', ville:'Abidjan', pays:'Côte d\'Ivoire'}, gift:null},
   {id:'o2', no:'#CS-2026-9120', canal:'en_ligne', evenement:'', client:'Marie Lefèvre', email:'marie.lefevre@exemple.fr', telephone:'', pieceIds:['p7'], total:510000, dateIso:'2026-07-14', mode:'Livraison internationale', paiement:'Carte bancaire', statut:'livree', tracking:'DHL-5521-FR', note:''},
   {id:'o3', no:'#CS-2026-9051', canal:'popup', evenement:'Pop-up Dakar — Almadies', client:'Fatou Diop', email:'fatou.diop@exemple.sn', telephone:'+221 77 000 00 00', pieceIds:['p8'], total:300000, dateIso:'2026-07-02', mode:'Remise en main propre', paiement:'Espèces', statut:'livree', tracking:'', note:''},
   {id:'o4', no:'#CS-2026-8990', canal:'en_ligne', evenement:'', client:'Julien Petit', email:'julien.petit@exemple.fr', telephone:'', pieceIds:['p6'], total:340000, dateIso:'2026-06-20', mode:'Livraison à domicile', paiement:'Carte bancaire', statut:'annulee', tracking:'', note:'Annulée à la demande du client avant expédition.'}
@@ -1389,7 +1403,7 @@ const ROLES = [
   {key:'direction', label:'Direction', acces:'Accès complet, création des comptes et paramètres généraux', neVoitPas:'—'},
   {key:'commandes', label:'Commandes et clientèle', acces:'Commandes, clients, remboursements, exports', neVoitPas:'Codes d\'activation, registre des pièces'},
   {key:'logistique', label:'Logistique', acces:'Commandes payées à expédier, saisie du code de suivi, confirmation de livraison', neVoitPas:'Données financières, coordonnées clients complètes'},
-  {key:'atelier', label:'Atelier et registre', acces:'Création et modification des pièces, génération des codes et des QR codes', neVoitPas:'Commandes, clients'},
+  {key:'atelier', label:'Atelier et registre', acces:'Création et modification des pièces, génération des codes et des QR codes', neVoitPas:'Commandes et coordonnées clients (voit seulement les messages cadeau à glisser dans le coffret)'},
   {key:'contenu', label:'Contenu', acces:'Pages, textes, traductions, photographies, lettre d\'information', neVoitPas:'Toute donnée client'},
   {key:'comptabilite', label:'Comptabilité', acces:'Consultation et export du chiffre d\'affaires et des factures', neVoitPas:'Aucune modification possible'}
 ];
@@ -1956,6 +1970,12 @@ class Component extends DCLogic {
         itemList: ps.length ? ps.map(p => ({label: p ? p.modele + ' (' + p.serie + ')' : 'Pièce supprimée'})) : [{label:'—'}],
         subline: canalLabel + (o.evenement ? ' · ' + o.evenement : '') + ' · ' + fmtIsoDate(o.dateIso),
         kindLabel: o.canal==='en_ligne' ? 'Commande en ligne' : 'Vente hors site',
+        hasGift: !!(o.gift && o.gift.message),
+        giftMessage: o.gift ? (o.gift.message || '') : '',
+        giftTo: o.gift ? (o.gift.to || '') : '',
+        hasLivraison: !!o.livraison,
+        livraisonLabel: o.livraison ? [o.livraison.adresse, o.livraison.ville, o.livraison.pays].filter(Boolean).join(', ') : '',
+        civiliteLabel: o.livraison ? (o.livraison.civilite || '') : '',
         clientLabel: o.client || 'Client non renseigné',
         clientLine: (o.client || 'Client non renseigné') + ' · ' + canalLabel,
         totalLabel: fmtFcfa(o.total), dateLabel: fmtIsoDate(o.dateIso),
@@ -2258,8 +2278,8 @@ class Component extends DCLogic {
         return base + ' · dont ' + horsSite + ' hors site';
       })(),
       exportOrdersCsv: () => this.downloadCsv('commandes-carole-sessegnon.csv',
-        [['N° de commande','Canal','Événement','Client','E-mail','Téléphone','Pièces','Total (FCFA)','Date','Paiement','Réception','Code de suivi','Statut']]
-          .concat(decOrders.map(o => [o.no,o.canalLabel,o.evenement||'',o.client||'',o.email||'',o.telephone||'',o.items,o.total,o.dateIso,o.paiement||'',o.mode||'',o.tracking||'',ORDER_STATUT_LABEL[o.statut]]))),
+        [['N° de commande','Canal','Événement','Client','E-mail','Téléphone','Pièces','Total (FCFA)','Date','Paiement','Réception','Code de suivi','Statut','Civilité','Adresse de livraison','Message cadeau','Destinataire du cadeau']]
+          .concat(decOrders.map(o => [o.no,o.canalLabel,o.evenement||'',o.client||'',o.email||'',o.telephone||'',o.items,o.total,o.dateIso,o.paiement||'',o.mode||'',o.tracking||'',ORDER_STATUT_LABEL[o.statut],o.civiliteLabel,o.livraisonLabel,o.giftMessage,o.giftTo]))),
       openVente: () => this.go('vente-form', {vente:this._emptyVente(), venteErr:{}, venteSearch:'', venteStep:0, venteMax:0}),
       viewOrder: viewOrder || {},
       orderDraft: s.orderDraft,
