@@ -245,6 +245,15 @@
             </sc-for>
           </div>
 
+          <sc-if value="{{ hasTodo }}">
+            <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:22px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+              <div>
+                <p style="margin:0 0 8px;font-family:var(--font-display);font-size:19px;color:rgb(71,29,27)">À traiter</p>
+                <p style="margin:0;font-size:14px;color:rgb(70,70,70)">{{ newReqLabel }} · {{ alertWaitingLabel }}</p>
+              </div>
+              <div style="display:flex;gap:20px"><button type="button" onClick="{{ goDemandes }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);font-family:inherit">Voir les messages</button><button type="button" onClick="{{ goAlertes }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);font-family:inherit">Voir les alertes</button></div>
+            </div>
+          </sc-if>
           <sc-if value="{{ geoRepartition.length }}">
             <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:24px;margin-bottom:20px">
               <p style="margin:0 0 16px;font-family:var(--font-display);font-size:19px;color:rgb(71,29,27)">Répartition géographique des activations</p>
@@ -804,6 +813,113 @@
             <sc-if value="{{ noOrders }}">
               <p style="margin:0;padding:40px;text-align:center;font-size:14px;color:rgb(94,94,94)">Aucune commande ne correspond à cette recherche.</p>
             </sc-if>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isDemandes }}">
+          <div role="tablist" aria-label="Demandes" class="bo-tabs-scroll" style="display:flex;gap:28px;overflow-x:auto;margin-bottom:24px;box-shadow:inset 0 -1px 0 rgba(0,0,0,.1)">
+            <sc-for list="{{ demTabs }}" as="tab" hint-placeholder-count="2">
+              <button type="button" role="tab" aria-selected="{{ tab.selected }}" onClick="{{ tab.select }}" style="flex:0 0 auto;background:none;border:0;padding:12px 0;cursor:pointer;font-size:13px;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;color:{{ tab.color }};box-shadow:{{ tab.underline }}">{{ tab.label }}</button>
+            </sc-for>
+          </div>
+
+          <sc-if value="{{ isDemMessages }}">
+            <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:20px">
+              <input type="search" aria-label="Rechercher une demande" placeholder="Nom, e-mail, n° de commande, message" value="{{ reqSearch }}" onInput="{{ onReqSearch }}" style="flex:1 1 240px;height:46px;padding:0 14px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0);font-size:14px">
+              <select aria-label="Filtrer par objet" value="{{ reqObjet }}" onChange="{{ onReqObjet }}" style="flex:0 1 220px;height:46px;padding:0 14px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0);font-size:14px">
+                <option value="tous">Tous les objets</option>
+                <sc-for list="{{ objets }}" as="ob"><option value="{{ ob.value }}">{{ ob.label }}</option></sc-for>
+              </select>
+              <select aria-label="Filtrer par statut" value="{{ reqStatut }}" onChange="{{ onReqStatut }}" style="flex:0 1 180px;height:46px;padding:0 14px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0);font-size:14px">
+                <option value="tous">Tous les statuts</option>
+                <option value="nouveau">Nouveau</option>
+                <option value="encours">En cours</option>
+                <option value="traite">Traité</option>
+              </select>
+              <button type="button" onClick="{{ exportReqCsv }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);font-family:inherit">Exporter en CSV</button>
+            </div>
+            <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);overflow:auto">
+              <table class="bo-table" style="width:100%;border-collapse:collapse;min-width:760px">
+                <thead><tr>
+                  <th style="padding:12px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Date</th><th style="padding:12px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Contact</th><th style="padding:12px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Objet</th><th style="padding:12px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">N° de commande</th><th style="padding:12px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Message</th><th style="padding:12px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Statut</th>
+                </tr></thead>
+                <tbody>
+                  <sc-for list="{{ filteredReq }}" as="r" hint-placeholder-count="4">
+                    <tr onClick="{{ r.open }}" style="cursor:pointer;transition:background-color .15s" style-hover="background:rgb(255,251,248)">
+                      <td data-label="Date" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);white-space:nowrap">{{ r.dateLabel }}</td>
+                      <td data-label="Contact" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);white-space:nowrap">{{ r.who }}</td>
+                      <td data-label="Objet" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);white-space:nowrap">{{ r.objet }}<sc-if value="{{ r.hasPj }}"><span title="Pièce jointe" style="margin-left:6px;color:rgb(94,94,94)">📎</span></sc-if></td>
+                      <td data-label="N° de commande" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);white-space:nowrap">{{ r.commandeLabel }}</td>
+                      <td data-label="Message" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);max-width:320px;overflow:hidden;text-overflow:ellipsis">{{ r.preview }}</td>
+                      <td data-label="Statut" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)"><span style="display:inline-block;white-space:nowrap;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ r.statutBg }};color:{{ r.statutFg }};box-shadow:{{ r.statutShadow }}">{{ r.statutLabel }}</span></td>
+                    </tr>
+                  </sc-for>
+                </tbody>
+              </table>
+              <sc-if value="{{ !hasReq }}"><p style="margin:0;padding:28px;text-align:center;font-size:14px;color:rgb(94,94,94)">Aucune demande ne correspond à ces filtres.</p></sc-if>
+            </div>
+            <p style="margin:16px 0 0;font-size:13px;color:rgb(94,94,94)">Les demandes arrivent aussi à {{ maisonEmail }} et au {{ maisonTel }}.</p>
+          </sc-if>
+
+          <sc-if value="{{ isDemAlertes }}">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:20px">
+              <p style="margin:0;font-size:14px;color:rgb(70,70,70);max-width:62ch">Clients ayant demandé à être prévenus du retour d'un modèle. Quand une pièce de ce modèle est de nouveau disponible, prévenez-les en un clic.</p>
+              <button type="button" onClick="{{ exportAlertsCsv }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);font-family:inherit">Exporter en CSV</button>
+            </div>
+            <sc-if value="{{ !hasAlerts }}"><p style="margin:0;padding:28px;text-align:center;font-size:14px;color:rgb(94,94,94);background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)">Aucun client n'attend le retour d'un modèle.</p></sc-if>
+            <div style="display:flex;flex-direction:column;gap:20px">
+              <sc-for list="{{ alertGroups }}" as="g" hint-placeholder-count="2">
+                <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:22px">
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:10px">
+                    <p style="margin:0;font-family:var(--font-display);font-size:19px;color:rgb(71,29,27)">{{ g.modele }}</p>
+                    <span style="display:inline-block;white-space:nowrap;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ g.stockBg }};color:{{ g.stockFg }};box-shadow:{{ g.stockShadow }}">{{ g.stockLabel }}</span>
+                  </div>
+                  <sc-for list="{{ g.subs }}" as="a" hint-placeholder-count="2">
+                    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px;flex-wrap:wrap">
+                      <span style="overflow-wrap:anywhere">{{ a.email }}</span>
+                      <span style="display:flex;align-items:center;gap:16px;font-size:13px;color:rgb(94,94,94)"><span>{{ a.dateLabel }} · {{ a.statusLabel }}</span><button type="button" onClick="{{ a.remove }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);font-family:inherit;color:rgb(94,94,94);border-bottom-color:rgb(94,94,94)">Retirer</button></span>
+                    </div>
+                  </sc-for>
+                  <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:14px">
+                    <button type="button" onClick="{{ g.notify }}" disabled="{{ g.notifyDisabled }}" style="height:46px;padding:0 22px;background:rgb(71,29,27);color:rgb(255,255,255);border:0;cursor:pointer;font-size:13px;letter-spacing:.08em;text-transform:uppercase;opacity:{{ g.notifyOpacity }}">{{ g.notifyLabel }}</button>
+                    <sc-if value="{{ !g.canNotify }}"><span style="font-size:13px;color:rgb(94,94,94)">L'envoi se débloque dès qu'une pièce de ce modèle est disponible.</span></sc-if>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+        </sc-if>
+
+        <sc-if value="{{ isDemandeDetail }}">
+          <button type="button" onClick="{{ goDemandes }}" style="background:none;border:0;padding:0;margin-bottom:22px;color:rgb(94,94,94);cursor:pointer;font-size:13px">← Retour aux demandes</button>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:24px;align-items:start;max-width:1000px">
+            <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:clamp(22px,3vw,32px)">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 6px">
+                <p style="margin:0;font-family:var(--font-display);font-size:24px;color:rgb(71,29,27)">{{ viewReq.objet }}</p>
+                <span style="display:inline-block;white-space:nowrap;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ viewReq.statutBg }};color:{{ viewReq.statutFg }};box-shadow:{{ viewReq.statutShadow }}">{{ viewReq.statutLabel }}</span>
+              </div>
+              <p style="margin:0 0 22px;font-size:13px;color:rgb(94,94,94)">Reçue le {{ viewReq.dateLabel }}</p>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Contact</span><span style="text-align:right">{{ viewReq.who }}</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">E-mail</span><span style="overflow-wrap:anywhere;text-align:right">{{ viewReq.email }}</span></div>
+              <sc-if value="{{ viewReq.hasTel }}"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Téléphone</span><span style="text-align:right">{{ viewReq.telephone }}</span></div></sc-if>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Préférence de contact</span><span style="text-align:right">{{ viewReq.prefLabel }}</span></div>
+              <sc-if value="{{ viewReq.hasCommande }}"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Commande</span><span><sc-if value="{{ viewReq.hasOrder }}"><button type="button" onClick="{{ viewReq.openOrder }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);font-family:inherit;font-size:14px">{{ viewReq.commandeNo }}</button></sc-if><sc-if value="{{ !viewReq.hasOrder }}">{{ viewReq.commandeNo }}</sc-if></span></div></sc-if>
+              <sc-if value="{{ viewReq.hasPj }}"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Pièce jointe</span><span style="text-align:right">{{ viewReq.pjLabel }}</span></div></sc-if>
+              <div style="padding:16px 0 0;border-top:1px solid rgba(0,0,0,.08)">
+                <p style="margin:0 0 8px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">Message</p>
+                <p style="margin:0;font-size:15px;line-height:1.6;color:rgb(0,0,0);white-space:pre-wrap;overflow-wrap:anywhere">{{ viewReq.message }}</p>
+              </div>
+            </div>
+            <div style="background:rgb(255,251,248);padding:clamp(22px,3vw,32px);display:flex;flex-direction:column;gap:18px">
+              <p style="margin:0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">Traitement</p>
+              <div role="group" aria-label="Statut" style="display:flex;gap:8px;flex-wrap:wrap">
+                <sc-for list="{{ reqStatutOpts }}" as="o" hint-placeholder-count="3">
+                  <button type="button" onClick="{{ setReqStatut[o.key] }}" style="height:40px;padding:0 16px;background:rgb(255,255,255);border:0;cursor:pointer;font-size:13px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2)">{{ o.label }}</button>
+                </sc-for>
+              </div>
+              <a href="{{ viewReq.mailto }}" style="display:inline-flex;align-items:center;justify-content:center;height:52px;padding:0 22px;background:rgb(71,29,27);color:rgb(255,255,255);text-decoration:none;font-size:13px;letter-spacing:.08em;text-transform:uppercase">Répondre par e-mail</a>
+              <p style="margin:0;font-size:13px;color:rgb(94,94,94)">Préférence du client : {{ viewReq.prefLabel }}. Statut « Traité » une fois la réponse envoyée.</p>
+            </div>
           </div>
         </sc-if>
 
@@ -1369,6 +1485,7 @@ const ICONS = {
   pieces: '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1"><circle cx="10" cy="10" r="8.5"></circle><path d="M6 12.5 8.5 15 14 6"></path></svg>',
   owners: '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1"><circle cx="10" cy="6.5" r="4"></circle><path d="M2.5 18c0-4.1 3.4-6.3 7.5-6.3s7.5 2.2 7.5 6.3"></path></svg>',
   orders: '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1"><path d="M2 6h16l-1.4 11H3.4L2 6Z"></path><path d="M6.5 6V4a3.5 3.5 0 0 1 7 0v2"></path></svg>',
+  inbox: '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1"><path d="M2 11h4.5l1 2h5l1-2H18"></path><path d="M4.2 4h11.6L18 11v5H2v-5l2.2-7Z"></path></svg>',
   team: '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1"><circle cx="7" cy="6" r="3"></circle><circle cx="15" cy="7" r="2.4"></circle><path d="M1.5 17c0-3.3 2.5-5.2 5.5-5.2s5.5 1.9 5.5 5.2M13 12.5c2.4.2 4 1.7 4 4.5"></path></svg>'
 };
 // Le statut stocké ne contient jamais « vendue » pour une pièce passée par une vente :
@@ -1398,6 +1515,23 @@ const SEED_ORDERS = [
   {id:'o2', no:'#CS-2026-9120', canal:'en_ligne', evenement:'', client:'Marie Lefèvre', email:'marie.lefevre@exemple.fr', telephone:'', pieceIds:['p7'], total:510000, dateIso:'2026-07-14', mode:'Livraison internationale', paiement:'Carte bancaire', statut:'livree', tracking:'DHL-5521-FR', note:''},
   {id:'o3', no:'#CS-2026-9051', canal:'popup', evenement:'Pop-up Dakar — Almadies', client:'Fatou Diop', email:'fatou.diop@exemple.sn', telephone:'+221 77 000 00 00', pieceIds:['p8'], total:300000, dateIso:'2026-07-02', mode:'Remise en main propre', paiement:'Espèces', statut:'livree', tracking:'', note:''},
   {id:'o4', no:'#CS-2026-8990', canal:'en_ligne', evenement:'', client:'Julien Petit', email:'julien.petit@exemple.fr', telephone:'', pieceIds:['p6'], total:340000, dateIso:'2026-06-20', mode:'Livraison à domicile', paiement:'Carte bancaire', statut:'annulee', tracking:'', note:'Annulée à la demande du client avant expédition.'}
+];
+const MAISON = {email:'contact@carolesessegnon.com', telephone:'+225 07 20 00 95 20'};
+const OBJETS = ['Une pièce','Une commande','Le passeport numérique','Presse','Livraison','Retour et échange','Commande en ligne','Service après-vente','Autre demande'];
+const REQ_STATUT_LABEL = {nouveau:'Nouveau', encours:'En cours', traite:'Traité'};
+const REQ_STATUT_KIND = {nouveau:'alert', encours:'progress', traite:'doneFilled'};
+const PREF_LABEL = {email:'E-mail', telephone:'Téléphone'};
+const SEED_REQUESTS = [
+  {id:'r1', civilite:'Mme', nom:'Awa Koné', email:'awa.kone@exemple.ci', telephone:'+225 07 11 22 33 44', objet:'Livraison', commandeNo:'#CS-2026-9482', message:'Bonjour, mon colis est indiqué comme livré mais je ne l\'ai pas encore reçu. Pouvez-vous vérifier auprès du transporteur ?', pj:null, preference:'telephone', statut:'nouveau', dateIso:'2026-10-22'},
+  {id:'r2', civilite:'M.', nom:'Koffi Yao', email:'koffi.yao@exemple.ci', telephone:'', objet:'Commande en ligne', commandeNo:'#CS-2026-9530', message:'Je souhaite ajouter un message sur la carte cadeau. Est-ce encore possible ?', pj:null, preference:'email', statut:'encours', dateIso:'2026-10-21'},
+  {id:'r3', civilite:'Mme', nom:'Claire Martin', email:'claire.martin@presse.fr', telephone:'+33 6 00 00 00 00', objet:'Presse', commandeNo:'', message:'Nous préparons un portrait de la maison pour un magazine. Pourrions-nous échanger avec Carole Sessegnon ?', pj:{name:'dossier-presse.pdf', size:482000}, preference:'email', statut:'nouveau', dateIso:'2026-10-20'},
+  {id:'r4', civilite:'M.', nom:'Julien Petit', email:'julien.petit@exemple.fr', telephone:'', objet:'Retour et échange', commandeNo:'#CS-2026-8990', message:'Merci pour la confirmation de l\'annulation.', pj:null, preference:'email', statut:'traite', dateIso:'2026-06-22'}
+];
+const _alertModele = id => ((SEED_PIECES.find(p => p.id===id) || SEED_PIECES[0]).modele);
+const SEED_ALERTS = [
+  {id:'a1', modele:_alertModele('p1'), email:'amina.t@exemple.ci', dateIso:'2026-10-19', prevenu:false},
+  {id:'a2', modele:_alertModele('p1'), email:'lea.b@exemple.fr', dateIso:'2026-10-21', prevenu:false},
+  {id:'a3', modele:_alertModele('p3'), email:'nadia.k@exemple.sn', dateIso:'2026-10-22', prevenu:false}
 ];
 const ROLES = [
   {key:'direction', label:'Direction', acces:'Accès complet, création des comptes et paramètres généraux', neVoitPas:'—'},
@@ -1606,6 +1740,7 @@ class Component extends DCLogic {
     vente:null, venteErr:{}, venteSearch:'', venteStep:0, venteMax:0,
     viewOwnerId:null, savForm:this._emptySav(), savFormOpen:false, filtersOpen:false,
     serieMax:maxSerie(SEED_PIECES),
+    requests:SEED_REQUESTS, alerts:SEED_ALERTS, demTab:'messages', reqSearch:'', reqObjet:'tous', reqStatut:'tous', viewReqId:null,
     teamTab:'membres', auditSearch:'', auditAuteur:'tous',
     viewOrderId:null, orderDraft:{statut:'', tracking:''},
     editId:null, form:this._emptyForm(), fieldErr:{}, codeRevealed:false, photoBusy:false, photoErr:'', photoNotice:null,
@@ -1633,7 +1768,8 @@ class Component extends DCLogic {
         team:this.state.team, audit:this.state.audit,
         pieces:this.state.pieces.map(p => (p.photos && p.photos.length)
           ? Object.assign({}, p, {photos:p.photos.map(ph => ({id:ph.id, name:ph.name}))}) : p),
-        orders:this.state.orders, owners:this.state.owners, serieMax:this.state.serieMax
+        orders:this.state.orders, owners:this.state.owners, serieMax:this.state.serieMax,
+        requests:this.state.requests, alerts:this.state.alerts
       }));
     } catch(e) { ok = false; }
     this.phSync();
@@ -1673,6 +1809,8 @@ class Component extends DCLogic {
         pieces:restored,
         orders:Array.isArray(saved.orders) ? saved.orders : SEED_ORDERS,
         owners:Array.isArray(saved.owners) ? saved.owners : SEED_OWNERS,
+        requests:Array.isArray(saved.requests) ? saved.requests : SEED_REQUESTS,
+        alerts:Array.isArray(saved.alerts) ? saved.alerts : SEED_ALERTS,
         serieMax: typeof saved.serieMax==='number' ? saved.serieMax : maxSerie(restored)
       });
       finish();
@@ -2037,14 +2175,62 @@ class Component extends DCLogic {
     const viewOrder = decOrders.find(o => o.id===s.viewOrderId);
     const orderDirty = !!viewOrder && (s.orderDraft.statut!==viewOrder.statut || s.orderDraft.tracking.trim()!==(viewOrder.tracking||''));
 
+    // Demandes : messages du formulaire de contact + alertes retour en stock
+    const reqRaw = s.requests.slice().sort((a,b) => (b.dateIso||'').localeCompare(a.dateIso||''));
+    const decReq = reqRaw.map(r => {
+      const ord = r.commandeNo ? s.orders.find(o => o.no===r.commandeNo) : null;
+      const body = 'Bonjour ' + (r.civilite ? r.civilite + ' ' : '') + r.nom + ',\n\n\n\nCordialement,\nLa Maison Carole Sessegnon';
+      return {...r, ...BADGE[REQ_STATUT_KIND[r.statut]], statutLabel:REQ_STATUT_LABEL[r.statut],
+        who: (r.civilite ? r.civilite + ' ' : '') + r.nom, dateLabel: fmtIsoDate(r.dateIso),
+        commandeLabel: r.commandeNo || '—', hasCommande: !!r.commandeNo, hasOrder: !!ord,
+        openOrder: () => ord && this.go('commande-detail', {viewOrderId:ord.id, orderDraft:{statut:ord.statut, tracking:ord.tracking||''}}),
+        hasPj: !!r.pj, pjLabel: r.pj ? r.pj.name + ' (' + Math.max(1, Math.round(r.pj.size/1024)) + ' Ko)' : '',
+        prefLabel: PREF_LABEL[r.preference] || '—', hasTel: !!r.telephone,
+        preview: r.message.length>80 ? r.message.slice(0,80) + '…' : r.message,
+        mailto: 'mailto:' + r.email + '?subject=' + encodeURIComponent('Re : ' + r.objet) + '&body=' + encodeURIComponent(body),
+        open: () => {
+          if (r.statut==='nouveau') this.setState(st => ({requests: st.requests.map(x => x.id===r.id ? Object.assign({}, x, {statut:'encours'}) : x)}), () => this.persist());
+          this.go('demande-detail', {viewReqId:r.id});
+        }};
+    });
+    const viewReq = decReq.find(r => r.id===s.viewReqId) || null;
+    const rSq = s.reqSearch.trim().toLowerCase();
+    const filteredReq = decReq.filter(r =>
+      (!rSq || (r.nom+' '+r.email+' '+r.commandeNo+' '+r.message+' '+r.objet).toLowerCase().includes(rSq)) &&
+      (s.reqObjet==='tous' || r.objet===s.reqObjet) && (s.reqStatut==='tous' || r.statut===s.reqStatut));
+    const newReqCount = s.requests.filter(r => r.statut==='nouveau').length;
+    const alertGroups = Array.from(new Set(s.alerts.map(a => a.modele))).map(m => {
+      const subs = s.alerts.filter(a => a.modele===m);
+      const stock = s.pieces.filter(p => p.modele===m && effStatut(p, s.orders)==='disponible').length;
+      const waiting = subs.filter(a => !a.prevenu);
+      const canNotify = stock>0 && waiting.length>0;
+      return {modele:m, count:subs.length, stock, stockLabel: stock>0 ? stock + (stock>1 ? ' pièces disponibles' : ' pièce disponible') : 'Pas de stock',
+        stockBg: stock>0 ? BADGE.doneFilled.statutBg : BADGE.neutral.statutBg, stockFg: stock>0 ? BADGE.doneFilled.statutFg : BADGE.neutral.statutFg, stockShadow: stock>0 ? BADGE.doneFilled.statutShadow : BADGE.neutral.statutShadow,
+        canNotify, notifyDisabled: !canNotify, notifyOpacity: canNotify ? 1 : .4,
+        notifyLabel: waiting.length>0 ? 'Prévenir ' + waiting.length + (waiting.length>1 ? ' personnes' : ' personne') : 'Tout le monde est prévenu',
+        subs: subs.map(a => ({email:a.email, dateLabel:fmtIsoDate(a.dateIso), prevenu:a.prevenu, statusLabel: a.prevenu ? 'Prévenu' : 'En attente',
+          remove: () => this.askConfirm({title:'Retirer cet abonné ?', body: a.email + ' ne sera plus prévenu du retour de « ' + m + ' ».', okLabel:'Retirer', tone:'danger',
+            onOk: () => { this.setState(st => ({alerts: st.alerts.filter(x => x.id!==a.id)}), () => this.persist()); this.logAudit('Alerte retirée — ' + a.email + ' (' + m + ')'); }})})),
+        notify: () => {
+          const ids = new Set(waiting.map(a => a.id));
+          this.setState(st => ({alerts: st.alerts.map(a => ids.has(a.id) ? Object.assign({}, a, {prevenu:true}) : a)}), () => this.persist());
+          this.logAudit('Alerte retour en stock envoyée — ' + m + ' (' + waiting.length + ' destinataire' + (waiting.length>1 ? 's' : '') + ')');
+          this.showFlash('E-mail de retour en stock envoyé à ' + waiting.length + (waiting.length>1 ? ' personnes' : ' personne') + ' (simulé dans cette démonstration).', 6000);
+        }};
+    });
+    const alertWaiting = s.alerts.filter(a => !a.prevenu).length;
+    const demTabKeys = [{key:'messages', label:'Messages' + (newReqCount ? ' (' + newReqCount + ')' : '')}, {key:'alertes', label:'Alertes retour en stock' + (alertWaiting ? ' (' + alertWaiting + ')' : '')}];
+    const demTab = s.demTab==='alertes' ? 'alertes' : 'messages';
+
     const navKeys = [
       {key:'dashboard', label:'Tableau de bord', icon:'dashboard'},
       {key:'pieces', label:'Pièces', icon:'pieces'},
       {key:'commandes', label:'Commandes', icon:'orders'},
+      {key:'demandes', label:'Demandes', icon:'inbox'},
       {key:'proprietaires', label:'Propriétaires', icon:'owners'},
       {key:'equipe', label:'Équipe', icon:'team'}
     ];
-    const NAV_PARENT = {'piece-form':'pieces', 'piece-detail':'pieces', 'lot-form':'pieces', 'qr-sheet':'pieces', 'commande-detail':'commandes', 'vente-form':'commandes', 'proprietaire':'proprietaires'};
+    const NAV_PARENT = {'piece-form':'pieces', 'piece-detail':'pieces', 'lot-form':'pieces', 'qr-sheet':'pieces', 'commande-detail':'commandes', 'vente-form':'commandes', 'demande-detail':'demandes', 'proprietaire':'proprietaires'};
     const activeNav = NAV_PARENT[s.route] || s.route;
 
     const activeDirection = s.team.filter(t => t.role==='direction' && t.statut==='actif').length;
@@ -2141,6 +2327,33 @@ class Component extends DCLogic {
       isProprietaire: s.route==='proprietaire' && !!viewOwnerRaw,
       goPieces: () => this.go('pieces'),
       goCommandes: () => this.go('commandes'),
+      isDemandes: s.route==='demandes', isDemandeDetail: s.route==='demande-detail' && !!viewReq,
+      goDemandes: () => this.go('demandes'),
+      goAlertes: () => this.go('demandes', {demTab:'alertes'}),
+      viewReq, filteredReq, hasReq: filteredReq.length>0, alertGroups, hasAlerts: alertGroups.length>0,
+      newReqCount, alertWaiting, hasTodo: newReqCount>0 || alertWaiting>0,
+      newReqLabel: newReqCount + (newReqCount>1 ? ' nouveaux messages' : ' nouveau message'),
+      alertWaitingLabel: alertWaiting + (alertWaiting>1 ? ' abonnés en attente d\'une alerte' : ' abonné en attente d\'une alerte'),
+      demTabs: demTabKeys.map(t => ({label:t.label, selected: demTab===t.key ? 'true' : 'false',
+        color: demTab===t.key ? 'rgb(71,29,27)' : 'rgb(94,94,94)', underline: demTab===t.key ? 'inset 0 -2px 0 rgb(71,29,27)' : 'none',
+        select: () => this.setState({demTab:t.key})})),
+      isDemMessages: demTab==='messages', isDemAlertes: demTab==='alertes',
+      maisonEmail: MAISON.email, maisonTel: MAISON.telephone,
+      reqSearch: s.reqSearch, onReqSearch: e => this.setState({reqSearch:e.target.value}),
+      reqObjet: s.reqObjet, onReqObjet: e => this.setState({reqObjet:e.target.value}),
+      reqStatut: s.reqStatut, onReqStatut: e => this.setState({reqStatut:e.target.value}),
+      objets: OBJETS.map(o => ({value:o, label:o})),
+      setReqStatut: Object.fromEntries(Object.keys(REQ_STATUT_LABEL).map(k => [k, () => {
+        if (!viewReq) return;
+        this.setState(st => ({requests: st.requests.map(x => x.id===viewReq.id ? Object.assign({}, x, {statut:k}) : x)}), () => this.persist());
+        this.logAudit('Demande « ' + viewReq.objet + ' » (' + viewReq.who + ') : ' + REQ_STATUT_LABEL[k]);
+      }])),
+      reqStatutOpts: Object.keys(REQ_STATUT_LABEL).map(k => ({key:k, label:REQ_STATUT_LABEL[k]})),
+      exportReqCsv: () => this.downloadCsv('demandes-carole-sessegnon.csv',
+        [['Date','Civilité','Nom','E-mail','Téléphone','Objet','N° de commande','Préférence de contact','Pièce jointe','Statut','Message']]
+          .concat(decReq.map(r => [r.dateIso,r.civilite||'',r.nom,r.email,r.telephone||'',r.objet,r.commandeNo||'',r.prefLabel,r.pj ? r.pj.name : '',r.statutLabel,r.message]))),
+      exportAlertsCsv: () => this.downloadCsv('alertes-retour-en-stock-carole-sessegnon.csv',
+        [['Modèle','E-mail','Date d\'inscription','Statut']].concat(s.alerts.map(a => [a.modele,a.email,a.dateIso,a.prevenu ? 'Prévenu' : 'En attente']))),
       goProprietaires: () => this.go('proprietaires'),
       toggleFilters: () => this.setState(st => ({filtersOpen:!st.filtersOpen})),
       filtersOpen: s.filtersOpen,
@@ -2148,16 +2361,17 @@ class Component extends DCLogic {
       ordersFiltersLabel: (n => 'Filtres' + (n ? ' (' + n + ')' : ''))((s.canalFilter!=='tous' ? 1 : 0) + (s.orderStatutFilter!=='tous' ? 1 : 0)),
       piecesFiltersLabel: (n => 'Filtres' + (n ? ' (' + n + ')' : ''))((s.statutFilter!=='tous' ? 1 : 0) + (s.sortBy!=='recent' ? 1 : 0)),
 
-      crumb: ({'piece-form':'Pièces', 'piece-detail':'Pièces', 'lot-form':'Pièces', 'qr-sheet':'Pièces', 'commande-detail':'Commandes', 'vente-form':'Commandes', 'proprietaire':'Propriétaires'})[s.route] || '',
+      crumb: ({'piece-form':'Pièces', 'piece-detail':'Pièces', 'lot-form':'Pièces', 'qr-sheet':'Pièces', 'commande-detail':'Commandes', 'vente-form':'Commandes', 'demande-detail':'Demandes', 'proprietaire':'Propriétaires'})[s.route] || '',
       crumbGo: () => this.go(NAV_PARENT[s.route] || 'dashboard'),
       pageTitle: ({
-        dashboard:'Tableau de bord', pieces:'Pièces', commandes:'Commandes', equipe:'Équipe et accès', proprietaires:'Propriétaires',
+        dashboard:'Tableau de bord', pieces:'Pièces', commandes:'Commandes', demandes:'Demandes', equipe:'Équipe et accès', proprietaires:'Propriétaires',
         'piece-form': isEditing ? 'Modifier la pièce' : 'Ajouter une pièce',
         'piece-detail': pieceById(s.viewPieceId) ? pieceById(s.viewPieceId).modele : 'Pièce',
         'lot-form': 'Générer un lot de pièces',
         'qr-sheet': 'Planche de QR codes',
         'commande-detail': viewOrder ? viewOrder.no : 'Commande',
         'vente-form': 'Enregistrer une vente',
+        'demande-detail': viewReq ? viewReq.objet : 'Demande',
         'proprietaire': viewOwnerRaw ? viewOwnerRaw.owner : 'Propriétaire'
       })[s.route] || 'Administration',
 
