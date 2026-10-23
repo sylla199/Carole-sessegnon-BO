@@ -432,8 +432,8 @@
                   <input value="{{ form.modele }}" onChange="{{ setF.modele }}" aria-invalid="{{ fieldInvalid.modele }}" aria-describedby="err-modele" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:{{ fieldShadow.modele }};color:rgb(0,0,0)">
                   <sc-if value="{{ fieldErr.modele }}"><span id="err-modele" style="display:block;margin-top:6px;font-size:12px;color:rgb(155,24,33)">{{ fieldErr.modele }}</span></sc-if>
                 </label>
-                <label style="display:block;font-size:13px;color:rgb(70,70,70)">Coloris
-                  <input value="{{ form.coloris }}" onChange="{{ setF.coloris }}" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+                <label style="display:block;font-size:13px;color:rgb(70,70,70)">Couleur
+                  <input value="{{ form.couleur }}" onChange="{{ setF.couleur }}" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
                 </label>
               </div>
               <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:16px">
@@ -672,8 +672,8 @@
                 <input value="{{ lotForm.modele }}" onChange="{{ setLot.modele }}" aria-invalid="{{ lotInvalid.modele }}" aria-describedby="err-lot-modele" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:{{ lotShadow.modele }};color:rgb(0,0,0)">
                 <sc-if value="{{ lotErr.modele }}"><span id="err-lot-modele" style="display:block;margin-top:6px;font-size:12px;color:rgb(155,24,33)">{{ lotErr.modele }}</span></sc-if>
               </label>
-              <label style="display:block;font-size:13px;color:rgb(70,70,70)">Coloris <span style="color:rgb(94,94,94)">(facultatif)</span>
-                <input value="{{ lotForm.coloris }}" onChange="{{ setLot.coloris }}" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+              <label style="display:block;font-size:13px;color:rgb(70,70,70)">Couleur <span style="color:rgb(94,94,94)">(facultatif)</span>
+                <input value="{{ lotForm.couleur }}" onChange="{{ setLot.couleur }}" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
               </label>
             </div>
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:16px">
@@ -1363,19 +1363,19 @@ const ICONS = {
 // Le statut stocké ne contient jamais « vendue » pour une pièce passée par une vente :
 // « Vendue » est calculé à partir des commandes non annulées (voir effStatut).
 const SEED_PIECES = [
-  {id:'p1', reference:'HUP', modele:'Huperano', coloris:'Cuir naturel & bordeaux', serie:'CS-0042-2026', code:'8F3K-22QD', matiere:'Cuir de vachette, tannage végétal', dateFab:'2026-03-12', prix:420000, statut:'disponible', sav:[]},
-  {id:'p2', reference:'RAD', modele:'Radah', coloris:'Bordeaux', serie:'CS-0043-2026', code:'2LK9-77RT', matiere:'Cuir bordeaux, doublure daim', dateFab:'2026-03-20', prix:380000, statut:'disponible', sav:[]},
-  {id:'p3', reference:'NAF', modele:'Nafi', coloris:'Cuir naturel', serie:'CS-0044-2026', code:'9QW7-4XMZ', matiere:'Cuir naturel patiné à la main', dateFab:'2026-04-02', prix:300000, statut:'disponible', sav:[]},
-  {id:'p4', reference:'SIK', modele:'Sikadi', coloris:'Cuir grainé', serie:'CS-0045-2026', code:'5TY6-88XP', matiere:'Cuir grainé, ferrures bronze', dateFab:'2026-04-15', prix:510000, statut:'disponible', sav:[]},
-  {id:'p5', reference:'AYA', modele:'Ayaba', coloris:'Cuir tressé', serie:'CS-0046-2026', code:'3JH2-K9CV', matiere:'Cuir tressé, pièce d\'atelier', dateFab:'2026-05-01', prix:450000, statut:'bientot', sav:[]},
-  {id:'p6', reference:'WEL', modele:'Wèlè', coloris:'Cuir souple', serie:'CS-0047-2026', code:'6RF8-33NB', matiere:'Cuir souple, fermoir aimanté', dateFab:'2026-05-10', prix:340000, statut:'disponible', sav:[]},
-  {id:'p7', reference:'SIK', modele:'Sikadi', coloris:'Cuir grainé', serie:'CS-0038-2026', code:'4MW2-T7HD', matiere:'Cuir grainé, ferrures bronze', dateFab:'2026-02-10', prix:510000, statut:'disponible', sav:[]},
-  {id:'p8', reference:'NAF', modele:'Nafi', coloris:'Cuir naturel', serie:'CS-0031-2026', code:'Q8ZN-25RA', matiere:'Cuir naturel patiné à la main', dateFab:'2026-01-20', prix:300000, statut:'disponible', sav:[
+  {id:'p1', reference:'HUP', modele:'Huperano', couleur:'Cuir naturel & bordeaux', serie:'CS-0042-2026', code:'8F3K-22QD', matiere:'Cuir de vachette, tannage végétal', dateFab:'2026-03-12', prix:420000, statut:'disponible', sav:[]},
+  {id:'p2', reference:'RAD', modele:'Radah', couleur:'Bordeaux', serie:'CS-0043-2026', code:'2LK9-77RT', matiere:'Cuir bordeaux, doublure daim', dateFab:'2026-03-20', prix:380000, statut:'disponible', sav:[]},
+  {id:'p3', reference:'NAF', modele:'Nafi', couleur:'Cuir naturel', serie:'CS-0044-2026', code:'9QW7-4XMZ', matiere:'Cuir naturel patiné à la main', dateFab:'2026-04-02', prix:300000, statut:'disponible', sav:[]},
+  {id:'p4', reference:'SIK', modele:'Sikadi', couleur:'Cuir grainé', serie:'CS-0045-2026', code:'5TY6-88XP', matiere:'Cuir grainé, ferrures bronze', dateFab:'2026-04-15', prix:510000, statut:'disponible', sav:[]},
+  {id:'p5', reference:'AYA', modele:'Ayaba', couleur:'Cuir tressé', serie:'CS-0046-2026', code:'3JH2-K9CV', matiere:'Cuir tressé, pièce d\'atelier', dateFab:'2026-05-01', prix:450000, statut:'bientot', sav:[]},
+  {id:'p6', reference:'WEL', modele:'Wèlè', couleur:'Cuir souple', serie:'CS-0047-2026', code:'6RF8-33NB', matiere:'Cuir souple, fermoir aimanté', dateFab:'2026-05-10', prix:340000, statut:'disponible', sav:[]},
+  {id:'p7', reference:'SIK', modele:'Sikadi', couleur:'Cuir grainé', serie:'CS-0038-2026', code:'4MW2-T7HD', matiere:'Cuir grainé, ferrures bronze', dateFab:'2026-02-10', prix:510000, statut:'disponible', sav:[]},
+  {id:'p8', reference:'NAF', modele:'Nafi', couleur:'Cuir naturel', serie:'CS-0031-2026', code:'Q8ZN-25RA', matiere:'Cuir naturel patiné à la main', dateFab:'2026-01-20', prix:300000, statut:'disponible', sav:[
     {id:'s1', type:'en_reparation', date:'2026-09-02', note:'Couture de l\'anse à reprendre, pièce reçue à l\'atelier.', auteur:'Michelle Kouassi', replacementId:''},
     {id:'s2', type:'reparee', date:'2026-09-18', note:'Anse recousue à la main, renvoyée à la cliente.', auteur:'Michelle Kouassi', replacementId:''}
   ]},
-  {id:'p9', reference:'HUP', modele:'Huperano', coloris:'Toile et cuir naturel', serie:'CS-0001-2026', code:'PR7T-0TY9', matiere:'Prototype d\'atelier — toile, cuir naturel', dateFab:'2025-11-05', prix:'', statut:'prototype', sav:[]},
-  {id:'p10', reference:'RAD', modele:'Radah', coloris:'Bordeaux', serie:'CS-0039-2026', code:'G4FT-8WKE', matiere:'Cuir bordeaux, doublure daim', dateFab:'2026-02-14', prix:380000, statut:'offerte', sav:[]}
+  {id:'p9', reference:'HUP', modele:'Huperano', couleur:'Toile et cuir naturel', serie:'CS-0001-2026', code:'PR7T-0TY9', matiere:'Prototype d\'atelier — toile, cuir naturel', dateFab:'2025-11-05', prix:'', statut:'prototype', sav:[]},
+  {id:'p10', reference:'RAD', modele:'Radah', couleur:'Bordeaux', serie:'CS-0039-2026', code:'G4FT-8WKE', matiere:'Cuir bordeaux, doublure daim', dateFab:'2026-02-14', prix:380000, statut:'offerte', sav:[]}
 ];
 // Chaque commande, en ligne ou hors site, désigne les pièces vendues par leur id.
 const SEED_ORDERS = [
@@ -1576,6 +1576,12 @@ const phPrune = keep => phDb().then(db => new Promise(res => {
   tx.oncomplete = () => res(); tx.onerror = () => res(); tx.onabort = () => res();
 })).catch(() => {});
 
+// Le champ « Teinte / Coloris » s'appelle désormais « couleur » (catalogue de la boutique) : on reprend les anciennes sauvegardes.
+const migratePiece = p => {
+  if (!p || p.couleur !== undefined || p.coloris === undefined) return p;
+  const copy = Object.assign({}, p, {couleur:p.coloris}); delete copy.coloris; return copy;
+};
+
 class Component extends DCLogic {
   state = {
     authed:false, loginErr:'', loginInfo:'', route:'dashboard',
@@ -1639,7 +1645,7 @@ class Component extends DCLogic {
     try { saved = JSON.parse(localStorage.getItem(STORE_KEY) || 'null'); } catch(e) {}
     const finish = () => { this._loaded = true; if (this._persistPending) { this._persistPending = false; this.persist(); } };
     if (!(saved && Array.isArray(saved.team))) { finish(); return; }
-    const pieces = Array.isArray(saved.pieces) ? saved.pieces : SEED_PIECES;
+    const pieces = (Array.isArray(saved.pieces) ? saved.pieces : SEED_PIECES).map(migratePiece);
     const need = [];
     pieces.forEach(p => (p.photos || []).forEach(ph => { if (!ph.src && !this._phCache[ph.id]) need.push(ph.id); }));
     const apply = found => {
@@ -1716,8 +1722,8 @@ class Component extends DCLogic {
     clearTimeout(this._photoT);
   }
 
-  _emptyForm(){ return {modele:'', coloris:'', reference:'', prix:'', serie:'', code:'', matiere:'', dateFab:'', statut:'disponible', autoIds:false, photos:[]}; }
-  _emptyLot(){ return {modele:'', coloris:'', reference:'', prix:'', matiere:'', quantite:'', annee:String(new Date().getFullYear())}; }
+  _emptyForm(){ return {modele:'', couleur:'', reference:'', prix:'', serie:'', code:'', matiere:'', dateFab:'', statut:'disponible', autoIds:false, photos:[]}; }
+  _emptyLot(){ return {modele:'', couleur:'', reference:'', prix:'', matiere:'', quantite:'', annee:String(new Date().getFullYear())}; }
   _emptySav(){ return {type:'en_reparation', date:isoToday(), note:'', replacementId:''}; }
   _emptyVente(){ return {canal:'popup', date:isoToday(), evenement:'', pieceIds:[], client:'', email:'', telephone:'', montant:'', paiement:'Espèces', note:''}; }
 
@@ -1915,7 +1921,7 @@ class Component extends DCLogic {
         dateFabColor: p.dateFab ? 'rgb(70,70,70)' : 'rgb(164,164,164)',
         prixLabel: fmtFcfa(p.prix),
         prixColor: String(p.prix).trim()!=='' ? 'rgb(70,70,70)' : 'rgb(164,164,164)',
-        refLabel: [p.reference, p.coloris].filter(Boolean).join(' · '),
+        refLabel: [p.reference, p.couleur].filter(Boolean).join(' · '),
         editLabel:'Modifier ' + p.modele + ' ' + p.serie,
         open: () => viewPiece(p),
         edit: e => { if (e && e.stopPropagation) e.stopPropagation(); openPieceEdit(p); }};
@@ -2329,7 +2335,7 @@ class Component extends DCLogic {
         return {
           ventePieces: list.map(p => ({...p, checked: v.pieceIds.includes(p.id),
             bg: v.pieceIds.includes(p.id) ? 'rgb(255,251,248)' : 'rgb(255,255,255)',
-            sub: p.serie + (p.coloris ? ' · ' + p.coloris : ''),
+            sub: p.serie + (p.couleur ? ' · ' + p.couleur : ''),
             toggle: () => this.setState(st => {
               const ids = st.vente.pieceIds.includes(p.id) ? st.vente.pieceIds.filter(x => x!==p.id) : st.vente.pieceIds.concat([p.id]);
               const err = Object.assign({}, st.venteErr); delete err.pieces;
@@ -2416,7 +2422,7 @@ class Component extends DCLogic {
       }])),
       savNeedsReplacement: s.savForm.type==='remplacee',
       savReplacementOptions: decPieces.filter(p => p.eff==='disponible' && (!viewOwnerRaw || p.id!==viewOwnerRaw.pieceId))
-        .map(p => ({id:p.id, label:pieceLabel(p) + (p.coloris ? ' · ' + p.coloris : '')})),
+        .map(p => ({id:p.id, label:pieceLabel(p) + (p.couleur ? ' · ' + p.couleur : '')})),
       addSav: e => {
         e.preventDefault();
         const o = viewOwnerRaw; if (!o || !o.piece) return;
@@ -2516,8 +2522,8 @@ class Component extends DCLogic {
           const aFabriquer = decPieces.filter(p => p.eff==='reserve');
           if (!aFabriquer.length) { this.showFlash('Aucune pièce réservée en fabrication pour le moment.', 6000); return; }
           this.downloadCsv('lot-a-fabriquer-carole-sessegnon.csv',
-            [['Référence','Modèle','Coloris','Numéro de série']]
-              .concat(aFabriquer.map(p => [p.reference||'',p.modele,p.coloris,p.serie])));
+            [['Référence','Modèle','Couleur','Numéro de série']]
+              .concat(aFabriquer.map(p => [p.reference||'',p.modele,p.couleur,p.serie])));
         }},
         {label:'Imprimer la planche de QR codes', run: () => { this.setState({registreOpen:false}); this.go('qr-sheet', {qrOnlyId:null}); }},
         {label:'Exporter pour les certificats (CSV, sans QR)', run: () => {
@@ -2534,8 +2540,8 @@ class Component extends DCLogic {
           this.setState({registreOpen:false});
           // Les codes d'activation restent hors de l'export : ils ne quittent pas le back-office.
           this.downloadCsv('pieces-carole-sessegnon.csv',
-            [['Référence','Modèle','Coloris','Numéro de série','Prix (FCFA)','Matière','Date de fabrication','Statut']]
-              .concat(decPieces.map(p => [p.reference||'',p.modele,p.coloris,p.serie,p.prix===''||p.prix===undefined?'':p.prix,p.matiere,p.dateFab,STATUT_LABEL[p.eff]])));
+            [['Référence','Modèle','Couleur','Numéro de série','Prix (FCFA)','Matière','Date de fabrication','Statut']]
+              .concat(decPieces.map(p => [p.reference||'',p.modele,p.couleur,p.serie,p.prix===''||p.prix===undefined?'':p.prix,p.matiere,p.dateFab,STATUT_LABEL[p.eff]])));
         }}
       ].map(m => {
         const meta = REG_META[m.label] || {};
@@ -2661,7 +2667,7 @@ class Component extends DCLogic {
         const activeIdx = Math.min(s.viewPhotoIndex || 0, Math.max(photos.length - 1, 0));
         return {...p, eff,
           statutLabel:STATUT_LABEL[eff] || eff, ...BADGE[STATUT_KIND[eff] || 'neutral'],
-          refLabel: [p.reference, p.coloris].filter(Boolean).join(' · '),
+          refLabel: [p.reference, p.couleur].filter(Boolean).join(' · '),
           prixLabel: fmtFcfa(p.prix), dateFabLabel: fmtIsoDate(p.dateFab),
           hasPhotos: photos.length>0, noPhotos: photos.length===0,
           hasMultiplePhotos: photos.length>1,
@@ -2738,14 +2744,14 @@ class Component extends DCLogic {
           const lotId = 'L' + Date.now().toString(36);
           const prevMax = s.serieMax;
           const reference = (raw.reference.trim() || refFromModele(modele)).toUpperCase();
-          const coloris = raw.coloris.trim(), matiere = raw.matiere.trim();
+          const couleur = raw.couleur.trim(), matiere = raw.matiere.trim();
           const prix = String(raw.prix).trim()==='' ? '' : Number(raw.prix);
           const batch = [];
           let counter = Math.max(maxSerie(s.pieces), s.serieMax);
           for (let i = 0; i < quantiteNum; i++) {
             counter++;
             const code = genCode(s.pieces.concat(batch));
-            batch.push({id:'p' + Date.now() + '-' + i, lotId, reference, modele, coloris, matiere, prix,
+            batch.push({id:'p' + Date.now() + '-' + i, lotId, reference, modele, couleur, matiere, prix,
               serie:serieOf(counter), code, dateFab:'', statut:'reserve', sav:[], photos:[]});
           }
           const first = batch[0].serie, last = batch[batch.length - 1].serie;
