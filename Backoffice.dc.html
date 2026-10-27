@@ -1037,7 +1037,7 @@
                   <tr>
                     <td data-label="Modèle" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);color:rgb(0,0,0)">{{ r.modele }}</td>
                     <td data-label="Couleur" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)">{{ r.couleur }}</td>
-                    <td data-label="Disponibles" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);font-family:var(--font-display);font-size:20px;color:{{ r.dispoColor }}">{{ r.dispo }}</td>
+                    <td data-label="Disponibles" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)"><span style="font-family:var(--font-display);font-size:20px;color:{{ r.dispoColor }}">{{ r.dispo }}</span></td>
                     <td data-label="En fabrication" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)">{{ r.fabLabel }}</td>
                     <td data-label="Vendues" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)">{{ r.vendue }}</td>
                     <td data-label="Seuil d'alerte" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)"><input type="number" min="0" step="1" inputMode="numeric" aria-label="Seuil d'alerte {{ r.modele }} {{ r.couleur }}" value="{{ r.seuil }}" onChange="{{ r.onSeuil }}" style="width:72px;height:38px;padding:0 10px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0);font-size:14px"></td>
@@ -2616,7 +2616,7 @@ class Component extends DCLogic {
           this.setState(st => ({seuils: Object.assign({}, st.seuils, {[r.key]:v})}), () => this.persist());
           this.logAudit('Seuil de stock — ' + r.modele + ' · ' + r.couleur + ' : ' + v);
         },
-        makeLot: () => this.go('lot-form', {lotForm:Object.assign(this._emptyLot(), {modele:r.modele, couleur:r.couleur === 'Sans couleur précisée' ? '' : r.couleur}), lotErr:{}})};
+        makeLot: () => this.go('lot-form', {lotForm:(() => { const c = r.couleur === 'Sans couleur précisée' ? '' : r.couleur; return Object.assign(this._emptyLot(), {modele:r.modele, couleur:c, variants:[{couleur:c, quantite:'', prix:''}]}); })(), lotErr:{}})};
     }).sort((a,b) => ({rupture:0, bas:1, ok:2})[a.level] - ({rupture:0, bas:1, ok:2})[b.level] || a.modele.localeCompare(b.modele) || a.couleur.localeCompare(b.couleur));
     const stockRupture = stockRows.filter(r => r.level==='rupture').length;
     const stockBas = stockRows.filter(r => r.level==='bas').length;
