@@ -34,9 +34,19 @@
   .bo-table th{white-space:nowrap}
   /* Planche de QR codes : chaque carte devient un certificat imprimable */
   .bo-qr-card{break-inside:avoid;page-break-inside:avoid}
+  .bo-qr-cert{display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:2.4mm;box-sizing:border-box;height:136mm;padding:6mm 7mm;border:.2mm dashed #9a9a9a;color:rgb(71,29,27);font-size:8.5pt;line-height:1.3}
+  .bo-qr-cert p{margin:0}
+  .bo-qr-cert .cert-brand{font-size:12pt;letter-spacing:.04em;margin-bottom:1mm}
+  .bo-qr-cert .cert-title{font-size:12.5pt;font-weight:700;margin-bottom:1mm}
+  .bo-qr-cert .cert-val{font-weight:700;font-size:11pt;letter-spacing:.03em}
+  .bo-qr-cert img{width:28mm;height:28mm;image-rendering:pixelated}
   @media print{
     .bo-aside,.bo-header,.bo-no-print{display:none !important}
-    .bo-qr-grid{display:grid !important;grid-template-columns:repeat(2,1fr) !important;gap:12mm !important}
+    @page{size:A4;margin:10mm}
+    .bo-qr-grid{display:grid !important;grid-template-columns:repeat(2,1fr) !important;gap:0 !important}
+    .bo-qr-card{background:none !important;box-shadow:none !important;padding:0 !important;display:block !important;break-inside:avoid;page-break-inside:avoid}
+    .bo-qr-screen{display:none !important}
+    .bo-qr-cert{display:flex !important}
     html,body,.bo-shell{background:#fff !important}
   }
   /* Onglets qui débordent horizontalement : dégradé au bord pour signaler qu'il y a plus à voir */
@@ -466,7 +476,7 @@
                 <p style="margin:0;font-size:12px;line-height:18px;color:rgb(94,94,94)">{{ idsHint }}</p>
                 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:16px">
                   <label style="display:block;font-size:13px;color:rgb(70,70,70)">Numéro de série
-                    <input value="{{ form.serie }}" onChange="{{ setF.serie }}" readOnly="{{ idsLocked }}" placeholder="CS-0000-2026" aria-invalid="{{ fieldInvalid.serie }}" aria-describedby="err-serie" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:{{ idsBg }};border:0;box-shadow:{{ fieldShadow.serie }};color:rgb(0,0,0);letter-spacing:.06em">
+                    <input value="{{ form.serie }}" onChange="{{ setF.serie }}" readOnly="{{ idsLocked }}" placeholder="HU260001" aria-invalid="{{ fieldInvalid.serie }}" aria-describedby="err-serie" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:{{ idsBg }};border:0;box-shadow:{{ fieldShadow.serie }};color:rgb(0,0,0);letter-spacing:.06em">
                     <sc-if value="{{ fieldErr.serie }}"><span id="err-serie" style="display:block;margin-top:6px;font-size:12px;color:rgb(155,24,33)">{{ fieldErr.serie }}</span></sc-if>
                   </label>
                   <div style="font-size:13px;color:rgb(70,70,70)">
@@ -730,13 +740,26 @@
           <div class="bo-qr-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px">
             <sc-for list="{{ qrPieces }}" as="q" hint-placeholder-count="4">
               <div class="bo-qr-card" style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.12);padding:20px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center">
-                <div>
-                  <p style="margin:0;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">{{ q.reference }}</p>
-                  <p style="margin:2px 0 0;font-family:var(--font-display);font-size:18px;color:rgb(71,29,27)">{{ q.modele }}</p>
+                <div class="bo-qr-screen" style="display:flex;flex-direction:column;align-items:center;gap:10px">
+                  <div>
+                    <p style="margin:0;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">{{ q.reference }}</p>
+                    <p style="margin:2px 0 0;font-family:var(--font-display);font-size:18px;color:rgb(71,29,27)">{{ q.modele }}</p>
+                  </div>
+                  <img src="{{ q.qrDataUrl }}" alt="QR code d'authentification — {{ q.serie }}" width="140" height="140" style="width:140px;height:140px;image-rendering:pixelated">
+                  <p style="margin:0;font-size:13px;letter-spacing:.04em;color:rgb(0,0,0);font-variant-numeric:tabular-nums">{{ q.serie }}</p>
+                  <p style="margin:0;font-size:13px;letter-spacing:.04em;color:rgb(70,70,70);font-variant-numeric:tabular-nums">{{ q.code }}</p>
                 </div>
-                <img src="{{ q.qrDataUrl }}" alt="QR code d'authentification — {{ q.serie }}" width="140" height="140" style="width:140px;height:140px;image-rendering:pixelated">
-                <p style="margin:0;font-size:13px;letter-spacing:.04em;color:rgb(0,0,0);font-variant-numeric:tabular-nums">{{ q.serie }}</p>
-                <p style="margin:0;font-size:13px;letter-spacing:.04em;color:rgb(70,70,70);font-variant-numeric:tabular-nums">{{ q.code }}</p>
+                <div class="bo-qr-cert">
+                  <p class="cert-brand">CAROLE SESSEGNON</p>
+                  <p class="cert-title">CERTIFICAT / CERTIFICATE</p>
+                  <p>Cette création est une pièce<br>authentique de<br>CAROLE SESSEGNON.</p>
+                  <p>This creation is an authentic piece of<br>CAROLE SESSEGNON.</p>
+                  <p>numéro de série / serial number<br><span class="cert-val">{{ q.serie }}</span></p>
+                  <p>code d'activation / activation code<br><span class="cert-val">{{ q.code }}</span></p>
+                  <img src="{{ q.qrDataUrl }}" alt="">
+                  <p>Scannez ce code pour accéder au<br>passeport numérique de votre pièce.</p>
+                  <p>Scan this code to access the digital<br>passport of your piece.</p>
+                </div>
               </div>
             </sc-for>
           </div>
@@ -1503,19 +1526,19 @@ const ICONS = {
 // Le statut stocké ne contient jamais « vendue » pour une pièce passée par une vente :
 // « Vendue » est calculé à partir des commandes non annulées (voir effStatut).
 const SEED_PIECES = [
-  {id:'p1', reference:'HUP', modele:'Huperano', couleur:'Cuir naturel & bordeaux', serie:'CS-0042-2026', code:'8F3K-22QD', matiere:'Cuir de vachette, tannage végétal', dateFab:'2026-03-12', prix:420000, statut:'disponible', sav:[]},
-  {id:'p2', reference:'RAD', modele:'Radah', couleur:'Bordeaux', serie:'CS-0043-2026', code:'2LK9-77RT', matiere:'Cuir bordeaux, doublure daim', dateFab:'2026-03-20', prix:380000, statut:'disponible', sav:[]},
-  {id:'p3', reference:'NAF', modele:'Nafi', couleur:'Cuir naturel', serie:'CS-0044-2026', code:'9QW7-4XMZ', matiere:'Cuir naturel patiné à la main', dateFab:'2026-04-02', prix:300000, statut:'disponible', sav:[]},
-  {id:'p4', reference:'SIK', modele:'Sikadi', couleur:'Cuir grainé', serie:'CS-0045-2026', code:'5TY6-88XP', matiere:'Cuir grainé, ferrures bronze', dateFab:'2026-04-15', prix:510000, statut:'disponible', sav:[]},
-  {id:'p5', reference:'AYA', modele:'Ayaba', couleur:'Cuir tressé', serie:'CS-0046-2026', code:'3JH2-K9CV', matiere:'Cuir tressé, pièce d\'atelier', dateFab:'2026-05-01', prix:450000, statut:'bientot', sav:[]},
-  {id:'p6', reference:'WEL', modele:'Wèlè', couleur:'Cuir souple', serie:'CS-0047-2026', code:'6RF8-33NB', matiere:'Cuir souple, fermoir aimanté', dateFab:'2026-05-10', prix:340000, statut:'disponible', sav:[]},
-  {id:'p7', reference:'SIK', modele:'Sikadi', couleur:'Cuir grainé', serie:'CS-0038-2026', code:'4MW2-T7HD', matiere:'Cuir grainé, ferrures bronze', dateFab:'2026-02-10', prix:510000, statut:'disponible', sav:[]},
-  {id:'p8', reference:'NAF', modele:'Nafi', couleur:'Cuir naturel', serie:'CS-0031-2026', code:'Q8ZN-25RA', matiere:'Cuir naturel patiné à la main', dateFab:'2026-01-20', prix:300000, statut:'disponible', sav:[
+  {id:'p1', reference:'HUP', modele:'Huperano', couleur:'Cuir naturel & bordeaux', serie:'HU260002', code:'8F3K-22QD', matiere:'Cuir de vachette, tannage végétal', dateFab:'2026-03-12', prix:420000, statut:'disponible', sav:[]},
+  {id:'p2', reference:'RAD', modele:'Radah', couleur:'Bordeaux', serie:'RA260002', code:'2LK9-77RT', matiere:'Cuir bordeaux, doublure daim', dateFab:'2026-03-20', prix:380000, statut:'disponible', sav:[]},
+  {id:'p3', reference:'NAF', modele:'Nafi', couleur:'Cuir naturel', serie:'NA260002', code:'9QW7-4XMZ', matiere:'Cuir naturel patiné à la main', dateFab:'2026-04-02', prix:300000, statut:'disponible', sav:[]},
+  {id:'p4', reference:'SIK', modele:'Sikadi', couleur:'Cuir grainé', serie:'SI260002', code:'5TY6-88XP', matiere:'Cuir grainé, ferrures bronze', dateFab:'2026-04-15', prix:510000, statut:'disponible', sav:[]},
+  {id:'p5', reference:'AYA', modele:'Ayaba', couleur:'Cuir tressé', serie:'AY260001', code:'3JH2-K9CV', matiere:'Cuir tressé, pièce d\'atelier', dateFab:'2026-05-01', prix:450000, statut:'bientot', sav:[]},
+  {id:'p6', reference:'WEL', modele:'Wèlè', couleur:'Cuir souple', serie:'WE260001', code:'6RF8-33NB', matiere:'Cuir souple, fermoir aimanté', dateFab:'2026-05-10', prix:340000, statut:'disponible', sav:[]},
+  {id:'p7', reference:'SIK', modele:'Sikadi', couleur:'Cuir grainé', serie:'SI260001', code:'4MW2-T7HD', matiere:'Cuir grainé, ferrures bronze', dateFab:'2026-02-10', prix:510000, statut:'disponible', sav:[]},
+  {id:'p8', reference:'NAF', modele:'Nafi', couleur:'Cuir naturel', serie:'NA260001', code:'Q8ZN-25RA', matiere:'Cuir naturel patiné à la main', dateFab:'2026-01-20', prix:300000, statut:'disponible', sav:[
     {id:'s1', type:'en_reparation', date:'2026-09-02', note:'Couture de l\'anse à reprendre, pièce reçue à l\'atelier.', auteur:'Michelle Kouassi', replacementId:''},
     {id:'s2', type:'reparee', date:'2026-09-18', note:'Anse recousue à la main, renvoyée à la cliente.', auteur:'Michelle Kouassi', replacementId:''}
   ]},
-  {id:'p9', reference:'HUP', modele:'Huperano', couleur:'Toile et cuir naturel', serie:'CS-0001-2026', code:'PR7T-0TY9', matiere:'Prototype d\'atelier — toile, cuir naturel', dateFab:'2025-11-05', prix:'', statut:'prototype', sav:[]},
-  {id:'p10', reference:'RAD', modele:'Radah', couleur:'Bordeaux', serie:'CS-0039-2026', code:'G4FT-8WKE', matiere:'Cuir bordeaux, doublure daim', dateFab:'2026-02-14', prix:380000, statut:'offerte', sav:[]}
+  {id:'p9', reference:'HUP', modele:'Huperano', couleur:'Toile et cuir naturel', serie:'HU260001', code:'PR7T-0TY9', matiere:'Prototype d\'atelier — toile, cuir naturel', dateFab:'2025-11-05', prix:'', statut:'prototype', sav:[]},
+  {id:'p10', reference:'RAD', modele:'Radah', couleur:'Bordeaux', serie:'RA260001', code:'G4FT-8WKE', matiere:'Cuir bordeaux, doublure daim', dateFab:'2026-02-14', prix:380000, statut:'offerte', sav:[]}
 ];
 // Chaque commande, en ligne ou hors site, désigne les pièces vendues par leur id.
 const SEED_ORDERS = [
@@ -1570,9 +1593,9 @@ const STORE_KEY = 'cs-bo-equipe-v1';
 const INVITE_DAYS = 7;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const SEED_AUDIT = [
-  {date:'21 sept. 2026 — 09:12', auteur:'Carole Sessegnon', action:'Consultation du code d\'activation — CS-0042-2026'},
+  {date:'21 sept. 2026 — 09:12', auteur:'Carole Sessegnon', action:'Consultation du code d\'activation — HU260002'},
   {date:'20 sept. 2026 — 17:40', auteur:'Issa Traoré', action:'Code de suivi saisi — commande #CS-2026-9120'},
-  {date:'19 sept. 2026 — 11:05', auteur:'Michelle Kouassi', action:'Pièce créée — Wèlè, CS-0047-2026'},
+  {date:'19 sept. 2026 — 11:05', auteur:'Michelle Kouassi', action:'Pièce créée — Wèlè, WE260001'},
   {date:'18 sept. 2026 — 08:50', auteur:'Aya Bamba', action:'Remboursement initié — commande #CS-2026-8990'}
 ];
 const SEED_OWNERS = [
@@ -1634,7 +1657,7 @@ const ORDER_STATUT_KIND = {preparation:'neutral', expediee:'progress', livree:'d
 const TEAM_STATUT_LABEL = {actif:'Actif', invite:'Invitation envoyée', expiree:'Invitation expirée', desactive:'Désactivé'};
 const TEAM_STATUT_KIND = {actif:'done', invite:'neutral', expiree:'alert', desactive:'neutral'};
 
-const SERIE_RE = /^CS-\d{4}-\d{4}$/;
+const SERIE_RE = /^[A-Z]{2}\d{6,}$/;
 const CODE_RE = /^[A-Z0-9]{4}-[A-Z0-9]{4}$/;
 const FIELD_OK = 'inset 0 0 0 1px rgba(0,0,0,.2)';
 const FIELD_ERR = 'inset 0 0 0 2px rgb(155,24,33)';
@@ -1662,10 +1685,29 @@ const displayName = t => t.nom || t.email || 'Collaborateur sans nom';
 const fmtFcfa = n => (n===''||n===null||n===undefined||isNaN(Number(n))) ? '—' : fmtNumber(Math.round(Number(n))) + ' FCFA';
 const yearOf = iso => (iso && /^\d{4}/.test(iso)) ? iso.slice(0,4) : String(new Date().getFullYear());
 const refFromModele = m => (m || '').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^A-Za-z]/g, '').slice(0, 3).toUpperCase();
-const serieNo = p => { const x = /^CS-(\d{4})-/.exec((p && p.serie) || ''); return x ? Number(x[1]) : 0; };
-const maxSerie = pieces => pieces.reduce((m, p) => Math.max(m, serieNo(p)), 0);
-// Le compteur (issuedMax) ne redescend jamais : un numéro déjà émis, donc peut-être imprimé, n'est jamais réattribué.
-const nextSerie = (pieces, iso, issuedMax) => 'CS-' + String(Math.max(maxSerie(pieces), issuedMax || 0) + 1).padStart(4, '0') + '-' + yearOf(iso);
+// N° de série : 2 premières lettres du modèle + année sur 2 chiffres + compteur sur 4 chiffres ou plus (ex. HU260001).
+// Un compteur par modèle et par année ; il ne redescend jamais : un numéro déjà émis n'est jamais réattribué.
+const seriePrefix = m => (m || '').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^A-Za-z]/g, '').slice(0, 2).toUpperCase();
+const serieKey = (modele, iso) => seriePrefix(modele).length===2 ? seriePrefix(modele) + yearOf(iso).slice(2) : '';
+const serieParse = serie => { const x = /^([A-Z]{2}\d{2})(\d{4,})$/.exec(serie || ''); return x ? {key:x[1], n:Number(x[2])} : null; };
+const maxSerie = pieces => pieces.reduce((m, p) => { const x = serieParse(p && p.serie); if (x && x.n > (m[x.key] || 0)) m[x.key] = x.n; return m; }, {});
+const serieCounter = (pieces, issued, key) => Math.max(maxSerie(pieces)[key] || 0, (issued && issued[key]) || 0);
+const fmtSerie = (key, n) => key + String(n).padStart(4, '0');
+const nextSerie = (pieces, modele, iso, issued) => { const key = serieKey(modele, iso); return key ? fmtSerie(key, serieCounter(pieces, issued, key) + 1) : ''; };
+const bumpSerie = (issued, serie) => { const x = serieParse(serie); return !x || ((issued && issued[x.key]) || 0) >= x.n ? (issued || {}) : Object.assign({}, issued, {[x.key]:x.n}); };
+// Anciennes données enregistrées (CS-0042-2026) : renumérotées au nouveau format, dans l'ordre des anciens numéros.
+const convertSeries = (pieces, audit) => {
+  const old = pieces.filter(p => /^CS-\d{4}-\d{4}$/.test(p.serie || ''));
+  if (!old.length) return {pieces, audit, changed:false};
+  const cnt = maxSerie(pieces.filter(p => !old.includes(p))), map = {};
+  old.slice().sort((a, b) => a.serie.slice(3, 7) - b.serie.slice(3, 7)).forEach(p => {
+    const key = serieKey(p.modele, p.serie.slice(8)) || ('XX' + p.serie.slice(10));
+    cnt[key] = (cnt[key] || 0) + 1; map[p.serie] = fmtSerie(key, cnt[key]);
+  });
+  const fix = t => Object.keys(map).reduce((x, o) => x.split(o).join(map[o]), t);
+  return {pieces:pieces.map(p => map[p.serie] ? Object.assign({}, p, {serie:map[p.serie]}) : p),
+    audit:(audit || []).map(a => Object.assign({}, a, {action:fix(a.action || '')})), changed:true, issued:cnt};
+};
 const genCode = pieces => {
   const used = new Set(pieces.map(p => (p.code || '').toUpperCase()));
   for (;;) {
@@ -1818,14 +1860,15 @@ class Component extends DCLogic {
         return src ? Object.assign({}, ph, {src}) : null;
       }).filter(Boolean)}) : p);
       Object.keys(found).forEach(id => { this._phStored.add(id); this._phCache[id] = found[id]; });
+      const conv = convertSeries(restored, Array.isArray(saved.audit) ? saved.audit : SEED_AUDIT);
       this.setState({
-        team:saved.team, audit:Array.isArray(saved.audit) ? saved.audit : SEED_AUDIT,
-        pieces:restored,
+        team:saved.team, audit:conv.audit,
+        pieces:conv.pieces,
         orders:Array.isArray(saved.orders) ? saved.orders : SEED_ORDERS,
         owners:Array.isArray(saved.owners) ? saved.owners : SEED_OWNERS,
         requests:Array.isArray(saved.requests) ? saved.requests : SEED_REQUESTS,
         alerts:Array.isArray(saved.alerts) ? saved.alerts : SEED_ALERTS,
-        serieMax: typeof saved.serieMax==='number' ? saved.serieMax : maxSerie(restored)
+        serieMax: conv.changed ? conv.issued : (saved.serieMax && typeof saved.serieMax==='object' ? saved.serieMax : maxSerie(conv.pieces))
       });
       finish();
       const keep = new Set(); restored.forEach(p => (p.photos || []).forEach(ph => keep.add(ph.id)));
@@ -1941,15 +1984,15 @@ class Component extends DCLogic {
   }
 
   // Annule un lot tout juste généré, tant qu'aucune de ses pièces n'a été modifiée ou vendue.
-  undoLot(lotId, prevMax, counter){
+  undoLot(lotId, key, prevMax, counter){
     const st = this.state;
     const mine = st.pieces.filter(p => p.lotId===lotId);
     if (!mine.length) return;
     const touched = mine.filter(p => p.statut!=='reserve' || (p.photos || []).length || (p.sav || []).length || st.orders.some(o => (o.pieceIds || []).includes(p.id)));
     if (touched.length) { this.showFlash('Ce lot ne peut plus être annulé : ' + touched.length + (touched.length>1 ? ' pièces ont été modifiées ou vendues.' : ' pièce a été modifiée ou vendue.'), 7000); return; }
-    const reusable = st.serieMax===counter;
+    const reusable = (st.serieMax[key] || 0)===counter;
     const first = mine[0].serie, last = mine[mine.length - 1].serie;
-    this.setState(s2 => ({pieces:s2.pieces.filter(p => p.lotId!==lotId), serieMax: s2.serieMax===counter ? prevMax : s2.serieMax, lotFocus:null}), () => this.persist());
+    this.setState(s2 => ({pieces:s2.pieces.filter(p => p.lotId!==lotId), serieMax: (s2.serieMax[key] || 0)===counter ? Object.assign({}, s2.serieMax, {[key]:prevMax}) : s2.serieMax, lotFocus:null}), () => this.persist());
     this.logAudit('Lot annulé — ' + mine.length + ' × ' + mine[0].modele + ' (' + (first===last ? first : first + ' → ' + last) + ')' + (reusable ? ' ; numéros remis à disposition' : ' ; numéros non réutilisés'));
     this.showFlash('Lot annulé : ' + mine.length + (mine.length>1 ? ' pièces retirées' : ' pièce retirée') + (reusable ? ', numéros de série remis à disposition.' : '. Les numéros de série restent consommés (d\'autres pièces ont été créées depuis).'), 7000);
   }
@@ -2030,7 +2073,7 @@ class Component extends DCLogic {
       body:'La pièce ' + p.serie + ' et son code d\'activation seront retirés du registre. Cette action est définitive.',
       okLabel:'Supprimer la pièce',
       onOk: () => {
-        this.setState(st => ({pieces: st.pieces.filter(x => x.id!==p.id), route:'pieces', serieMax:Math.max(st.serieMax, serieNo(p))}), () => this.persist());
+        this.setState(st => ({pieces: st.pieces.filter(x => x.id!==p.id), route:'pieces', serieMax:bumpSerie(st.serieMax, p.serie)}), () => this.persist());
         this.logAudit('Pièce supprimée — ' + p.modele + ', ' + p.serie);
         this.showFlash('Pièce « ' + p.modele + ' » supprimée du registre.');
       }
@@ -2056,7 +2099,7 @@ class Component extends DCLogic {
     const err = {};
     // Aucun champ n'est obligatoire : seuls le format et l'unicité sont vérifiés quand le champ est rempli.
     const serie = f.serie.trim();
-    if (serie && !SERIE_RE.test(serie)) err.serie = 'Format attendu : CS-0000-2026.';
+    if (serie && !SERIE_RE.test(serie)) err.serie = 'Format attendu : 2 lettres puis au moins 6 chiffres (ex. HU260001).';
     else if (serie && this.state.pieces.some(p => p.serie===serie && p.id!==this.state.editId)) err.serie = 'Ce numéro de série est déjà attribué à une autre pièce.';
     const code = f.code.trim().toUpperCase();
     if (code && !CODE_RE.test(code)) err.code = 'Format attendu : 4 caractères, un tiret, 4 caractères (ex. 8F3K-22QD).';
@@ -2757,7 +2800,7 @@ class Component extends DCLogic {
           + (nRes ? ' · ' + nRes + (nRes>1 ? ' réservées en fabrication' : ' réservée en fabrication') : '');
       })(),
       newPiece: () => this.go('piece-form', {editId:null, fieldErr:{}, codeRevealed:false,
-        form:Object.assign(this._emptyForm(), {autoIds:true, serie:nextSerie(s.pieces, '', s.serieMax), code:genCode(s.pieces)})}),
+        form:Object.assign(this._emptyForm(), {autoIds:true, serie:'', code:genCode(s.pieces)})}),
       openLot: () => this.go('lot-form', {lotForm:this._emptyLot(), lotErr:{}}),
       printQrSheet: () => { try { window.print(); } catch(e) {} },
       qrPieces: (() => {
@@ -2827,11 +2870,11 @@ class Component extends DCLogic {
       idsHint: isEditing
         ? 'Le n° de série et le code sont figés une fois la pièce enregistrée : ils sont imprimés sur le certificat et encodés dans le QR code.'
         : (s.form.autoIds
-          ? 'Générés automatiquement : n° de série CS-numéro d\'ordre-année de fabrication (un numéro n\'est jamais réattribué, même après suppression), code aléatoire de 8 caractères sans 0/O ni 1/I, unique au registre.'
+          ? 'Générés automatiquement : n° de série = 2 premières lettres du modèle + année + numéro d\'ordre (ex. HU260001 ; un numéro n\'est jamais réattribué, même après suppression), saisissez d\'abord le modèle, code aléatoire de 8 caractères sans 0/O ni 1/I, unique au registre.'
           : 'Saisie manuelle : à réserver aux pièces déjà numérotées (registre papier ou fichier Excel existant).'),
       toggleAutoIds: () => this.setState(st => st.form.autoIds
         ? {form:Object.assign({}, st.form, {autoIds:false})}
-        : {form:Object.assign({}, st.form, {autoIds:true, serie:nextSerie(st.pieces, st.form.dateFab, st.serieMax), code:genCode(st.pieces)}), fieldErr:{}, codeRevealed:false}),
+        : {form:Object.assign({}, st.form, {autoIds:true, serie:nextSerie(st.pieces, st.form.modele, st.form.dateFab, st.serieMax), code:genCode(st.pieces)}), fieldErr:{}, codeRevealed:false}),
       regenCode: () => this.setState(st => ({form:Object.assign({}, st.form, {code:genCode(st.pieces)})})),
       ...(() => {
         const cur = isEditing ? pieceById(s.editId) : null;
@@ -2891,7 +2934,7 @@ class Component extends DCLogic {
           const fe = Object.assign({}, st.fieldErr); delete fe[key];
           const patch = {[key]: v};
           // En génération automatique, l'année du n° de série suit la date de fabrication.
-          if (key==='dateFab' && st.form.autoIds && !st.editId) patch.serie = (st.form.serie || nextSerie(st.pieces, v, st.serieMax)).replace(/-\d{4}$/, '-' + yearOf(v));
+          if ((key==='dateFab' || key==='modele') && st.form.autoIds && !st.editId) patch.serie = nextSerie(st.pieces, key==='modele' ? v : st.form.modele, key==='dateFab' ? v : st.form.dateFab, st.serieMax);
           return {form: Object.assign({}, st.form, patch), fieldErr: fe};
         });
       }])),
@@ -2905,13 +2948,14 @@ class Component extends DCLogic {
           reference: (raw.reference.trim() || refFromModele(raw.modele)).toUpperCase(),
           prix: String(raw.prix).trim()==='' ? '' : Number(raw.prix)
         });
+        if (raw.autoIds && !this.state.editId) f.serie = nextSerie(this.state.pieces, f.modele, f.dateFab, this.state.serieMax);
         const err = this.validatePiece(f);
         if (Object.keys(err).length) { this.setState({fieldErr:err}, () => this.focusFirstInvalid()); return; }
         delete f.autoIds;
         const editing = !!this.state.editId;
         this.setState(st => editing
           ? {pieces: st.pieces.map(p => p.id===st.editId ? Object.assign({}, p, f, {id:st.editId, serie:p.serie, code:p.code}) : p), route:'pieces', fieldErr:{}}
-          : {pieces: st.pieces.concat([Object.assign({id:'p' + Date.now(), sav:[]}, f)]), route:'pieces', fieldErr:{}, serieMax:Math.max(st.serieMax, serieNo(f))},
+          : {pieces: st.pieces.concat([Object.assign({id:'p' + Date.now(), sav:[]}, f)]), route:'pieces', fieldErr:{}, serieMax:bumpSerie(st.serieMax, f.serie)},
           () => this.persist());
         const nom = f.modele || 'sans nom';
         this.logAudit((editing ? 'Pièce modifiée — ' : 'Pièce créée — ') + nom + (f.serie ? ', ' + f.serie : '') + ((f.photos || []).length ? ' · ' + f.photos.length + (f.photos.length>1 ? ' photos' : ' photo') : ''));
@@ -2962,11 +3006,13 @@ class Component extends DCLogic {
       lotRangeText: (() => {
         const lf = s.lotForm || this._emptyLot();
         const yr = /^\d{4}$/.test(lf.annee) ? lf.annee : String(new Date().getFullYear());
+        const key = serieKey(lf.modele, yr);
+        if (!key) return 'Indiquez le modèle (au moins 2 lettres) pour voir les numéros de série émis.';
+        const start = serieCounter(s.pieces, s.serieMax, key) + 1;
+        const first = fmtSerie(key, start);
         const n = Number(lf.quantite);
-        const start = Math.max(maxSerie(s.pieces), s.serieMax) + 1;
-        const first = 'CS-' + String(start).padStart(4, '0') + '-' + yr;
         if (lf.quantite && Number.isInteger(n) && n >= 1 && n <= 500) {
-          const last = 'CS-' + String(start + n - 1).padStart(4, '0') + '-' + yr;
+          const last = fmtSerie(key, start + n - 1);
           return n === 1 ? 'Numéro de série émis : ' + first + '.' : 'Numéros de série émis : ' + first + ' → ' + last + ' (' + n + ' pièces).';
         }
         return 'Prochain numéro de série à émettre : ' + first + '.';
@@ -3001,16 +3047,18 @@ class Component extends DCLogic {
         if (String(raw.prix).trim()!=='' && !(Number(raw.prix) >= 0)) err.prix = 'Indiquez un montant en FCFA (chiffres uniquement).';
         if (Object.keys(err).length) { this.setState({lotErr:err}, () => this.focusFirstInvalid()); return; }
         const annee = /^\d{4}$/.test(raw.annee) ? raw.annee : String(new Date().getFullYear());
-        const startNo = Math.max(maxSerie(s.pieces), s.serieMax) + 1;
-        const serieOf = no => 'CS-' + String(no).padStart(4, '0') + '-' + annee;
+        const sKey = serieKey(modele, annee);
+        if (!sKey) { this.setState({lotErr:{modele:'Le modèle doit contenir au moins 2 lettres pour former le numéro de série.'}}, () => this.focusFirstInvalid()); return; }
+        const startNo = serieCounter(s.pieces, s.serieMax, sKey) + 1;
+        const serieOf = no => fmtSerie(sKey, no);
         const doLot = () => {
           const lotId = 'L' + Date.now().toString(36);
-          const prevMax = s.serieMax;
+          const prevMax = (s.serieMax && s.serieMax[sKey]) || 0;
           const reference = (raw.reference.trim() || refFromModele(modele)).toUpperCase();
           const couleur = raw.couleur.trim(), matiere = raw.matiere.trim();
           const prix = String(raw.prix).trim()==='' ? '' : Number(raw.prix);
           const batch = [];
-          let counter = Math.max(maxSerie(s.pieces), s.serieMax);
+          let counter = serieCounter(s.pieces, s.serieMax, sKey);
           for (let i = 0; i < quantiteNum; i++) {
             counter++;
             const code = genCode(s.pieces.concat(batch));
@@ -3018,13 +3066,13 @@ class Component extends DCLogic {
               serie:serieOf(counter), code, dateFab:'', statut:'reserve', sav:[], photos:[]});
           }
           const first = batch[0].serie, last = batch[batch.length - 1].serie;
-          this.setState(st => ({pieces: st.pieces.concat(batch), serieMax:counter, route:'pieces', lotErr:{},
+          this.setState(st => ({pieces: st.pieces.concat(batch), serieMax:Object.assign({}, st.serieMax, {[sKey]:counter}), route:'pieces', lotErr:{},
             lotFocus:{id:lotId, modele, count:quantiteNum, first, last}}), () => this.persist());
           this.logAudit('Lot généré — ' + quantiteNum + ' × ' + modele + ' (' + (first===last ? first : first + ' → ' + last) + ')');
           this.showFlash(quantiteNum>1
             ? quantiteNum + ' pièces « ' + modele + ' » générées (' + first + ' → ' + last + '), prêtes pour la fabrication.'
             : '1 pièce « ' + modele + ' » générée (' + first + '), prête pour la fabrication.',
-            12000, {label:'Annuler le lot', run: () => this.undoLot(lotId, prevMax, counter)});
+            12000, {label:'Annuler le lot', run: () => this.undoLot(lotId, sKey, prevMax, counter)});
         };
         if (quantiteNum > 20) {
           this.askConfirm({
