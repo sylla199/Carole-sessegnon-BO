@@ -1083,14 +1083,22 @@
                   </sc-for>
                 </div>
               </div>
+              <sc-if value="{{ viewOrder.hasFrais }}">
+                <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Prix du sac</span><span style="font-variant-numeric:tabular-nums">{{ viewOrder.prixArticlesLabel }}</span></div>
+                <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Frais de livraison</span><span style="font-variant-numeric:tabular-nums">{{ viewOrder.fraisLabel }}</span></div>
+              </sc-if>
               <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Total</span><span style="font-variant-numeric:tabular-nums">{{ viewOrder.totalLabel }}</span></div>
               <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Date</span><span>{{ viewOrder.dateLabel }}</span></div>
               <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Paiement</span><span style="text-align:right">{{ viewOrder.paiementLabel }}</span></div>
               <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Réception</span><span style="text-align:right">{{ viewOrder.mode }}</span></div>
-              <sc-if value="{{ viewOrder.isOnline }}"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Code de suivi</span><span style="text-align:right;letter-spacing:.04em">{{ viewOrder.trackingLabel }}</span></div></sc-if>
+              <sc-if value="{{ viewOrder.isOnline }}">
+                <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Code de suivi</span><span style="text-align:right;letter-spacing:.04em">{{ viewOrder.trackingLabel }}</span></div>
+                <sc-if value="{{ viewOrder.transporteur }}"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Transporteur</span><span style="text-align:right">{{ viewOrder.transporteurLabel }}</span></div></sc-if>
+                <sc-if value="{{ viewOrder.dateExpeditionLabel }}"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Date d'expédition</span><span style="text-align:right">{{ viewOrder.dateExpeditionLabel }}</span></div></sc-if>
+              </sc-if>
               <sc-if value="{{ viewOrder.note }}"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Note</span><span style="text-align:right;max-width:70%">{{ viewOrder.note }}</span></div></sc-if>
               <sc-if value="{{ viewOrder.hasLivraison }}">
-                <sc-if value="{{ viewOrder.civiliteLabel }}"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Civilité</span><span style="text-align:right;max-width:70%">{{ viewOrder.civiliteLabel }}</span></div></sc-if>
+                <sc-if value="{{ viewOrder.livraisonNomLabel }}"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Destinataire</span><span style="text-align:right;max-width:70%">{{ viewOrder.livraisonNomLabel }}</span></div></sc-if>
                 <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Adresse de livraison</span><span style="text-align:right;max-width:70%">{{ viewOrder.livraisonLabel }}</span></div>
                 <sc-if value="{{ viewOrder.livraisonCodePostal }}"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Code postal</span><span style="text-align:right">{{ viewOrder.livraisonCodePostal }}</span></div></sc-if>
                 <sc-if value="{{ viewOrder.livraisonEmail }}"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">E-mail du destinataire</span><span style="overflow-wrap:anywhere;text-align:right">{{ viewOrder.livraisonEmail }}</span></div></sc-if>
@@ -1124,11 +1132,19 @@
                 <label style="display:block;font-size:13px;color:rgb(70,70,70)">Code de suivi du transporteur
                   <input value="{{ orderDraft.tracking }}" onChange="{{ setDraft.tracking }}" placeholder="Ex. EXP-4471-CI" autocomplete="off" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0);letter-spacing:.04em">
                 </label>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:16px">
+                  <label style="display:block;font-size:13px;color:rgb(70,70,70)">Transporteur
+                    <input value="{{ orderDraft.transporteur }}" onChange="{{ setDraft.transporteur }}" placeholder="Ex. DHL Express" autocomplete="off" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+                  </label>
+                  <label style="display:block;font-size:13px;color:rgb(70,70,70)">Date d'expédition
+                    <input type="date" value="{{ orderDraft.dateExpedition }}" onChange="{{ setDraft.dateExpedition }}" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+                  </label>
+                </div>
               </sc-if>
               <p style="margin:0;font-size:12px;line-height:18px;color:rgb(94,94,94)">Tant que la commande n'est pas annulée, ses pièces restent « Vendue ». L'annuler les remet automatiquement en « Disponible ».</p>
 
               <sc-if value="{{ viewOrder.isOnline }}">
-                <p style="margin:6px 0 0;font-size:12px;line-height:18px;color:rgb(94,94,94)">Commande passée par la cliente sur le site : ses coordonnées, le montant et le moyen de paiement viennent de sa commande et ne se modifient pas depuis le back-office. Seuls le statut et le code de suivi sont à votre main.</p>
+                <p style="margin:6px 0 0;font-size:12px;line-height:18px;color:rgb(94,94,94)">Commande passée par la cliente sur le site : ses coordonnées, le montant et le moyen de paiement (y compris les frais de livraison) viennent de sa commande et ne se modifient pas depuis le back-office. Statut, code de suivi, transporteur et date d'expédition restent à votre main.</p>
               </sc-if>
               <sc-if value="{{ viewOrder.notOnline }}">
                 <p style="margin:6px 0 0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">Détails de la commande</p>
@@ -1219,15 +1235,15 @@
                   <input type="search" aria-label="Filtrer les pièces disponibles" value="{{ venteSearch }}" onChange="{{ setVenteSearch }}" placeholder="Filtrer par modèle ou n° de série…" style="margin-top:8px;width:100%;height:46px;padding:0 12px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);color:rgb(0,0,0);font-size:14px;padding:0 16px">
                   <div role="group" aria-label="Pièces disponibles" style="margin-top:8px;max-height:320px;overflow:auto;box-shadow:{{ ventePiecesShadow }}">
                     <sc-for list="{{ ventePieces }}" as="v" hint-placeholder-count="4">
-                      <label style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid rgba(0,0,0,.06);cursor:pointer;background:{{ v.bg }}">
-                        <input type="checkbox" checked="{{ v.checked }}" onChange="{{ v.toggle }}" aria-describedby="err-vente-pieces" style="flex:0 0 auto;width:18px;height:18px;margin:0;accent-color:rgb(71,29,27)">
+                      <label style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid rgba(0,0,0,.06);cursor:pointer;background:{{ v.bg }};opacity:{{ v.rowOpacity }}">
+                        <input type="checkbox" checked="{{ v.checked }}" disabled="{{ v.notSellable }}" onChange="{{ v.toggle }}" aria-describedby="err-vente-pieces" style="flex:0 0 auto;width:18px;height:18px;margin:0;accent-color:rgb(71,29,27)">
                         <div style="flex:0 0 40px;width:40px;height:40px;border-radius:50%;overflow:hidden;background:rgb(252,249,248);outline:1px solid oklch(0 0 0 / 0.1);outline-offset:-1px;display:flex;align-items:center;justify-content:center">
                           <sc-if value="{{ v.hasPhoto }}"><img src="{{ v.photoSrc }}" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></sc-if>
                           <sc-if value="{{ v.noPhoto }}"><svg aria-hidden="true" viewBox="0 0 24 24" style="width:40%;height:40%;opacity:.3" fill="none" stroke="rgb(164,164,164)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h12l1 12H5L6 8Z"></path><path d="M9 8V6a3 3 0 0 1 6 0v2"></path></svg></sc-if>
                         </div>
                         <span style="flex:1;min-width:0">
                           <span style="display:block;font-size:14px;color:rgb(0,0,0)">{{ v.modele }}</span>
-                          <span style="display:block;margin-top:2px;font-size:12px;color:rgb(94,94,94)">{{ v.sub }}</span>
+                          <span style="display:block;margin-top:2px;font-size:12px;color:rgb(94,94,94)">{{ v.sub }}<sc-if value="{{ v.statutNote }}"> · {{ v.statutNote }}</sc-if></span>
                         </span>
                         <span style="flex:0 0 auto;font-size:13px;color:rgb(70,70,70);font-variant-numeric:tabular-nums">{{ v.prixLabel }}</span>
                       </label>
@@ -1723,16 +1739,17 @@ const SEED_PIECES = [
 ];
 // Chaque commande, en ligne ou hors site, désigne les pièces vendues par leur id.
 const SEED_ORDERS = [
-  {id:'o5', no:'#CS-2026-9530', canal:'en_ligne', evenement:'', client:'Koffi Yao', email:'koffi.yao@exemple.ci', telephone:'', pieceIds:['p2'], total:380000, dateIso:'2026-09-21', mode:'Livraison à domicile', paiement:'Mobile Money', statut:'preparation', tracking:'', note:'',
-   livraison:{civilite:'M.', adresse:'Cocody Angré, 8e tranche, villa 12', ville:'Abidjan', pays:'Côte d\'Ivoire', email:'aya.destinataire@exemple.ci', telephone:'+225 07 08 09 10 11'},
+  {id:'o5', no:'#CS-2026-9530', canal:'en_ligne', evenement:'', client:'Koffi Yao', email:'koffi.yao@exemple.ci', telephone:'', pieceIds:['p2'], total:380000, dateIso:'2026-09-21', mode:'Livraison à domicile', paiement:'Mobile Money', statut:'preparation', tracking:'', transporteur:'', dateExpedition:'', note:'',
+   livraison:{civilite:'Mme', nom:'Aya Konaté', adresse:'Cocody Angré, 8e tranche, villa 12', ville:'Abidjan', pays:'Côte d\'Ivoire', email:'aya.destinataire@exemple.ci', telephone:'+225 07 08 09 10 11', frais:5000},
    giftByPiece:{p2:{kind:'message', to:'Aya', message:'Joyeux anniversaire, Aya. Que ce bijou t\'accompagne longtemps. Avec toute mon affection, Koffi.'}}},
-  {id:'o1', no:'#CS-2026-9482', canal:'en_ligne', evenement:'', client:'Awa Koné', email:'awa.kone@exemple.ci', telephone:'', pieceIds:['p1'], total:420000, dateIso:'2026-09-02', mode:'Livraison à domicile', paiement:'Carte bancaire', statut:'livree', tracking:'CIP-2093-AB', note:'',
-   livraison:{civilite:'Mme', adresse:'Riviera Palmeraie, rue des Jasmins', ville:'Abidjan', pays:'Côte d\'Ivoire', codePostal:'', telephone:'+225 07 12 13 14 15'},
+  {id:'o1', no:'#CS-2026-9482', canal:'en_ligne', evenement:'', client:'Awa Koné', email:'awa.kone@exemple.ci', telephone:'', pieceIds:['p1'], total:420000, dateIso:'2026-09-02', mode:'Livraison à domicile', paiement:'Carte bancaire', statut:'livree', tracking:'CIP-2093-AB', transporteur:'Colis Privé', dateExpedition:'2026-09-04', note:'',
+   livraison:{civilite:'Mme', nom:'Awa Koné', adresse:'Riviera Palmeraie, rue des Jasmins', ville:'Abidjan', pays:'Côte d\'Ivoire', codePostal:'', telephone:'+225 07 12 13 14 15', frais:5000},
    giftByPiece:{p1:{kind:'vierge'}}},
-  {id:'o2', no:'#CS-2026-9120', canal:'en_ligne', evenement:'', client:'Marie Lefèvre', email:'marie.lefevre@exemple.fr', telephone:'', pieceIds:['p7'], total:510000, dateIso:'2026-07-14', mode:'Livraison internationale', paiement:'Carte bancaire', statut:'livree', tracking:'DHL-5521-FR', note:'',
-   livraison:{civilite:'Mme', adresse:'12 rue des Lilas', ville:'Lyon', pays:'France', codePostal:'69003', telephone:'+33 6 12 34 56 78'}},
+  {id:'o2', no:'#CS-2026-9120', canal:'en_ligne', evenement:'', client:'Marie Lefèvre', email:'marie.lefevre@exemple.fr', telephone:'', pieceIds:['p7'], total:510000, dateIso:'2026-07-14', mode:'Livraison internationale', paiement:'Carte bancaire', statut:'livree', tracking:'DHL-5521-FR', transporteur:'DHL Express', dateExpedition:'2026-07-16', note:'',
+   livraison:{civilite:'Mme', nom:'Marie Lefèvre', adresse:'12 rue des Lilas', ville:'Lyon', pays:'France', codePostal:'69003', telephone:'+33 6 12 34 56 78', frais:18000}},
   {id:'o3', no:'#CS-2026-9051', canal:'popup', evenement:'Pop-up Dakar — Almadies', client:'Fatou Diop', email:'fatou.diop@exemple.sn', telephone:'+221 77 000 00 00', pieceIds:['p8'], total:300000, dateIso:'2026-07-02', mode:'Remise en main propre', paiement:'Espèces', statut:'livree', tracking:'', note:''},
-  {id:'o4', no:'#CS-2026-8990', canal:'en_ligne', evenement:'', client:'Julien Petit', email:'julien.petit@exemple.fr', telephone:'', pieceIds:['p6'], total:340000, dateIso:'2026-06-20', mode:'Livraison à domicile', paiement:'Carte bancaire', statut:'annulee', tracking:'', note:'Annulée à la demande du client avant expédition.'}
+  {id:'o4', no:'#CS-2026-8990', canal:'en_ligne', evenement:'', client:'Julien Petit', email:'julien.petit@exemple.fr', telephone:'', pieceIds:['p6'], total:340000, dateIso:'2026-06-20', mode:'Livraison à domicile', paiement:'Carte bancaire', statut:'annulee', tracking:'', transporteur:'', dateExpedition:'', note:'Annulée à la demande du client avant expédition.',
+   livraison:{civilite:'M.', nom:'Julien Petit', adresse:'8 avenue de la République', ville:'Lyon', pays:'France', codePostal:'69002', telephone:'+33 6 98 76 54 32', frais:5000}}
 ];
 const MAISON = {email:'contact@carolesessegnon.com', telephone:'+225 07 20 00 95 20'};
 const OBJETS = ['Une pièce','Une commande','Le passeport numérique','Presse','Livraison','Retour et échange','Commande en ligne','Service après-vente','Autre demande'];
@@ -2463,7 +2480,7 @@ class Component extends DCLogic {
     fieldKeys.forEach(k => { fieldShadow[k] = fieldErr[k] ? FIELD_ERR : FIELD_OK; fieldInvalid[k] = !!fieldErr[k]; });
 
     // Commandes (en ligne et hors site, même suivi)
-    const draftFromOrder = o => ({statut:o.statut, tracking:o.tracking||'', client:o.client||'', email:o.email||'', telephone:o.telephone||'',
+    const draftFromOrder = o => ({statut:o.statut, tracking:o.tracking||'', transporteur:o.transporteur||'', dateExpedition:o.dateExpedition||'', client:o.client||'', email:o.email||'', telephone:o.telephone||'',
       evenement:o.evenement||'', montant:String(o.total===undefined ? '' : o.total), paiement:o.paiement||'', note:o.note||'', dateIso:o.dateIso||''});
     const openOrder = o => this.go('commande-detail', {viewOrderId:o.id, orderDraft:draftFromOrder(o), orderErr:{}, orderDeleteOpen:false, orderDeleteReason:''});
     const decOrders = s.orders.slice().sort((a,b) => (b.dateIso||'').localeCompare(a.dateIso||'')).map(o => {
@@ -2487,9 +2504,17 @@ class Component extends DCLogic {
         hasLivraison: !!o.livraison,
         livraisonLabel: o.livraison ? [o.livraison.adresse, o.livraison.ville, o.livraison.pays].filter(Boolean).join(', ') : '',
         civiliteLabel: o.livraison ? (o.livraison.civilite || '') : '',
+        livraisonNom: o.livraison ? (o.livraison.nom || '') : '',
+        livraisonNomLabel: o.livraison ? [o.livraison.civilite, o.livraison.nom].filter(Boolean).join(' ') : '',
         livraisonEmail: o.livraison ? (o.livraison.email || '') : '',
         livraisonTelephone: o.livraison ? (o.livraison.telephone || '') : '',
         livraisonCodePostal: o.livraison ? (o.livraison.codePostal || '') : '',
+        // Le total encaissé ventile en « prix du sac » (les pièces) + frais de livraison, quand ces frais sont connus.
+        hasFrais: !!(o.livraison && Number(o.livraison.frais) > 0),
+        fraisLabel: o.livraison ? fmtFcfa(o.livraison.frais) : '',
+        prixArticlesLabel: fmtFcfa((Number(o.total) || 0) - (o.livraison && Number(o.livraison.frais) > 0 ? Number(o.livraison.frais) : 0)),
+        transporteurLabel: o.transporteur || '—',
+        dateExpeditionLabel: o.dateExpedition ? fmtIsoDate(o.dateExpedition) : '',
         clientLabel: o.client || 'Client non renseigné',
         clientLine: (o.client || 'Client non renseigné') + ' · ' + canalLabel,
         totalLabel: fmtFcfa(o.total), dateLabel: fmtIsoDate(o.dateIso),
@@ -2555,7 +2580,8 @@ class Component extends DCLogic {
     // Commande en ligne : seuls statut et code de suivi sont à la main du BO — le reste vient de la cliente.
     const orderDirty = !!viewOrder && (() => {
       const d = s.orderDraft;
-      const core = d.statut!==viewOrder.statut || d.tracking.trim()!==(viewOrder.tracking||'');
+      const core = d.statut!==viewOrder.statut || d.tracking.trim()!==(viewOrder.tracking||'') ||
+        d.transporteur.trim()!==(viewOrder.transporteur||'') || d.dateExpedition!==(viewOrder.dateExpedition||'');
       if (viewOrder.isOnline) return core;
       return core || d.client.trim()!==(viewOrder.client||'') || d.email.trim()!==(viewOrder.email||'') ||
         d.telephone.trim()!==(viewOrder.telephone||'') || d.evenement.trim()!==(viewOrder.evenement||'') ||
@@ -2923,9 +2949,10 @@ class Component extends DCLogic {
         return base + ' · dont ' + horsSite + ' hors site';
       })(),
       exportOrdersCsv: () => this.downloadCsv('commandes-carole-sessegnon.csv',
-        [['N° de commande','Canal','Événement','Client','E-mail','Téléphone','Pièces','Total (FCFA)','Date','Paiement','Réception','Code de suivi','Statut','Civilité','Adresse de livraison','Code postal','E-mail destinataire','Téléphone destinataire','Cadeaux (par pièce)']]
-          .concat(decOrders.map(o => [o.no,o.canalLabel,o.evenement||'',o.client||'',o.email||'',o.telephone||'',o.items,o.total,o.dateIso,o.paiement||'',o.mode||'',o.tracking||'',ORDER_STATUT_LABEL[o.statut],
-            o.civiliteLabel,o.livraisonLabel,o.livraisonCodePostal,o.livraisonEmail,o.livraisonTelephone,
+        [['N° de commande','Canal','Événement','Client','E-mail','Téléphone','Pièces','Prix du sac (FCFA)','Frais de livraison (FCFA)','Total (FCFA)','Date','Paiement','Réception','Code de suivi','Transporteur','Date d\'expédition','Statut','Civilité','Nom du destinataire','Adresse de livraison','Code postal','E-mail destinataire','Téléphone destinataire','Cadeaux (par pièce)']]
+          .concat(decOrders.map(o => [o.no,o.canalLabel,o.evenement||'',o.client||'',o.email||'',o.telephone||'',o.items,
+            o.livraison ? (Number(o.total)||0) - (Number(o.livraison.frais)||0) : o.total, o.livraison ? (Number(o.livraison.frais)||0) : '', o.total,o.dateIso,o.paiement||'',o.mode||'',o.tracking||'',o.transporteur||'',o.dateExpedition||'',ORDER_STATUT_LABEL[o.statut],
+            o.civiliteLabel,o.livraisonNom,o.livraisonLabel,o.livraisonCodePostal,o.livraisonEmail,o.livraisonTelephone,
             o.gifts.map(g => g.modele + ' : ' + (g.isVierge ? 'carte vierge' : g.message)).join(' | ')]))),
       openVente: () => this.go('vente-form', {vente:this._emptyVente(), venteErr:{}, venteSearch:'', venteStep:0, venteMax:0}),
       viewOrder: viewOrder || {},
@@ -2938,7 +2965,7 @@ class Component extends DCLogic {
         montant: (s.orderErr||{}).montant ? FIELD_ERR : FIELD_OK
       },
       // Le moteur de template ne lit que des chemins ({{ a.b }}) : un handler par champ, pas d'appel setDraft('x').
-      setDraft: Object.fromEntries(['statut','tracking','client','email','telephone','evenement','montant','paiement','note','dateIso'].map(key => [key, e => {
+      setDraft: Object.fromEntries(['statut','tracking','transporteur','dateExpedition','client','email','telephone','evenement','montant','paiement','note','dateIso'].map(key => [key, e => {
         const v = e.target.value;
         this.setState(st => {
           const oe = Object.assign({}, st.orderErr); delete oe[key];
@@ -2950,8 +2977,8 @@ class Component extends DCLogic {
         if (!orderDirty) return;
         const raw = s.orderDraft;
         const o = viewOrder;
-        // Commande en ligne : les informations de la cliente ne se modifient pas depuis le BO, seuls statut et suivi le sont.
-        let d = {statut:raw.statut, tracking:raw.tracking.trim()};
+        // Commande en ligne : les informations de la cliente ne se modifient pas depuis le BO, seuls statut, suivi, transporteur et date d'expédition le sont.
+        let d = {statut:raw.statut, tracking:raw.tracking.trim(), transporteur:raw.transporteur.trim(), dateExpedition:raw.dateExpedition};
         if (!o.isOnline) {
           const err = {};
           if (raw.email.trim() && !EMAIL_RE.test(raw.email.trim())) err.email = 'Adresse e-mail invalide.';
@@ -2976,6 +3003,9 @@ class Component extends DCLogic {
           else if (o.statut==='annulee' && d.statut!=='annulee') this.logAudit('Commande réactivée — ' + o.no + ' : pièces repassées en « Vendue » (' + piecesTxt + ')');
           else if (d.statut!==o.statut) this.logAudit('Statut modifié — commande ' + o.no + ' : ' + ORDER_STATUT_LABEL[o.statut] + ' → ' + ORDER_STATUT_LABEL[d.statut]);
           if (d.tracking!==(o.tracking||'')) this.logAudit('Code de suivi saisi — commande ' + o.no);
+          if (d.transporteur!==(o.transporteur||'') || d.dateExpedition!==(o.dateExpedition||'')) {
+            this.logAudit('Expédition renseignée — commande ' + o.no + (d.transporteur ? ' : ' + d.transporteur : '') + (d.dateExpedition ? ', le ' + fmtIsoDate(d.dateExpedition) : ''));
+          }
           const detailsChanged = !o.isOnline && (['client','email','telephone','evenement','paiement','note','dateIso'].some(k => d[k]!==(o[k]||'')) || d.total!==o.total);
           if (detailsChanged) this.logAudit('Commande modifiée — ' + o.no + ' (client, montant, paiement ou autre détail)');
           this.showFlash('Commande ' + o.no + ' mise à jour.');
@@ -3044,23 +3074,32 @@ class Component extends DCLogic {
         const v = s.vente || this._emptyVente();
         const ve = s.venteErr || {};
         const vq = s.venteSearch.trim().toLowerCase();
-        const avail = decPieces.filter(p => p.eff==='disponible');
-        const list = avail.filter(p => v.pieceIds.includes(p.id) || !vq || (p.modele+' '+p.serie+' '+(p.reference||'')).toLowerCase().includes(vq));
+        // Tout le registre est visible ici, pas seulement le disponible : les autres pièces sont grisées,
+        // avec leur motif, pour qu'on comprenne pourquoi elles ne peuvent pas rejoindre cette vente.
+        const NON_SELLABLE_NOTE = {reserve:'Réservée en fabrication', vendue:'Déjà vendue', bientot:'Bientôt disponible', prototype:'Prototype, hors vente', offerte:'Offerte, hors vente'};
+        const list = decPieces
+          .filter(p => v.pieceIds.includes(p.id) || !vq || (p.modele+' '+p.serie+' '+(p.reference||'')+' '+(p.couleur||'')).toLowerCase().includes(vq))
+          .sort((a,b) => (a.eff==='disponible')===(b.eff==='disponible') ? 0 : (a.eff==='disponible' ? -1 : 1));
         const selected = v.pieceIds.map(id => decPieces.find(p => p.id===id)).filter(Boolean);
         const suggested = selected.reduce((t,p) => t + (Number(p.prix) || 0), 0);
         const total = String(v.montant).trim()!=='' ? Number(v.montant) : suggested;
         const step = s.venteStep || 0, vMax = Math.max(s.venteMax || 0, step);
         return {
-          ventePieces: list.map(p => ({...p, checked: v.pieceIds.includes(p.id),
-            bg: v.pieceIds.includes(p.id) ? 'rgb(255,251,248)' : 'rgb(255,255,255)',
-            sub: p.serie + (p.couleur ? ' · ' + p.couleur : ''),
-            toggle: () => this.setState(st => {
-              const ids = st.vente.pieceIds.includes(p.id) ? st.vente.pieceIds.filter(x => x!==p.id) : st.vente.pieceIds.concat([p.id]);
-              const err = Object.assign({}, st.venteErr); delete err.pieces;
-              return {vente:Object.assign({}, st.vente, {pieceIds:ids}), venteErr:err};
-            })})),
+          ventePieces: list.map(p => {
+            const sellable = p.eff==='disponible';
+            return {...p, checked: v.pieceIds.includes(p.id), sellable, notSellable: !sellable,
+              statutNote: NON_SELLABLE_NOTE[p.eff] || '',
+              bg: v.pieceIds.includes(p.id) ? 'rgb(255,251,248)' : 'rgb(255,255,255)',
+              rowOpacity: sellable ? 1 : .45,
+              sub: p.serie + (p.couleur ? ' · ' + p.couleur : ''),
+              toggle: sellable ? () => this.setState(st => {
+                const ids = st.vente.pieceIds.includes(p.id) ? st.vente.pieceIds.filter(x => x!==p.id) : st.vente.pieceIds.concat([p.id]);
+                const err = Object.assign({}, st.venteErr); delete err.pieces;
+                return {vente:Object.assign({}, st.vente, {pieceIds:ids}), venteErr:err};
+              }) : () => {}};
+          }),
           noVentePieces: list.length===0,
-          noVentePiecesText: avail.length ? 'Aucune pièce disponible ne correspond à ce filtre.' : 'Aucune pièce n\'est disponible à la vente dans le registre.',
+          noVentePiecesText: 'Aucune pièce du registre ne correspond à ce filtre.',
           ventePiecesShadow: ve.pieces ? 'inset 0 0 0 2px rgb(155,24,33)' : 'inset 0 0 0 1px rgba(0,0,0,.12)',
           venteSelected: selected, venteNoneSelected: selected.length===0,
           venteSuggested: suggested ? fmtNumber(suggested) : 'Ex. 420 000',
