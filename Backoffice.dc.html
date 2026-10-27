@@ -939,7 +939,10 @@
               <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Pièces</span>
                 <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
                   <sc-for list="{{ viewOrder.pieces }}" as="vp" hint-placeholder-count="1">
-                    <button type="button" onClick="{{ vp.open }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);text-align:left;font-family:inherit;font-size:14px;text-align:right">{{ vp.label }}</button>
+                    <span style="display:flex;align-items:center;gap:8px">
+                      <sc-if value="{{ vp.hasGift }}"><span aria-label="Cadeau" title="Cadeau" style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:3px 7px;background:rgb(255,251,248);color:rgb(71,29,27);box-shadow:inset 0 0 0 1px rgb(71,29,27)">Cadeau</span></sc-if>
+                      <button type="button" onClick="{{ vp.open }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);text-align:left;font-family:inherit;font-size:14px;text-align:right">{{ vp.label }}</button>
+                    </span>
                   </sc-for>
                 </div>
               </div>
@@ -952,13 +955,21 @@
               <sc-if value="{{ viewOrder.hasLivraison }}">
                 <sc-if value="{{ viewOrder.civiliteLabel }}"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Civilité</span><span style="text-align:right;max-width:70%">{{ viewOrder.civiliteLabel }}</span></div></sc-if>
                 <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Adresse de livraison</span><span style="text-align:right;max-width:70%">{{ viewOrder.livraisonLabel }}</span></div>
+                <sc-if value="{{ viewOrder.livraisonCodePostal }}"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Code postal</span><span style="text-align:right">{{ viewOrder.livraisonCodePostal }}</span></div></sc-if>
+                <sc-if value="{{ viewOrder.livraisonEmail }}"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">E-mail du destinataire</span><span style="overflow-wrap:anywhere;text-align:right">{{ viewOrder.livraisonEmail }}</span></div></sc-if>
+                <sc-if value="{{ viewOrder.livraisonTelephone }}"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Téléphone du destinataire</span><span style="text-align:right">{{ viewOrder.livraisonTelephone }}</span></div></sc-if>
               </sc-if>
               <sc-if value="{{ viewOrder.hasGift }}">
-                <div style="margin-top:14px;padding:16px 18px;background:rgb(255,251,248);box-shadow:inset 0 0 0 1px rgb(71,29,27)">
-                  <p style="margin:0 0 6px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(71,29,27)">Cadeau · à glisser dans le coffret</p>
-                  <sc-if value="{{ viewOrder.giftTo }}"><p style="margin:0 0 8px;font-size:13px;color:rgb(94,94,94)">Pour {{ viewOrder.giftTo }}</p></sc-if>
-                  <p style="margin:0;font-family:var(--font-display);font-size:17px;line-height:1.5;color:rgb(71,29,27);white-space:pre-wrap;overflow-wrap:anywhere">{{ viewOrder.giftMessage }}</p>
-                </div>
+                <sc-for list="{{ viewOrder.gifts }}" as="g" hint-placeholder-count="1">
+                  <div style="margin-top:14px;padding:16px 18px;background:rgb(255,251,248);box-shadow:inset 0 0 0 1px rgb(71,29,27)">
+                    <p style="margin:0 0 6px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(71,29,27)">Cadeau · {{ g.modele }} ({{ g.serie }})</p>
+                    <sc-if value="{{ g.isVierge }}"><p style="margin:0;font-size:14px;color:rgb(94,94,94);font-style:italic">Carte vierge — le mot sera écrit à la main par le client.</p></sc-if>
+                    <sc-if value="{{ g.isMessage }}">
+                      <sc-if value="{{ g.to }}"><p style="margin:0 0 8px;font-size:13px;color:rgb(94,94,94)">Pour {{ g.to }}</p></sc-if>
+                      <p style="margin:0;font-family:var(--font-display);font-size:17px;line-height:1.5;color:rgb(71,29,27);white-space:pre-wrap;overflow-wrap:anywhere">{{ g.message }}</p>
+                    </sc-if>
+                  </div>
+                </sc-for>
               </sc-if>
               <div style="border-top:1px solid rgba(0,0,0,.08)"></div>
             </div>
@@ -1046,15 +1057,17 @@
               <sc-if value="{{ isVenteStep2 }}">
                 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:16px">
                   <label style="display:block;font-size:13px;color:rgb(70,70,70)">Nom
-                    <input value="{{ vente.client }}" onChange="{{ setVente.client }}" autocomplete="off" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+                    <input value="{{ vente.client }}" onChange="{{ setVente.client }}" autocomplete="off" aria-required="true" aria-invalid="{{ venteInvalid.client }}" aria-describedby="err-vente-client" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:{{ venteShadow.client }};color:rgb(0,0,0)">
+                    <sc-if value="{{ venteErr.client }}"><span id="err-vente-client" style="display:block;margin-top:6px;font-size:12px;color:rgb(155,24,33)">{{ venteErr.client }}</span></sc-if>
                   </label>
-                  <label style="display:block;font-size:13px;color:rgb(70,70,70)">E-mail
+                  <label style="display:block;font-size:13px;color:rgb(70,70,70)">E-mail (facultatif)
                     <input type="email" value="{{ vente.email }}" onChange="{{ setVente.email }}" autocomplete="off" aria-invalid="{{ venteInvalid.email }}" aria-describedby="err-vente-email" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:{{ venteShadow.email }};color:rgb(0,0,0)">
                     <sc-if value="{{ venteErr.email }}"><span id="err-vente-email" style="display:block;margin-top:6px;font-size:12px;color:rgb(155,24,33)">{{ venteErr.email }}</span></sc-if>
                   </label>
                 </div>
                 <label style="display:block;font-size:13px;color:rgb(70,70,70)">Téléphone
-                  <input type="tel" value="{{ vente.telephone }}" onChange="{{ setVente.telephone }}" autocomplete="off" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+                  <input type="tel" value="{{ vente.telephone }}" onChange="{{ setVente.telephone }}" autocomplete="off" aria-required="true" aria-invalid="{{ venteInvalid.telephone }}" aria-describedby="err-vente-telephone" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:{{ venteShadow.telephone }};color:rgb(0,0,0)">
+                  <sc-if value="{{ venteErr.telephone }}"><span id="err-vente-telephone" style="display:block;margin-top:6px;font-size:12px;color:rgb(155,24,33)">{{ venteErr.telephone }}</span></sc-if>
                 </label>
               </sc-if>
               <sc-if value="{{ isVenteStep3 }}">
@@ -1080,7 +1093,6 @@
               <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;padding-top:18px;border-top:1px solid rgba(0,0,0,.08)">
                 <sc-if value="{{ venteHasPrev }}"><button type="button" onClick="{{ ventePrev }}" style="height:46px;padding:0 22px;background:none;border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);cursor:pointer;font-size:13px;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;color:rgb(0,0,0)">← Retour</button></sc-if>
                 <div style="display:flex;flex-wrap:wrap;align-items:center;gap:16px;margin-left:auto">
-                  <sc-if value="{{ isVenteStep2 }}"><button type="button" onClick="{{ venteSkipClient }}" style="background:none;border:0;padding:0;cursor:pointer;font-size:14px;color:rgb(94,94,94);text-decoration:underline;text-underline-offset:3px">Passer</button></sc-if>
                   <sc-if value="{{ venteIsLast }}"><x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="primary" dc-props="{{ btnUpperSm }}" hint-size="auto,46px">Enregistrer la vente</x-import></sc-if>
                   <sc-if value="{{ venteNotLast }}"><x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="primary" dc-props="{{ btnUpperSm }}" hint-size="auto,46px">Continuer →</x-import></sc-if>
                 </div>
@@ -1508,11 +1520,13 @@ const SEED_PIECES = [
 // Chaque commande, en ligne ou hors site, désigne les pièces vendues par leur id.
 const SEED_ORDERS = [
   {id:'o5', no:'#CS-2026-9530', canal:'en_ligne', evenement:'', client:'Koffi Yao', email:'koffi.yao@exemple.ci', telephone:'', pieceIds:['p2'], total:380000, dateIso:'2026-09-21', mode:'Livraison à domicile', paiement:'Mobile Money', statut:'preparation', tracking:'', note:'',
-   livraison:{civilite:'M.', adresse:'Cocody Angré, 8e tranche, villa 12', ville:'Abidjan', pays:'Côte d\'Ivoire'},
-   gift:{to:'Aya', message:'Joyeux anniversaire, Aya. Que ce bijou t\'accompagne longtemps. Avec toute mon affection, Koffi.'}},
+   livraison:{civilite:'M.', adresse:'Cocody Angré, 8e tranche, villa 12', ville:'Abidjan', pays:'Côte d\'Ivoire', email:'aya.destinataire@exemple.ci', telephone:'+225 07 08 09 10 11'},
+   giftByPiece:{p2:{kind:'message', to:'Aya', message:'Joyeux anniversaire, Aya. Que ce bijou t\'accompagne longtemps. Avec toute mon affection, Koffi.'}}},
   {id:'o1', no:'#CS-2026-9482', canal:'en_ligne', evenement:'', client:'Awa Koné', email:'awa.kone@exemple.ci', telephone:'', pieceIds:['p1'], total:420000, dateIso:'2026-09-02', mode:'Livraison à domicile', paiement:'Carte bancaire', statut:'livree', tracking:'CIP-2093-AB', note:'',
-   livraison:{civilite:'Mme', adresse:'Riviera Palmeraie, rue des Jasmins', ville:'Abidjan', pays:'Côte d\'Ivoire'}, gift:null},
-  {id:'o2', no:'#CS-2026-9120', canal:'en_ligne', evenement:'', client:'Marie Lefèvre', email:'marie.lefevre@exemple.fr', telephone:'', pieceIds:['p7'], total:510000, dateIso:'2026-07-14', mode:'Livraison internationale', paiement:'Carte bancaire', statut:'livree', tracking:'DHL-5521-FR', note:''},
+   livraison:{civilite:'Mme', adresse:'Riviera Palmeraie, rue des Jasmins', ville:'Abidjan', pays:'Côte d\'Ivoire', codePostal:'', telephone:'+225 07 12 13 14 15'},
+   giftByPiece:{p1:{kind:'vierge'}}},
+  {id:'o2', no:'#CS-2026-9120', canal:'en_ligne', evenement:'', client:'Marie Lefèvre', email:'marie.lefevre@exemple.fr', telephone:'', pieceIds:['p7'], total:510000, dateIso:'2026-07-14', mode:'Livraison internationale', paiement:'Carte bancaire', statut:'livree', tracking:'DHL-5521-FR', note:'',
+   livraison:{civilite:'Mme', adresse:'12 rue des Lilas', ville:'Lyon', pays:'France', codePostal:'69003', telephone:'+33 6 12 34 56 78'}},
   {id:'o3', no:'#CS-2026-9051', canal:'popup', evenement:'Pop-up Dakar — Almadies', client:'Fatou Diop', email:'fatou.diop@exemple.sn', telephone:'+221 77 000 00 00', pieceIds:['p8'], total:300000, dateIso:'2026-07-02', mode:'Remise en main propre', paiement:'Espèces', statut:'livree', tracking:'', note:''},
   {id:'o4', no:'#CS-2026-8990', canal:'en_ligne', evenement:'', client:'Julien Petit', email:'julien.petit@exemple.fr', telephone:'', pieceIds:['p6'], total:340000, dateIso:'2026-06-20', mode:'Livraison à domicile', paiement:'Carte bancaire', statut:'annulee', tracking:'', note:'Annulée à la demande du client avant expédition.'}
 ];
@@ -1586,7 +1600,7 @@ const CANAL_LABEL = {en_ligne:'En ligne', popup:'Pop-up', directe:'Vente directe
 const VENTE_STEPS = [
   {label:'Pièces', hint:'Cochez les pièces vendues. Elles passeront en « Vendue » à l\'enregistrement.', fields:['pieces']},
   {label:'Contexte', hint:'Pré-rempli avec une vente pop-up datée d\'aujourd\'hui.', fields:[]},
-  {label:'Client', hint:'Facultatif : utile pour le suivi après-vente.', fields:['email']},
+  {label:'Client', hint:'Nom et téléphone obligatoires pour le suivi après-vente ; e-mail facultatif.', fields:['client','telephone','email']},
   {label:'Paiement', hint:'Vérifiez le montant encaissé avant d\'enregistrer.', fields:['montant']},
 ];
 const SAV_LABEL = {en_reparation:'En réparation', reparee:'Réparée', irreparable:'Irréparable', remplacee:'Remplacée', remboursee:'Remboursée', restituee:'Restituée'};
@@ -2108,19 +2122,31 @@ class Component extends DCLogic {
         itemList: ps.length ? ps.map(p => ({label: p ? p.modele + ' (' + p.serie + ')' : 'Pièce supprimée'})) : [{label:'—'}],
         subline: canalLabel + (o.evenement ? ' · ' + o.evenement : '') + ' · ' + fmtIsoDate(o.dateIso),
         kindLabel: o.canal==='en_ligne' ? 'Commande en ligne' : 'Vente hors site',
-        hasGift: !!(o.gift && o.gift.message),
-        giftMessage: o.gift ? (o.gift.message || '') : '',
-        giftTo: o.gift ? (o.gift.to || '') : '',
+        // Une carte cadeau par pièce (ligne de commande), pas une carte unique pour toute la commande.
+        gifts: ps.filter(Boolean).map(p => {
+          const g = (o.giftByPiece || {})[p.id];
+          if (!g) return null;
+          return {modele: p.modele, serie: p.serie,
+            isVierge: g.kind==='vierge', isMessage: g.kind!=='vierge' && !!(g.message||'').trim(),
+            message: g.message || '', to: g.to || ''};
+        }).filter(Boolean),
+        hasGift: ps.some(p => p && o.giftByPiece && o.giftByPiece[p.id]),
         hasLivraison: !!o.livraison,
         livraisonLabel: o.livraison ? [o.livraison.adresse, o.livraison.ville, o.livraison.pays].filter(Boolean).join(', ') : '',
         civiliteLabel: o.livraison ? (o.livraison.civilite || '') : '',
+        livraisonEmail: o.livraison ? (o.livraison.email || '') : '',
+        livraisonTelephone: o.livraison ? (o.livraison.telephone || '') : '',
+        livraisonCodePostal: o.livraison ? (o.livraison.codePostal || '') : '',
         clientLabel: o.client || 'Client non renseigné',
         clientLine: (o.client || 'Client non renseigné') + ' · ' + canalLabel,
         totalLabel: fmtFcfa(o.total), dateLabel: fmtIsoDate(o.dateIso),
         paiementLabel: o.paiement || '—',
         trackingLabel: o.tracking || '—',
         detailLabel: 'Détail de la commande ' + o.no,
-        pieces: ps.filter(Boolean).map(p => ({label: pieceLabel(p), open: () => viewPiece(p)})),
+        pieces: ps.filter(Boolean).map(p => {
+          const g = (o.giftByPiece || {})[p.id];
+          return {label: pieceLabel(p), open: () => viewPiece(p), hasGift: !!g};
+        }),
         open: () => openOrder(o)};
     });
     const oSq = s.orderSearch.trim().toLowerCase();
@@ -2492,8 +2518,10 @@ class Component extends DCLogic {
         return base + ' · dont ' + horsSite + ' hors site';
       })(),
       exportOrdersCsv: () => this.downloadCsv('commandes-carole-sessegnon.csv',
-        [['N° de commande','Canal','Événement','Client','E-mail','Téléphone','Pièces','Total (FCFA)','Date','Paiement','Réception','Code de suivi','Statut','Civilité','Adresse de livraison','Message cadeau','Destinataire du cadeau']]
-          .concat(decOrders.map(o => [o.no,o.canalLabel,o.evenement||'',o.client||'',o.email||'',o.telephone||'',o.items,o.total,o.dateIso,o.paiement||'',o.mode||'',o.tracking||'',ORDER_STATUT_LABEL[o.statut],o.civiliteLabel,o.livraisonLabel,o.giftMessage,o.giftTo]))),
+        [['N° de commande','Canal','Événement','Client','E-mail','Téléphone','Pièces','Total (FCFA)','Date','Paiement','Réception','Code de suivi','Statut','Civilité','Adresse de livraison','Code postal','E-mail destinataire','Téléphone destinataire','Cadeaux (par pièce)']]
+          .concat(decOrders.map(o => [o.no,o.canalLabel,o.evenement||'',o.client||'',o.email||'',o.telephone||'',o.items,o.total,o.dateIso,o.paiement||'',o.mode||'',o.tracking||'',ORDER_STATUT_LABEL[o.statut],
+            o.civiliteLabel,o.livraisonLabel,o.livraisonCodePostal,o.livraisonEmail,o.livraisonTelephone,
+            o.gifts.map(g => g.modele + ' : ' + (g.isVierge ? 'carte vierge' : g.message)).join(' | ')]))),
       openVente: () => this.go('vente-form', {vente:this._emptyVente(), venteErr:{}, venteSearch:'', venteStep:0, venteMax:0}),
       viewOrder: viewOrder || {},
       orderDraft: s.orderDraft,
@@ -2582,8 +2610,8 @@ class Component extends DCLogic {
           venteSuggested: suggested ? fmtNumber(suggested) : 'Ex. 420 000',
           venteTotalLabel: fmtFcfa(isNaN(total) ? 0 : total),
           venteErr: ve,
-          venteInvalid: {email:!!ve.email, montant:!!ve.montant},
-          venteShadow: {email: ve.email ? FIELD_ERR : FIELD_OK, montant: ve.montant ? FIELD_ERR : FIELD_OK},
+          venteInvalid: {client:!!ve.client, telephone:!!ve.telephone, email:!!ve.email, montant:!!ve.montant},
+          venteShadow: {client: ve.client ? FIELD_ERR : FIELD_OK, telephone: ve.telephone ? FIELD_ERR : FIELD_OK, email: ve.email ? FIELD_ERR : FIELD_OK, montant: ve.montant ? FIELD_ERR : FIELD_OK},
           // Stepper : on ne peut rouvrir que les étapes déjà atteintes
           venteSteps: VENTE_STEPS.map((st, i) => ({
             num: String(i + 1).padStart(2, '0'), label: st.label,
@@ -2597,12 +2625,13 @@ class Component extends DCLogic {
           isVenteStep0: step===0, isVenteStep1: step===1, isVenteStep2: step===2, isVenteStep3: step===3,
           venteHasPrev: step>0, venteIsLast: step===3, venteNotLast: step<3,
           ventePrev: () => this.setState({venteStep:Math.max(0, step - 1), venteErr:{}}),
-          venteSkipClient: () => this.setState(st => ({vente:Object.assign({}, st.vente, {client:'', email:'', telephone:''}), venteErr:{}, venteStep:3, venteMax:3})),
           saveVente: e => {
             e.preventDefault();
             const err = {};
             const ids = v.pieceIds.filter(id => { const p = pieceById(id); return p && effStatut(p, s.orders)==='disponible'; });
             if (!ids.length) err.pieces = 'Sélectionnez au moins une pièce vendue.';
+            if (!v.client.trim()) err.client = 'Indiquez le nom du client.';
+            if (!v.telephone.trim()) err.telephone = 'Indiquez le numéro de téléphone du client.';
             if (v.email.trim() && !EMAIL_RE.test(v.email.trim())) err.email = 'Adresse e-mail invalide.';
             if (String(v.montant).trim()!=='' && !(Number(v.montant) >= 0)) err.montant = 'Indiquez un montant en FCFA (chiffres uniquement).';
             // Avant la dernière étape, « Continuer » ne vérifie que l'étape affichée
