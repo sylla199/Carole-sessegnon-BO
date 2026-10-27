@@ -730,6 +730,7 @@
             <div style="display:flex;flex-direction:column;gap:14px">
               <x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="primary" onClick="{{ viewPiece.edit }}" dc-props="{{ btnBlock }}" hint-size="100%,58px">Modifier la pièce</x-import>
               <x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="secondary" onClick="{{ viewPiece.print }}" dc-props="{{ btnBlock }}" hint-size="100%,58px">Imprimer le certificat</x-import>
+              <x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="secondary" onClick="{{ viewPiece.makeLot }}" dc-props="{{ btnBlock }}" hint-size="100%,58px">Générer un lot à partir de cette pièce</x-import>
               <button type="button" onClick="{{ viewPiece.remove }}" style="background:none;border:0;padding:12px 0;color:rgb(155,24,33);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(155,24,33);align-self:flex-start">Supprimer cette pièce</button>
             </div>
           </div>
@@ -740,6 +741,13 @@
           <form onSubmit="{{ generateLot }}" noValidate style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:clamp(22px,3vw,32px);display:flex;flex-direction:column;gap:18px;max-width:640px">
             <p style="margin:0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">Préparer un lot avant fabrication</p>
             <p style="margin:0;font-size:13px;line-height:20px;color:rgb(94,94,94)">Les numéros de série et codes d'activation sont générés automatiquement, à la suite des derniers émis : aucun doublon possible, même en plusieurs lots séparés dans le temps. Chaque pièce entre au registre avec le statut « Réservée (en fabrication) » et n'apparaît pas à la vente tant qu'elle n'est pas reçue de l'atelier.</p>
+            <label style="display:block;font-size:13px;color:rgb(70,70,70)">Partir d'une pièce existante <span style="color:rgb(94,94,94)">(facultatif)</span>
+              <select value="{{ lotSource }}" onChange="{{ onLotSource }}" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+                <option value="">Nouveau modèle (formulaire vide)</option>
+                <sc-for list="{{ lotSources }}" as="src"><option value="{{ src.value }}">{{ src.label }}</option></sc-for>
+              </select>
+              <sc-if value="{{ lotSourceNote }}"><span style="display:block;margin-top:6px;font-size:12px;line-height:18px;color:rgb(94,94,94)">{{ lotSourceNote }}</span></sc-if>
+            </label>
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:16px">
               <label style="display:block;font-size:13px;color:rgb(70,70,70)">Modèle
                 <input value="{{ lotForm.modele }}" onChange="{{ setLot.modele }}" aria-invalid="{{ lotInvalid.modele }}" aria-describedby="err-lot-modele" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:{{ lotShadow.modele }};color:rgb(0,0,0)">
@@ -2005,7 +2013,7 @@ class Component extends DCLogic {
     viewOrderId:null, orderDraft:{statut:'', tracking:''}, orderErr:{}, orderDeleteOpen:false, orderDeleteReason:'',
     editId:null, form:this._emptyForm(), fieldErr:{}, codeRevealed:false, photoBusy:false, photoErr:'', photoNotice:null, videoBusy:false, videoErr:'',
     viewPieceId:null, pieceCodeRevealed:false, qrOnlyId:null, viewPhotoIndex:0,
-    lotForm:this._emptyLot(), lotErr:{},
+    lotForm:this._emptyLot(), lotErr:{}, lotSource:'',
     flash:'', flashAction:null, saveWarn:false, lotFocus:null, confirm:null,
     meId:ME_ID, invite:null,
     acceptToken:'', accept:this._emptyAccept()
@@ -2268,6 +2276,13 @@ class Component extends DCLogic {
     this.setState(s2 => ({pieces:s2.pieces.filter(p => p.lotId!==lotId), serieMax: (s2.serieMax[key] || 0)===counter ? Object.assign({}, s2.serieMax, {[key]:prevMax}) : s2.serieMax, lotFocus:null}), () => this.persist());
     this.logAudit('Lot annulé — ' + mine.length + ' × ' + mine[0].modele + ' (' + (first===last ? first : first + ' → ' + last) + ')' + (reusable ? ' ; numéros remis à disposition' : ' ; numéros non réutilisés'));
     this.showFlash('Lot annulé : ' + mine.length + (mine.length>1 ? ' pièces retirées' : ' pièce retirée') + (reusable ? ', numéros de série remis à disposition.' : '. Les numéros de série restent consommés (d\'autres pièces ont été créées depuis).'), 7000);
+  }
+
+  // Pré-remplit le lot depuis une pièce existante : tout sauf numéro, code, photos et vidéo (générés ou propres à chaque exemplaire).
+  lotFromPiece(p){
+    const c = p.couleur || '';
+    return Object.assign(this._emptyLot(), {modele:p.modele || '', reference:p.reference || '', matiere:p.matiere || '', prix:p.prix===undefined ? '' : p.prix, couleur:c,
+      variants:[{couleur:c, quantite:'', prix:''}]});
   }
 
   // Plusieurs couleurs dans le même lot : une ligne par variante, sa propre quantité, son propre prix si besoin.
@@ -2616,7 +2631,7 @@ class Component extends DCLogic {
           this.setState(st => ({seuils: Object.assign({}, st.seuils, {[r.key]:v})}), () => this.persist());
           this.logAudit('Seuil de stock — ' + r.modele + ' · ' + r.couleur + ' : ' + v);
         },
-        makeLot: () => this.go('lot-form', {lotForm:(() => { const c = r.couleur === 'Sans couleur précisée' ? '' : r.couleur; return Object.assign(this._emptyLot(), {modele:r.modele, couleur:c, variants:[{couleur:c, quantite:'', prix:''}]}); })(), lotErr:{}})};
+        makeLot: () => this.go('lot-form', {lotForm:(() => { const c = r.couleur === 'Sans couleur précisée' ? '' : r.couleur; return Object.assign(this._emptyLot(), {modele:r.modele, couleur:c, variants:[{couleur:c, quantite:'', prix:''}]}); })(), lotErr:{}, lotSource:''})};
     }).sort((a,b) => ({rupture:0, bas:1, ok:2})[a.level] - ({rupture:0, bas:1, ok:2})[b.level] || a.modele.localeCompare(b.modele) || a.couleur.localeCompare(b.couleur));
     const stockRupture = stockRows.filter(r => r.level==='rupture').length;
     const stockBas = stockRows.filter(r => r.level==='bas').length;
@@ -3212,7 +3227,7 @@ class Component extends DCLogic {
       })(),
       newPiece: () => this.go('piece-form', {editId:null, fieldErr:{}, codeRevealed:false,
         form:Object.assign(this._emptyForm(), {autoIds:true, serie:'', code:genCode(s.pieces)})}),
-      openLot: () => this.go('lot-form', {lotForm:this._emptyLot(), lotErr:{}}),
+      openLot: () => this.go('lot-form', {lotForm:this._emptyLot(), lotErr:{}, lotSource:''}),
       printQrSheet: () => { try { window.print(); } catch(e) {} },
       qrPieces: (() => {
         if (s.route!=='qr-sheet') return [];
@@ -3423,11 +3438,25 @@ class Component extends DCLogic {
           sav: savSorted(p).map(e => decSav(p, e)), hasSav: (p.sav||[]).length>0,
           edit: () => openPieceEdit(p),
           print: () => this.go('qr-sheet', {qrOnlyId:p.id}),
+          makeLot: () => this.go('lot-form', {lotForm:this.lotFromPiece(p), lotErr:{}, lotSource:p.modele + '|' + (p.couleur || '')}),
           remove: () => this.deletePieceConfirm(p)};
       })(),
 
       // Lot de pièces (identifiants préparés en amont de la fabrication)
       lotForm: s.lotForm || this._emptyLot(),
+      lotSource: s.lotSource || '',
+      lotSources: (() => {
+        const seen = new Set();
+        return s.pieces.slice().reverse().filter(p => { const k = p.modele + '|' + (p.couleur || ''); if (seen.has(k)) return false; seen.add(k); return !!p.modele; })
+          .sort((a, b) => a.modele.localeCompare(b.modele) || (a.couleur || '').localeCompare(b.couleur || ''))
+          .map(p => ({value:p.modele + '|' + (p.couleur || ''), label:p.modele + (p.couleur ? ' · ' + p.couleur : '')}));
+      })(),
+      onLotSource: e => {
+        const p = s.pieces.slice().reverse().find(x => x.modele + '|' + (x.couleur || '')===e.target.value);
+        this.setState(st => ({lotSource: e.target.value,
+          lotForm: p ? Object.assign(this.lotFromPiece(p), {annee: st.lotForm.annee, quantite: st.lotForm.quantite}) : st.lotForm, lotErr:{}}));
+      },
+      lotSourceNote: (() => { const p = s.pieces.slice().reverse().find(x => x.modele + '|' + (x.couleur || '')===s.lotSource); return p ? 'Repris de « ' + p.modele + (p.couleur ? ' · ' + p.couleur : '') + ' » : modèle, couleur, référence, matière et prix. Les numéros de série, codes d\'activation, photos et vidéo ne sont pas repris.' : ''; })(),
       lotRefPlaceholder: refFromModele((s.lotForm || this._emptyLot()).modele) ? 'Ex. ' + refFromModele((s.lotForm || this._emptyLot()).modele) : 'Ex. HUP',
       lotVariantsView: (s.lotForm || this._emptyLot()).variants.map((row, i) => ({
         couleur:row.couleur, quantite:row.quantite, prix:row.prix,
