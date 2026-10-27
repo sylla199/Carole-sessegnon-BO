@@ -285,11 +285,33 @@
             <p style="margin:0 0 16px;font-size:13px;color:rgb(94,94,94)">Calculé depuis le registre : une pièce vendue en ligne ou hors site sort du stock automatiquement.</p>
             <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,170px),1fr));gap:12px">
               <sc-for list="{{ stockByModel }}" as="m" hint-placeholder-count="5">
-                <div style="padding:14px 16px;background:rgb(252,249,248)">
-                  <p style="margin:0;font-size:14px;color:rgb(0,0,0)">{{ m.modele }}</p>
-                  <p style="margin:6px 0 2px;font-family:var(--font-display);font-size:28px;color:{{ m.numColor }}">{{ m.dispo }}</p>
-                  <p style="margin:0;font-size:12px;color:rgb(94,94,94)">{{ m.detail }}</p>
-                </div>
+                <sc-if value="{{ m.hasVariants }}">
+                  <div style="grid-column:span 2;padding:14px 16px;background:rgb(252,249,248);box-shadow:{{ m.cardShadow }}">
+                    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px">
+                      <p style="margin:0;font-size:14px;color:rgb(0,0,0)">{{ m.modele }}</p>
+                      <sc-if value="{{ m.anyRupture }}"><span style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:3px 7px;background:rgba(155,24,33,.08);color:rgb(155,24,33)">Une couleur en rupture</span></sc-if>
+                    </div>
+                    <div style="margin-top:8px;display:flex;flex-direction:column;gap:6px">
+                      <sc-for list="{{ m.variants }}" as="v" hint-placeholder-count="2">
+                        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;font-size:13px">
+                          <span style="color:{{ v.couleurColor }}">{{ v.couleur }}</span>
+                          <span style="display:flex;align-items:baseline;gap:8px;white-space:nowrap">
+                            <span style="color:rgb(94,94,94);font-variant-numeric:tabular-nums">{{ v.prixLabel }}</span>
+                            <sc-if value="{{ v.rupture }}"><span style="font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:rgb(155,24,33)">Rupture</span></sc-if>
+                            <sc-if value="{{ v.notRupture }}"><span style="font-variant-numeric:tabular-nums;color:rgb(71,29,27)">{{ v.dispo }}</span></sc-if>
+                          </span>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ m.noVariants }}">
+                  <div style="padding:14px 16px;background:rgb(252,249,248)">
+                    <p style="margin:0;font-size:14px;color:rgb(0,0,0)">{{ m.modele }}</p>
+                    <p style="margin:6px 0 2px;font-family:var(--font-display);font-size:28px;color:{{ m.numColor }}">{{ m.dispo }}</p>
+                    <p style="margin:0;font-size:12px;color:rgb(94,94,94)">{{ m.detail }}</p>
+                  </div>
+                </sc-if>
               </sc-for>
             </div>
           </div>
@@ -580,6 +602,34 @@
               </div>
 
               <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:clamp(22px,3vw,32px)">
+                <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:6px">
+                  <p style="margin:0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">Vidéo de la pièce</p>
+                  <span style="font-size:12px;color:rgb(94,94,94)">Facultatif</span>
+                </div>
+                <p style="margin:0 0 16px;font-size:12px;line-height:18px;color:rgb(94,94,94)">Une courte vidéo de présentation, en plus des photos. Elle est enregistrée avec la pièce.</p>
+                <sc-if value="{{ hasVideo }}">
+                  <video src="{{ videoSrc }}" controls preload="metadata" style="width:100%;max-height:260px;display:block;background:rgb(0,0,0)"></video>
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:10px;flex-wrap:wrap">
+                    <span style="font-size:12px;color:rgb(94,94,94);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ videoName }} · {{ videoSizeLabel }}</span>
+                    <div style="display:flex;gap:16px;flex:0 0 auto">
+                      <button type="button" onClick="{{ pickVideo }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:12px;border-bottom:1px solid rgb(71,29,27)">Remplacer</button>
+                      <button type="button" onClick="{{ removeVideo }}" style="background:none;border:0;padding:0;color:rgb(155,24,33);cursor:pointer;font-size:12px;border-bottom:1px solid rgb(155,24,33)">Retirer</button>
+                    </div>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ noVideo }}">
+                  <button type="button" onClick="{{ pickVideo }}" onDragOver="{{ videoDragOver }}" onDrop="{{ videoDrop }}" aria-label="Ajouter une vidéo" style="width:100%;min-height:104px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:rgb(255,251,248);border:0;box-shadow:inset 0 0 0 1px rgba(71,29,27,.45);color:rgb(71,29,27);cursor:pointer;font-family:inherit;font-size:13px;line-height:18px;padding:16px;text-align:center" style-hover="background:rgb(250,241,235)">
+                    <svg aria-hidden="true" width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1"><path d="M3 5.5h12v11H3z"></path><path d="M15 9.5l4-2.5v8l-4-2.5"></path></svg>
+                    <span>{{ addVideoLabel }}</span>
+                  </button>
+                </sc-if>
+                <input id="bo-video-input" type="file" accept="video/mp4,video/webm,video/quicktime" onChange="{{ onVideoFile }}" tabindex="-1" aria-hidden="true" style="display:none">
+                <sc-if value="{{ videoBusy }}"><p role="status" style="margin:14px 0 0;font-size:12px;color:rgb(94,94,94)">Traitement de la vidéo…</p></sc-if>
+                <sc-if value="{{ videoErr }}"><p role="alert" style="margin:14px 0 0;font-size:12px;line-height:18px;color:rgb(155,24,33)">{{ videoErr }}</p></sc-if>
+                <p style="margin:14px 0 0;font-size:12px;line-height:18px;color:rgb(94,94,94)">MP4, WebM ou MOV, jusqu'à {{ videoMaxLabel }}. Démonstration : la vidéo est gardée dans le navigateur le temps de la session.</p>
+              </div>
+
+              <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:clamp(22px,3vw,32px)">
                 <p style="margin:0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);margin-bottom:16px">Aperçu du certificat</p>
                 <div style="position:relative;aspect-ratio:.9;max-width:220px;margin:0 auto;overflow:hidden;border-radius:50%;outline:1px solid oklch(0 0 0 / 0.1);outline-offset:-1px">
                   <sc-if value="{{ hasMainPhoto }}"><img src="{{ mainPhotoSrc }}" alt="{{ mainPhotoAlt }}" style="width:100%;height:100%;object-fit:cover;display:block"></sc-if>
@@ -643,6 +693,10 @@
                     </button>
                   </sc-for>
                 </div>
+              </sc-if>
+
+              <sc-if value="{{ viewPiece.hasVideo }}">
+                <video src="{{ viewPiece.videoSrc }}" controls preload="metadata" style="width:100%;max-height:220px;display:block;background:rgb(0,0,0)"></video>
               </sc-if>
 
               <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Numéro de série</span><span style="font-variant-numeric:tabular-nums">{{ viewPiece.serie }}</span></div>
@@ -996,7 +1050,7 @@
               </sc-if>
               <div style="border-top:1px solid rgba(0,0,0,.08)"></div>
             </div>
-            <form onSubmit="{{ saveOrder }}" style="background:rgb(255,251,248);padding:clamp(22px,3vw,32px);display:flex;flex-direction:column;gap:18px">
+            <form onSubmit="{{ saveOrder }}" noValidate style="background:rgb(255,251,248);padding:clamp(22px,3vw,32px);display:flex;flex-direction:column;gap:18px">
               <p style="margin:0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">Suivi de la commande</p>
               <label for="bo-order-statut" style="display:block;font-size:13px;color:rgb(70,70,70)">Statut
                 <select id="bo-order-statut" value="{{ orderDraft.statut }}" onChange="{{ setDraft.statut }}" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
@@ -1012,10 +1066,67 @@
                 </label>
               </sc-if>
               <p style="margin:0;font-size:12px;line-height:18px;color:rgb(94,94,94)">Tant que la commande n'est pas annulée, ses pièces restent « Vendue ». L'annuler les remet automatiquement en « Disponible ».</p>
+
+              <p style="margin:6px 0 0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">Détails de la commande</p>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:16px">
+                <label style="display:block;font-size:13px;color:rgb(70,70,70)">Client
+                  <input value="{{ orderDraft.client }}" onChange="{{ setDraft.client }}" autocomplete="off" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+                </label>
+                <label style="display:block;font-size:13px;color:rgb(70,70,70)">E-mail
+                  <input type="email" value="{{ orderDraft.email }}" onChange="{{ setDraft.email }}" autocomplete="off" aria-invalid="{{ orderInvalid.email }}" aria-describedby="err-order-email" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:{{ orderShadow.email }};color:rgb(0,0,0)">
+                  <sc-if value="{{ orderErr.email }}"><span id="err-order-email" style="display:block;margin-top:6px;font-size:12px;color:rgb(155,24,33)">{{ orderErr.email }}</span></sc-if>
+                </label>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:16px">
+                <label style="display:block;font-size:13px;color:rgb(70,70,70)">Téléphone
+                  <input type="tel" value="{{ orderDraft.telephone }}" onChange="{{ setDraft.telephone }}" autocomplete="off" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+                </label>
+                <label style="display:block;font-size:13px;color:rgb(70,70,70)">Événement ou lieu
+                  <input value="{{ orderDraft.evenement }}" onChange="{{ setDraft.evenement }}" autocomplete="off" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+                </label>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:16px">
+                <label style="display:block;font-size:13px;color:rgb(70,70,70)">Montant encaissé (FCFA)
+                  <input type="number" min="0" step="1000" inputMode="numeric" value="{{ orderDraft.montant }}" onChange="{{ setDraft.montant }}" aria-invalid="{{ orderInvalid.montant }}" aria-describedby="err-order-montant" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:{{ orderShadow.montant }};color:rgb(0,0,0);font-variant-numeric:tabular-nums">
+                  <sc-if value="{{ orderErr.montant }}"><span id="err-order-montant" style="display:block;margin-top:6px;font-size:12px;color:rgb(155,24,33)">{{ orderErr.montant }}</span></sc-if>
+                </label>
+                <label style="display:block;font-size:13px;color:rgb(70,70,70)">Date
+                  <input type="date" value="{{ orderDraft.dateIso }}" onChange="{{ setDraft.dateIso }}" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+                </label>
+              </div>
+              <label style="display:block;font-size:13px;color:rgb(70,70,70)">Moyen de paiement
+                <select value="{{ orderDraft.paiement }}" onChange="{{ setDraft.paiement }}" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+                  <option value="Espèces">Espèces</option>
+                  <option value="Carte bancaire">Carte bancaire</option>
+                  <option value="Mobile Money">Mobile Money</option>
+                  <option value="Virement">Virement</option>
+                </select>
+              </label>
+              <label style="display:block;font-size:13px;color:rgb(70,70,70)">Note
+                <textarea value="{{ orderDraft.note }}" onChange="{{ setDraft.note }}" rows="3" style="margin-top:8px;width:100%;padding:14px 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0);resize:vertical;font-family:var(--font-body);font-size:15px;line-height:22px"></textarea>
+              </label>
+              <p style="margin:0;font-size:12px;line-height:18px;color:rgb(94,94,94)">Les pièces de la commande ne se changent pas ici : annulez la commande pour les remettre en stock, puis enregistrez-en une nouvelle.</p>
               <sc-if value="{{ orderDirty }}">
                 <p style="margin:0;font-size:12px;color:rgb(94,94,94)">Modifications non enregistrées.</p>
               </sc-if>
               <x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="primary" disabled="{{ orderUnchanged }}" dc-props="{{ btnBlock }}" hint-size="100%,58px">Mettre à jour</x-import>
+
+              <div style="border-top:1px solid rgba(0,0,0,.08);padding-top:16px;margin-top:4px">
+                <sc-if value="{{ isOrderDeleteClosed }}">
+                  <button type="button" onClick="{{ openOrderDelete }}" style="background:none;border:0;padding:0;color:rgb(155,24,33);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(155,24,33)">Supprimer cette vente</button>
+                </sc-if>
+                <sc-if value="{{ isOrderDeleteOpen }}">
+                  <p style="margin:0 0 10px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(155,24,33)">Supprimer cette vente</p>
+                  <p style="margin:0 0 10px;font-size:12px;line-height:18px;color:rgb(94,94,94)">La commande disparaît du suivi, sans retour possible. Ses pièces redeviennent disponibles à la vente. Indiquez le motif : il reste la seule trace de cette suppression.</p>
+                  <label style="display:block;font-size:13px;color:rgb(70,70,70)">Motif de la suppression
+                    <textarea value="{{ orderDeleteReason }}" onChange="{{ setOrderDeleteReason }}" rows="2" placeholder="Ex. doublon, erreur de saisie, vente annulée par le client avant tout paiement…" autofocus style="margin-top:8px;width:100%;padding:14px 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0);resize:vertical;font-family:var(--font-body);font-size:15px;line-height:22px"></textarea>
+                  </label>
+                  <div style="display:flex;gap:16px;align-items:center;margin-top:10px">
+                    <button type="button" onClick="{{ confirmDeleteOrder }}" disabled="{{ orderDeleteDisabled }}" style="height:46px;padding:0 22px;background:rgb(155,24,33);border:0;color:rgb(255,255,255);cursor:pointer;font-size:13px;letter-spacing:.08em;text-transform:uppercase;opacity:{{ orderDeleteOpacity }}">Confirmer la suppression</button>
+                    <button type="button" onClick="{{ closeOrderDelete }}" style="background:none;border:0;padding:0;color:rgb(94,94,94);cursor:pointer;font-size:13px">Annuler</button>
+                  </div>
+                </sc-if>
+              </div>
             </form>
           </div>
         </sc-if>
@@ -1538,7 +1649,9 @@ const SEED_PIECES = [
     {id:'s2', type:'reparee', date:'2026-09-18', note:'Anse recousue à la main, renvoyée à la cliente.', auteur:'Michelle Kouassi', replacementId:''}
   ]},
   {id:'p9', reference:'HUP', modele:'Huperano', couleur:'Toile et cuir naturel', serie:'HU260001', code:'PR7T-0TY9', matiere:'Prototype d\'atelier — toile, cuir naturel', dateFab:'2025-11-05', prix:'', statut:'prototype', sav:[]},
-  {id:'p10', reference:'RAD', modele:'Radah', couleur:'Bordeaux', serie:'RA260001', code:'G4FT-8WKE', matiere:'Cuir bordeaux, doublure daim', dateFab:'2026-02-14', prix:380000, statut:'offerte', sav:[]}
+  {id:'p10', reference:'RAD', modele:'Radah', couleur:'Bordeaux', serie:'RA260001', code:'G4FT-8WKE', matiere:'Cuir bordeaux, doublure daim', dateFab:'2026-02-14', prix:380000, statut:'offerte', sav:[]},
+  // Même modèle, autre couleur : chaque variante a son propre stock et son propre prix (voir « Stock disponible à la vente »).
+  {id:'p11', reference:'HUP', modele:'Huperano', couleur:'Noir Ébène', serie:'HU260003', code:'N3BE-7HKM', matiere:'Cuir de vachette, tannage végétal', dateFab:'2026-06-08', prix:450000, statut:'disponible', sav:[]}
 ];
 // Chaque commande, en ligne ou hors site, désigne les pièces vendues par leur id.
 const SEED_ORDERS = [
@@ -1651,6 +1764,16 @@ const readPhoto = file => new Promise((resolve, reject) => {
   img.onerror = () => { URL.revokeObjectURL(url); reject('lecture'); };
   img.src = url;
 });
+const VIDEO_MAX_BYTES = 200 * 1024 * 1024;
+const VIDEO_MAX_LABEL = '200 Mo';
+const VIDEO_TYPES = /^video\/(mp4|webm|quicktime)$/;
+const fmtMo = bytes => (bytes / (1024 * 1024)).toFixed(1).replace('.', ',') + ' Mo';
+// Pas de retraitement ici (contrairement aux photos) : le fichier est gardé tel quel, en Blob, dans IndexedDB.
+const readVideo = file => new Promise((resolve, reject) => {
+  if (!VIDEO_TYPES.test(file.type)) { reject('format'); return; }
+  if (file.size > VIDEO_MAX_BYTES) { reject('taille'); return; }
+  resolve({id:'vd' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name:file.name.replace(/\.[^.]+$/, ''), type:file.type, size:file.size, blob:file});
+});
 const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 const ORDER_STATUT_LABEL = {preparation:'En préparation', expediee:'Expédiée', livree:'Livrée', annulee:'Annulée'};
 const ORDER_STATUT_KIND = {preparation:'neutral', expediee:'progress', livree:'doneFilled', annulee:'alert'};
@@ -1754,8 +1877,12 @@ const PH_DB = 'cs-bo-photos';
 let _phDbP = null;
 const phDb = () => _phDbP || (_phDbP = new Promise((res, rej) => {
   try {
-    const r = indexedDB.open(PH_DB, 1);
-    r.onupgradeneeded = () => r.result.createObjectStore('photos');
+    const r = indexedDB.open(PH_DB, 2);
+    r.onupgradeneeded = () => {
+      const db = r.result;
+      if (!db.objectStoreNames.contains('photos')) db.createObjectStore('photos');
+      if (!db.objectStoreNames.contains('videos')) db.createObjectStore('videos');
+    };
     r.onsuccess = () => res(r.result);
     r.onerror = () => rej(r.error);
     r.onblocked = () => rej(new Error('blocked'));
@@ -1779,6 +1906,25 @@ const phPrune = keep => phDb().then(db => new Promise(res => {
   r.onsuccess = () => r.result.forEach(k => { if (!keep.has(k)) st.delete(k); });
   tx.oncomplete = () => res(); tx.onerror = () => res(); tx.onabort = () => res();
 })).catch(() => {});
+// Même mécanique que les photos, dans un magasin séparé : la vidéo est gardée en Blob (pas en base64, trop lourd en chaîne de caractères).
+const vidPut = (id, blob) => phDb().then(db => new Promise((res, rej) => {
+  const tx = db.transaction('videos', 'readwrite'); tx.objectStore('videos').put(blob, id);
+  tx.oncomplete = () => res(); tx.onerror = () => rej(tx.error); tx.onabort = () => rej(tx.error);
+}));
+const vidDelete = id => phDb().then(db => new Promise(res => {
+  const tx = db.transaction('videos', 'readwrite'); tx.objectStore('videos').delete(id);
+  tx.oncomplete = () => res(); tx.onerror = () => res(); tx.onabort = () => res();
+})).catch(() => {});
+const vidGetMany = ids => phDb().then(db => new Promise(res => {
+  const out = {}; const tx = db.transaction('videos', 'readonly'); const st = tx.objectStore('videos');
+  ids.forEach(id => { const r = st.get(id); r.onsuccess = () => { if (r.result) out[id] = r.result; }; });
+  tx.oncomplete = () => res(out); tx.onerror = () => res(out); tx.onabort = () => res(out);
+})).catch(() => ({}));
+const vidPrune = keep => phDb().then(db => new Promise(res => {
+  const tx = db.transaction('videos', 'readwrite'); const st = tx.objectStore('videos'); const r = st.getAllKeys();
+  r.onsuccess = () => r.result.forEach(k => { if (!keep.has(k)) st.delete(k); });
+  tx.oncomplete = () => res(); tx.onerror = () => res(); tx.onabort = () => res();
+})).catch(() => {});
 
 // Le champ « Teinte / Coloris » s'appelle désormais « couleur » (catalogue de la boutique) : on reprend les anciennes sauvegardes.
 const migratePiece = p => {
@@ -1798,8 +1944,8 @@ class Component extends DCLogic {
     serieMax:maxSerie(SEED_PIECES),
     requests:SEED_REQUESTS, alerts:SEED_ALERTS, demTab:'messages', reqSearch:'', reqObjet:'tous', reqStatut:'tous', viewReqId:null,
     teamTab:'membres', auditSearch:'', auditAuteur:'tous',
-    viewOrderId:null, orderDraft:{statut:'', tracking:''},
-    editId:null, form:this._emptyForm(), fieldErr:{}, codeRevealed:false, photoBusy:false, photoErr:'', photoNotice:null,
+    viewOrderId:null, orderDraft:{statut:'', tracking:''}, orderErr:{}, orderDeleteOpen:false, orderDeleteReason:'',
+    editId:null, form:this._emptyForm(), fieldErr:{}, codeRevealed:false, photoBusy:false, photoErr:'', photoNotice:null, videoBusy:false, videoErr:'',
     viewPieceId:null, pieceCodeRevealed:false, qrOnlyId:null, viewPhotoIndex:0,
     lotForm:this._emptyLot(), lotErr:{},
     flash:'', flashAction:null, saveWarn:false, lotFocus:null, confirm:null,
@@ -1812,9 +1958,12 @@ class Component extends DCLogic {
 
   _phStored = new Set();   // photos déjà écrites dans IndexedDB
   _phCache = {};           // photos déjà en mémoire (id -> données)
+  _vidStored = new Set();  // vidéos déjà écrites dans IndexedDB
+  _vidCache = {};          // blobs vidéo déjà en mémoire (id -> Blob)
+  _vidUrlCache = {};       // URL locales déjà créées pour ces blobs (id -> blob:…)
   _loaded = false;         // la sauvegarde a-t-elle déjà été relue ? (évite de l'écraser par les données de départ)
   _persistPending = false;
-  _phPending = 0;          // écritures de photos en cours (la page demande confirmation avant de se fermer)
+  _phPending = 0;          // écritures de photos/vidéo en cours (la page demande confirmation avant de se fermer)
 
   persist(){
     if (!this._loaded) { this._persistPending = true; return; }
@@ -1822,13 +1971,18 @@ class Component extends DCLogic {
     try {
       localStorage.setItem(STORE_KEY, JSON.stringify({
         team:this.state.team, audit:this.state.audit,
-        pieces:this.state.pieces.map(p => (p.photos && p.photos.length)
-          ? Object.assign({}, p, {photos:p.photos.map(ph => ({id:ph.id, name:ph.name}))}) : p),
+        pieces:this.state.pieces.map(p => {
+          let out = p;
+          if (p.photos && p.photos.length) out = Object.assign({}, out, {photos:p.photos.map(ph => ({id:ph.id, name:ph.name}))});
+          if (p.video) out = Object.assign({}, out, {video:{id:p.video.id, name:p.video.name, type:p.video.type, size:p.video.size}});
+          return out;
+        }),
         orders:this.state.orders, owners:this.state.owners, serieMax:this.state.serieMax,
         requests:this.state.requests, alerts:this.state.alerts
       }));
     } catch(e) { ok = false; }
     this.phSync();
+    this.vidSync();
     if (this.state.saveWarn === ok) this.setState({saveWarn:!ok});
   }
   // Écrit dans IndexedDB les photos nouvelles et supprime celles qui ne sont plus utilisées.
@@ -1846,20 +2000,59 @@ class Component extends DCLogic {
       if (!cur.has(id)) { this._phStored.delete(id); delete this._phCache[id]; phDelete(id); }
     });
   }
+  // Même logique que phSync(), pour la vidéo (un seul Blob par pièce).
+  vidSync(){
+    const cur = new Map();
+    this.state.pieces.forEach(p => { if (p.video && p.video.blob) cur.set(p.video.id, p.video.blob); });
+    cur.forEach((blob, id) => {
+      this._vidCache[id] = blob;
+      if (this._vidStored.has(id)) return;
+      this._vidStored.add(id);
+      this._phPending++;
+      vidPut(id, blob).then(() => { this._phPending--; }, () => { this._phPending--; this._vidStored.delete(id); if (!this.state.saveWarn) this.setState({saveWarn:true}); });
+    });
+    Array.from(this._vidStored).forEach(id => {
+      if (!cur.has(id)) {
+        this._vidStored.delete(id); delete this._vidCache[id]; vidDelete(id);
+        if (this._vidUrlCache[id]) { try { URL.revokeObjectURL(this._vidUrlCache[id]); } catch(e) {} delete this._vidUrlCache[id]; }
+      }
+    });
+  }
+  // Renvoie une URL locale réutilisable pour afficher un Blob vidéo (créée une seule fois par id).
+  videoUrl(id, blob){
+    if (!blob) return '';
+    if (!this._vidUrlCache[id]) {
+      try { this._vidUrlCache[id] = URL.createObjectURL(blob); } catch(e) { return ''; }
+    }
+    return this._vidUrlCache[id];
+  }
   loadStored(){
     let saved = null;
     try { saved = JSON.parse(localStorage.getItem(STORE_KEY) || 'null'); } catch(e) {}
     const finish = () => { this._loaded = true; if (this._persistPending) { this._persistPending = false; this.persist(); } };
     if (!(saved && Array.isArray(saved.team))) { finish(); return; }
     const pieces = (Array.isArray(saved.pieces) ? saved.pieces : SEED_PIECES).map(migratePiece);
-    const need = [];
-    pieces.forEach(p => (p.photos || []).forEach(ph => { if (!ph.src && !this._phCache[ph.id]) need.push(ph.id); }));
-    const apply = found => {
-      const restored = pieces.map(p => (p.photos && p.photos.length) ? Object.assign({}, p, {photos:p.photos.map(ph => {
-        const src = ph.src || this._phCache[ph.id] || found[ph.id];
-        return src ? Object.assign({}, ph, {src}) : null;
-      }).filter(Boolean)}) : p);
+    const needPhotos = [];
+    const needVideos = [];
+    pieces.forEach(p => {
+      (p.photos || []).forEach(ph => { if (!ph.src && !this._phCache[ph.id]) needPhotos.push(ph.id); });
+      if (p.video && !p.video.blob && !this._vidCache[p.video.id]) needVideos.push(p.video.id);
+    });
+    const apply = (found, foundVideos) => {
+      const restored = pieces.map(p => {
+        let out = p;
+        if (p.photos && p.photos.length) out = Object.assign({}, out, {photos:p.photos.map(ph => {
+          const src = ph.src || this._phCache[ph.id] || found[ph.id];
+          return src ? Object.assign({}, ph, {src}) : null;
+        }).filter(Boolean)});
+        if (p.video) {
+          const blob = p.video.blob || this._vidCache[p.video.id] || foundVideos[p.video.id];
+          out = blob ? Object.assign({}, out, {video:Object.assign({}, p.video, {blob})}) : Object.assign({}, out, {video:null});
+        }
+        return out;
+      });
       Object.keys(found).forEach(id => { this._phStored.add(id); this._phCache[id] = found[id]; });
+      Object.keys(foundVideos).forEach(id => { this._vidStored.add(id); this._vidCache[id] = foundVideos[id]; });
       const conv = convertSeries(restored, Array.isArray(saved.audit) ? saved.audit : SEED_AUDIT);
       this.setState({
         team:saved.team, audit:conv.audit,
@@ -1871,10 +2064,15 @@ class Component extends DCLogic {
         serieMax: conv.changed ? conv.issued : (saved.serieMax && typeof saved.serieMax==='object' ? saved.serieMax : maxSerie(conv.pieces))
       });
       finish();
-      const keep = new Set(); restored.forEach(p => (p.photos || []).forEach(ph => keep.add(ph.id)));
+      const keep = new Set(); const keepVid = new Set();
+      restored.forEach(p => { (p.photos || []).forEach(ph => keep.add(ph.id)); if (p.video) keepVid.add(p.video.id); });
       phPrune(keep);
+      vidPrune(keepVid);
     };
-    if (!need.length) apply({}); else phGetMany(need).then(apply);
+    Promise.all([
+      needPhotos.length ? phGetMany(needPhotos) : Promise.resolve({}),
+      needVideos.length ? vidGetMany(needVideos) : Promise.resolve({})
+    ]).then(([found, foundVideos]) => apply(found, foundVideos));
   }
   readHash(){
     const m = (location.hash || '').match(/invitation=([A-Za-z0-9_-]+)/);
@@ -1931,7 +2129,7 @@ class Component extends DCLogic {
     clearTimeout(this._photoT);
   }
 
-  _emptyForm(){ return {modele:'', couleur:'', reference:'', prix:'', serie:'', code:'', matiere:'', dateFab:'', statut:'disponible', autoIds:false, photos:[]}; }
+  _emptyForm(){ return {modele:'', couleur:'', reference:'', prix:'', serie:'', code:'', matiere:'', dateFab:'', statut:'disponible', autoIds:false, photos:[], video:null}; }
   _emptyLot(){ return {modele:'', couleur:'', reference:'', prix:'', matiere:'', quantite:'', annee:String(new Date().getFullYear())}; }
   _emptySav(){ return {type:'en_reparation', date:isoToday(), note:'', replacementId:''}; }
   _emptyVente(){ return {canal:'popup', date:isoToday(), evenement:'', pieceIds:[], client:'', email:'', telephone:'', montant:'', paiement:'Espèces', note:''}; }
@@ -1967,8 +2165,23 @@ class Component extends DCLogic {
     this.setState(st => ({form:Object.assign({}, st.form, {photos:(st.form.photos || []).concat(added)}), photoBusy:false, photoErr:msgs.join(' ')}));
   }
 
+  async addVideo(file){
+    if (!file) return;
+    this.setState({videoBusy:true, videoErr:''});
+    try {
+      const v = await readVideo(file);
+      this.setState(st => ({form:Object.assign({}, st.form, {video:v}), videoBusy:false, videoErr:''}));
+    } catch (e) {
+      const msg = e==='format' ? 'Format non pris en charge : seuls MP4, WebM et MOV sont acceptés.' : 'Vidéo trop lourde : ' + VIDEO_MAX_LABEL + ' maximum.';
+      this.setState({videoBusy:false, videoErr:msg});
+    }
+  }
+  removeVideo(){
+    this.setState(st => ({form:Object.assign({}, st.form, {video:null}), videoErr:''}));
+  }
+
   go(route, extra){
-    this.setState(Object.assign({route, navOpen:false, registreOpen:false, filtersOpen:false, photoErr:'', photoBusy:false, photoNotice:null, lotFocus:null}, extra||{}));
+    this.setState(Object.assign({route, navOpen:false, registreOpen:false, filtersOpen:false, photoErr:'', photoBusy:false, photoNotice:null, videoErr:'', videoBusy:false, lotFocus:null}, extra||{}));
     try{window.scrollTo(0,0);}catch(e){}
   }
 
@@ -2139,7 +2352,7 @@ class Component extends DCLogic {
     // Juste après la génération d'un lot, on n'affiche que ce lot (bandeau « Afficher tout le registre »)
     // sans modifier la recherche ni les filtres de l'utilisateur.
     let filteredPieces = s.lotFocus ? decPieces.filter(p => p.lotId===s.lotFocus.id) : decPieces.filter(p =>
-      (!q || (p.modele+' '+p.serie+' '+p.matiere+' '+(p.reference||'')).toLowerCase().includes(q)) &&
+      (!q || (p.modele+' '+p.serie+' '+p.matiere+' '+(p.reference||'')+' '+(p.couleur||'')).toLowerCase().includes(q)) &&
       (s.statutFilter==='tous' || p.eff===s.statutFilter));
     const sortKey = s.lotFocus ? 'serie' : s.sortBy;
     filteredPieces = filteredPieces.slice().sort((a,b) =>
@@ -2155,7 +2368,9 @@ class Component extends DCLogic {
     fieldKeys.forEach(k => { fieldShadow[k] = fieldErr[k] ? FIELD_ERR : FIELD_OK; fieldInvalid[k] = !!fieldErr[k]; });
 
     // Commandes (en ligne et hors site, même suivi)
-    const openOrder = o => this.go('commande-detail', {viewOrderId:o.id, orderDraft:{statut:o.statut, tracking:o.tracking||''}});
+    const draftFromOrder = o => ({statut:o.statut, tracking:o.tracking||'', client:o.client||'', email:o.email||'', telephone:o.telephone||'',
+      evenement:o.evenement||'', montant:String(o.total===undefined ? '' : o.total), paiement:o.paiement||'', note:o.note||'', dateIso:o.dateIso||''});
+    const openOrder = o => this.go('commande-detail', {viewOrderId:o.id, orderDraft:draftFromOrder(o), orderErr:{}, orderDeleteOpen:false, orderDeleteReason:''});
     const decOrders = s.orders.slice().sort((a,b) => (b.dateIso||'').localeCompare(a.dateIso||'')).map(o => {
       const ps = (o.pieceIds || []).map(pieceById);
       const items = ps.map(p => p ? p.modele + ' (' + p.serie + ')' : 'Pièce supprimée').join(', ') || '—';
@@ -2242,7 +2457,14 @@ class Component extends DCLogic {
     const viewOwnerRaw = decOwners.find(o => o.id===s.viewOwnerId);
     const ownerHasSav = !!(viewOwnerRaw && viewOwnerRaw.piece && (viewOwnerRaw.piece.sav||[]).length);
     const viewOrder = decOrders.find(o => o.id===s.viewOrderId);
-    const orderDirty = !!viewOrder && (s.orderDraft.statut!==viewOrder.statut || s.orderDraft.tracking.trim()!==(viewOrder.tracking||''));
+    const orderDirty = !!viewOrder && (() => {
+      const d = s.orderDraft;
+      return d.statut!==viewOrder.statut || d.tracking.trim()!==(viewOrder.tracking||'') ||
+        d.client.trim()!==(viewOrder.client||'') || d.email.trim()!==(viewOrder.email||'') ||
+        d.telephone.trim()!==(viewOrder.telephone||'') || d.evenement.trim()!==(viewOrder.evenement||'') ||
+        d.montant!==String(viewOrder.total===undefined ? '' : viewOrder.total) ||
+        d.paiement!==(viewOrder.paiement||'') || d.note.trim()!==(viewOrder.note||'') || d.dateIso!==(viewOrder.dateIso||'');
+    })();
 
     // Demandes : messages du formulaire de contact + alertes retour en stock
     const reqRaw = s.requests.slice().sort((a,b) => (b.dateIso||'').localeCompare(a.dateIso||''));
@@ -2252,7 +2474,7 @@ class Component extends DCLogic {
       return {...r, ...BADGE[REQ_STATUT_KIND[r.statut]], statutLabel:REQ_STATUT_LABEL[r.statut],
         who: (r.civilite ? r.civilite + ' ' : '') + r.nom, dateLabel: fmtIsoDate(r.dateIso),
         commandeLabel: r.commandeNo || '—', hasCommande: !!r.commandeNo, hasOrder: !!ord,
-        openOrder: () => ord && this.go('commande-detail', {viewOrderId:ord.id, orderDraft:{statut:ord.statut, tracking:ord.tracking||''}}),
+        openOrder: () => ord && this.go('commande-detail', {viewOrderId:ord.id, orderDraft:draftFromOrder(ord), orderErr:{}, orderDeleteOpen:false, orderDeleteReason:''}),
         hasPj: !!r.pj, pjLabel: r.pj ? r.pj.name + ' (' + Math.max(1, Math.round(r.pj.size/1024)) + ' Ko)' : '',
         prefLabel: PREF_LABEL[r.preference] || '—', hasTel: !!r.telephone,
         preview: r.message.length>80 ? r.message.slice(0,80) + '…' : r.message,
@@ -2569,14 +2791,31 @@ class Component extends DCLogic {
       viewOrder: viewOrder || {},
       orderDraft: s.orderDraft,
       orderDirty, orderUnchanged: !orderDirty,
+      orderErr: s.orderErr || {},
+      orderInvalid: {email:!!(s.orderErr||{}).email, montant:!!(s.orderErr||{}).montant},
+      orderShadow: {
+        email: (s.orderErr||{}).email ? FIELD_ERR : FIELD_OK,
+        montant: (s.orderErr||{}).montant ? FIELD_ERR : FIELD_OK
+      },
       // Le moteur de template ne lit que des chemins ({{ a.b }}) : un handler par champ, pas d'appel setDraft('x').
-      setDraft: Object.fromEntries(['statut','tracking'].map(key => [key, e => {
-        const v = e.target.value; this.setState(st => ({orderDraft:Object.assign({}, st.orderDraft, {[key]:v})}));
+      setDraft: Object.fromEntries(['statut','tracking','client','email','telephone','evenement','montant','paiement','note','dateIso'].map(key => [key, e => {
+        const v = e.target.value;
+        this.setState(st => {
+          const oe = Object.assign({}, st.orderErr); delete oe[key];
+          return {orderDraft:Object.assign({}, st.orderDraft, {[key]:v}), orderErr:oe};
+        });
       }])),
       saveOrder: e => {
         e.preventDefault();
         if (!orderDirty) return;
-        const d = {statut:s.orderDraft.statut, tracking:s.orderDraft.tracking.trim()};
+        const raw = s.orderDraft;
+        const err = {};
+        if (raw.email.trim() && !EMAIL_RE.test(raw.email.trim())) err.email = 'Adresse e-mail invalide.';
+        if (raw.montant.trim()==='' || !(Number(raw.montant) >= 0)) err.montant = 'Indiquez un montant en FCFA (chiffres uniquement).';
+        if (Object.keys(err).length) { this.setState({orderErr:err}); return; }
+        const d = {statut:raw.statut, tracking:raw.tracking.trim(), client:raw.client.trim(), email:raw.email.trim(),
+          telephone:raw.telephone.trim(), evenement:raw.evenement.trim(), total:Number(raw.montant),
+          paiement:raw.paiement, note:raw.note.trim(), dateIso:raw.dateIso};
         const o = viewOrder;
         const piecesTxt = o.pieces.map(x => x.label).join(', ');
         // Réactiver une commande annulée : ses pièces ne doivent pas avoir été revendues entre-temps.
@@ -2589,11 +2828,13 @@ class Component extends DCLogic {
           }
         }
         const apply = () => {
-          this.setState(st => ({orders: st.orders.map(x => x.id===o.id ? Object.assign({}, x, d) : x)}), () => this.persist());
+          this.setState(st => ({orders: st.orders.map(x => x.id===o.id ? Object.assign({}, x, d) : x), orderErr:{}}), () => this.persist());
           if (d.statut==='annulee' && o.statut!=='annulee') this.logAudit('Commande annulée — ' + o.no + ' : pièces remises en stock (' + piecesTxt + ')');
           else if (o.statut==='annulee' && d.statut!=='annulee') this.logAudit('Commande réactivée — ' + o.no + ' : pièces repassées en « Vendue » (' + piecesTxt + ')');
           else if (d.statut!==o.statut) this.logAudit('Statut modifié — commande ' + o.no + ' : ' + ORDER_STATUT_LABEL[o.statut] + ' → ' + ORDER_STATUT_LABEL[d.statut]);
           if (d.tracking!==(o.tracking||'')) this.logAudit('Code de suivi saisi — commande ' + o.no);
+          const detailsChanged = ['client','email','telephone','evenement','paiement','note','dateIso'].some(k => d[k]!==(o[k]||'')) || d.total!==o.total;
+          if (detailsChanged) this.logAudit('Commande modifiée — ' + o.no + ' (client, montant, paiement ou autre détail)');
           this.showFlash('Commande ' + o.no + ' mise à jour.');
         };
         if (d.statut==='annulee' && o.statut!=='annulee') {
@@ -2615,6 +2856,35 @@ class Component extends DCLogic {
           return;
         }
         apply();
+      },
+      // Supprimer une vente (distinct d'annuler) : le dossier disparaît, seul le motif en garde la trace.
+      isOrderDeleteOpen: s.orderDeleteOpen, isOrderDeleteClosed: !s.orderDeleteOpen,
+      openOrderDelete: () => this.setState({orderDeleteOpen:true, orderDeleteReason:''}),
+      closeOrderDelete: () => this.setState({orderDeleteOpen:false, orderDeleteReason:''}),
+      orderDeleteReason: s.orderDeleteReason,
+      setOrderDeleteReason: e => this.setState({orderDeleteReason:e.target.value}),
+      orderDeleteDisabled: !s.orderDeleteReason.trim(), orderDeleteOpacity: s.orderDeleteReason.trim() ? 1 : .5,
+      confirmDeleteOrder: () => {
+        const o = viewOrder;
+        const reason = s.orderDeleteReason.trim();
+        if (!o || !o.id || !reason) return;
+        const owners = (o.pieceIds || []).map(pieceById).filter(Boolean).map(p => ownerOf(p.id)).filter(Boolean);
+        if (owners.length) {
+          this.askConfirm({title:'Suppression impossible', cancelLabel:'Compris',
+            body:'Au moins une pièce de cette commande est associée au passeport d\'un propriétaire (' + owners.map(ow => ow.owner).join(', ') + '). Retirez d\'abord cette association, ou annulez la commande plutôt que de la supprimer.'});
+          return;
+        }
+        const piecesTxt = o.pieces.map(x => x.label).join(', ') || '—';
+        this.askConfirm({
+          title:'Supprimer la commande ' + o.no + '\u00a0?',
+          body:'Cette commande (' + o.clientLabel + ', ' + o.totalLabel + ') sera définitivement retirée du suivi et ses pièces redeviendront disponibles : ' + piecesTxt + '. Motif enregistré : « ' + reason + ' ».',
+          okLabel:'Supprimer la vente', cancelLabel:'Retour',
+          onOk: () => {
+            this.setState(st => ({orders: st.orders.filter(x => x.id!==o.id), route:'commandes', orderDeleteOpen:false, orderDeleteReason:''}), () => this.persist());
+            this.logAudit('Vente supprimée — ' + o.no + ' (' + o.clientLabel + ', ' + o.totalLabel + ', ' + piecesTxt + ') — motif : ' + reason);
+            this.showFlash('Commande ' + o.no + ' supprimée.');
+          }
+        });
       },
 
       // Vente hors site
@@ -2697,7 +2967,7 @@ class Component extends DCLogic {
             const labels = ids.map(id => pieceLabel(pieceById(id))).join(', ');
             this.setState(st => ({orders: st.orders.concat([order])}), () => this.persist());
             this.logAudit('Vente hors site enregistrée — ' + order.no + ' (' + CANAL_LABEL[order.canal] + (order.evenement ? ', ' + order.evenement : '') + ') : ' + labels);
-            this.go('commande-detail', {viewOrderId:order.id, orderDraft:{statut:order.statut, tracking:''}, vente:null, venteErr:{}, venteStep:0, venteMax:0});
+            this.go('commande-detail', {viewOrderId:order.id, orderDraft:draftFromOrder(order), orderErr:{}, orderDeleteOpen:false, orderDeleteReason:'', vente:null, venteErr:{}, venteStep:0, venteMax:0});
             this.showFlash('Vente ' + order.no + ' enregistrée — ' + (ids.length>1 ? ids.length + ' pièces passées' : '1 pièce passée') + ' en « Vendue ».', 6000);
           }
         };
@@ -2765,12 +3035,27 @@ class Component extends DCLogic {
         const by = {};
         decPieces.forEach(p => {
           if (!['disponible','bientot','vendue'].includes(p.eff)) return;
-          const m = by[p.modele] = by[p.modele] || {modele:p.modele, dispo:0, vendue:0, bientot:0};
+          const m = by[p.modele] = by[p.modele] || {modele:p.modele, dispo:0, vendue:0, bientot:0, byColor:{}};
           m[p.eff==='disponible' ? 'dispo' : p.eff] += 1;
+          // Chaque couleur d'un même modèle est une variante à part : son propre stock, son propre prix.
+          const c = p.couleur || 'Sans couleur précisée';
+          const cg = m.byColor[c] = m.byColor[c] || {couleur:c, dispo:0, prix:[]};
+          if (p.eff==='disponible') { cg.dispo += 1; if (String(p.prix).trim()!=='') cg.prix.push(Number(p.prix)); }
         });
-        return Object.values(by).sort((a,b) => b.dispo-a.dispo || a.modele.localeCompare(b.modele)).map(m => ({...m,
-          numColor: m.dispo ? 'rgb(71,29,27)' : 'rgb(164,164,164)',
-          detail: [m.vendue ? m.vendue + (m.vendue>1 ? ' vendues' : ' vendue') : '', m.bientot ? m.bientot + ' bientôt' : ''].filter(Boolean).join(' · ') || 'Disponible'}));
+        return Object.values(by).sort((a,b) => b.dispo-a.dispo || a.modele.localeCompare(b.modele)).map(m => {
+          const colors = Object.values(m.byColor);
+          const hasVariants = colors.length > 1;
+          const variants = colors.sort((a,b) => a.couleur.localeCompare(b.couleur)).map(c => ({
+            couleur:c.couleur, dispo:c.dispo, rupture: c.dispo===0, notRupture: c.dispo>0,
+            couleurColor: c.dispo===0 ? 'rgb(155,24,33)' : 'rgb(0,0,0)',
+            prixLabel: c.prix.length ? (new Set(c.prix).size>1 ? fmtFcfa(Math.min(...c.prix)) + ' – ' + fmtFcfa(Math.max(...c.prix)) : fmtFcfa(c.prix[0])) : '—'
+          }));
+          const anyRupture = hasVariants && variants.some(v => v.rupture);
+          return {...m, hasVariants, noVariants:!hasVariants, variants, anyRupture,
+            cardShadow: anyRupture ? 'inset 0 0 0 1px rgb(155,24,33)' : 'none',
+            numColor: m.dispo ? 'rgb(71,29,27)' : 'rgb(164,164,164)',
+            detail: [m.vendue ? m.vendue + (m.vendue>1 ? ' vendues' : ' vendue') : '', m.bientot ? m.bientot + ' bientôt' : ''].filter(Boolean).join(' · ') || 'Disponible'};
+        });
       })(),
       goPiecesDispo: () => this.go('pieces', {statutFilter:'disponible'}),
       geoRepartition: (() => {
@@ -2920,6 +3205,21 @@ class Component extends DCLogic {
           photoDrop: e => { if (e && e.preventDefault) e.preventDefault(); this.addPhotos((e && e.dataTransfer && e.dataTransfer.files) || []); }
         };
       })(),
+      ...(() => {
+        const v = s.form.video;
+        return {
+          hasVideo: !!v, noVideo: !v,
+          videoSrc: v ? this.videoUrl(v.id, v.blob) : '',
+          videoName: v ? v.name : '', videoSizeLabel: v ? fmtMo(v.size) : '',
+          videoMaxLabel: VIDEO_MAX_LABEL, videoBusy: s.videoBusy, videoErr: s.videoErr,
+          addVideoLabel: v ? 'Remplacer' : 'Ajouter une vidéo',
+          pickVideo: () => { try { document.getElementById('bo-video-input').click(); } catch(e) {} },
+          onVideoFile: e => { const t = e.target; const file = (t.files || [])[0]; try { t.value = ''; } catch(err) {} this.addVideo(file); },
+          videoDragOver: e => { if (e && e.preventDefault) e.preventDefault(); },
+          videoDrop: e => { if (e && e.preventDefault) e.preventDefault(); const file = e && e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]; if (file) this.addVideo(file); },
+          removeVideo: () => this.removeVideo()
+        };
+      })(),
       canToggleCode: isEditing || !!s.form.autoIds,
       codeType: (s.codeRevealed || (!isEditing && !s.form.autoIds)) ? 'text' : 'password',
       prixHint: (String(s.form.prix).trim()!=='' && Number(s.form.prix) >= 0) ? '= ' + fmtFcfa(s.form.prix) : '',
@@ -2928,7 +3228,7 @@ class Component extends DCLogic {
         if (!s.codeRevealed) this.logAudit('Consultation du code d\'activation — ' + (s.form.serie || 'pièce sans numéro'));
         this.setState({codeRevealed:!s.codeRevealed});
       },
-      setF: Object.fromEntries(Object.keys(this._emptyForm()).filter(k => k!=='autoIds' && k!=='photos').map(key => [key, e => {
+      setF: Object.fromEntries(Object.keys(this._emptyForm()).filter(k => k!=='autoIds' && k!=='photos' && k!=='video').map(key => [key, e => {
         const v = e.target.value;
         this.setState(st => {
           const fe = Object.assign({}, st.fieldErr); delete fe[key];
@@ -2958,7 +3258,7 @@ class Component extends DCLogic {
           : {pieces: st.pieces.concat([Object.assign({id:'p' + Date.now(), sav:[]}, f)]), route:'pieces', fieldErr:{}, serieMax:bumpSerie(st.serieMax, f.serie)},
           () => this.persist());
         const nom = f.modele || 'sans nom';
-        this.logAudit((editing ? 'Pièce modifiée — ' : 'Pièce créée — ') + nom + (f.serie ? ', ' + f.serie : '') + ((f.photos || []).length ? ' · ' + f.photos.length + (f.photos.length>1 ? ' photos' : ' photo') : ''));
+        this.logAudit((editing ? 'Pièce modifiée — ' : 'Pièce créée — ') + nom + (f.serie ? ', ' + f.serie : '') + ((f.photos || []).length ? ' · ' + f.photos.length + (f.photos.length>1 ? ' photos' : ' photo') : '') + (f.video ? ' · vidéo' : ''));
         this.showFlash('Pièce « ' + nom + ' » ' + (editing ? 'enregistrée.' : 'ajoutée au registre.'));
       },
       deletePiece: () => this.deletePieceConfirm(s.pieces.find(x => x.id===s.editId)),
@@ -2982,6 +3282,7 @@ class Component extends DCLogic {
           thumbs: photos.map((ph,i) => ({src:ph.src, alt:p.modele + ' — photo ' + (i+1), active: i===activeIdx ? 'true' : 'false',
             frame: i===activeIdx ? 'inset 0 0 0 2px rgb(71,29,27)' : 'inset 0 0 0 1px rgba(0,0,0,.12)',
             select: () => this.setState({viewPhotoIndex:i})})),
+          hasVideo: !!(p.video && p.video.blob), videoSrc: p.video ? this.videoUrl(p.video.id, p.video.blob) : '',
           codeMasked: s.pieceCodeRevealed ? (p.code || '—') : '••••-••••',
           codeToggleLabel: s.pieceCodeRevealed ? 'Masquer' : 'Afficher',
           toggleCode: () => {
