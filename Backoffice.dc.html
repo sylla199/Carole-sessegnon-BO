@@ -160,7 +160,7 @@
           <p role="alert" style="margin:0;font-size:13px;color:rgb(155,24,33)">{{ loginErr }}</p>
         </sc-if>
         <x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="primary" dc-props="{{ btnBlock }}" style="margin-top:6px" hint-size="100%,58px">Se connecter</x-import>
-        <button type="button" onClick="{{ forgotPassword }}" style="align-self:center;background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27)">Mot de passe oublié&nbsp;?</button>
+        <button type="button" onClick="{{ forgotPassword }}" style="align-self:center;background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center">Accès bloqué&nbsp;?</button>
         <sc-if value="{{ loginInfo }}">
           <p role="status" style="margin:0;font-size:13px;color:rgb(70,70,70);text-align:center">{{ loginInfo }}</p>
         </sc-if>
@@ -237,8 +237,8 @@
           <div role="status" class="bo-no-print" style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin:0 0 20px;padding:14px 18px;background:rgb(255,255,255);box-shadow:inset 3px 0 0 rgb(71,29,27),inset 0 0 0 1px rgba(0,0,0,.08);font-size:14px;color:rgb(71,29,27);animation:bo-in .2s ease">
             <span>{{ flash }}</span>
             <div style="flex:0 0 auto;display:flex;align-items:center;gap:16px">
-              <sc-if value="{{ flashActionLabel }}"><button type="button" onClick="{{ runFlashAction }}" style="background:none;border:0;padding:0;min-height:24px;color:rgb(71,29,27);font-weight:700;font-size:14px;cursor:pointer;text-decoration:underline;font-family:inherit">{{ flashActionLabel }}</button></sc-if>
-              <button type="button" onClick="{{ closeFlash }}" aria-label="Fermer le message" style="background:none;border:0;padding:0 2px;cursor:pointer;color:rgb(94,94,94);font-size:18px;line-height:1">×</button>
+              <sc-if value="{{ flashActionLabel }}"><button type="button" onClick="{{ runFlashAction }}" style="background:none;border:0;padding:0;min-height:44px;display:inline-flex;align-items:center;color:rgb(71,29,27);font-weight:700;font-size:14px;cursor:pointer;text-decoration:underline;font-family:inherit">{{ flashActionLabel }}</button></sc-if>
+              <button type="button" onClick="{{ closeFlash }}" aria-label="Fermer le message" style="background:none;border:0;padding:0 2px;min-width:44px;min-height:44px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:rgb(94,94,94);font-size:18px;line-height:1">×</button>
             </div>
           </div>
         </sc-if>
@@ -261,7 +261,7 @@
                 <p style="margin:0 0 8px;font-family:var(--font-display);font-size:19px;color:rgb(71,29,27)">À traiter</p>
                 <p style="margin:0;font-size:14px;color:rgb(70,70,70)">{{ todoLabel }}</p>
               </div>
-              <div style="display:flex;gap:20px"><button type="button" onClick="{{ goDemandes }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);font-family:inherit">Voir les messages</button><button type="button" onClick="{{ goAlertes }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);font-family:inherit">Voir les alertes</button><button type="button" onClick="{{ goStock }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);font-family:inherit">Voir le stock</button></div>
+              <div style="display:flex;gap:20px"><button type="button" onClick="{{ goDemandes }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center;font-family:inherit">Voir les messages</button><button type="button" onClick="{{ goAlertes }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center;font-family:inherit">Voir les alertes</button><button type="button" onClick="{{ goStock }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center;font-family:inherit">Voir le stock</button></div>
             </div>
           </sc-if>
           <sc-if value="{{ geoRepartition.length }}">
@@ -280,7 +280,7 @@
           <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:24px;margin-bottom:20px">
             <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:6px">
               <p style="margin:0;font-family:var(--font-display);font-size:19px;color:rgb(71,29,27)">Stock disponible à la vente</p>
-              <button type="button" onClick="{{ goPiecesDispo }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);text-align:left;font-family:inherit">Voir les pièces</button>
+              <button type="button" onClick="{{ goPiecesDispo }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center;text-align:left;font-family:inherit">Voir les pièces</button>
             </div>
             <p style="margin:0 0 16px;font-size:13px;color:rgb(94,94,94)">Calculé depuis le registre : une pièce vendue en ligne ou hors site sort du stock automatiquement.</p>
             <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,170px),1fr));gap:12px">
@@ -319,7 +319,7 @@
             <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:24px">
               <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
                 <p style="margin:0;font-family:var(--font-display);font-size:19px;color:rgb(71,29,27)">Pièces récemment ajoutées</p>
-                <button type="button" onClick="{{ goPieces }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27)">Tout voir</button>
+                <button type="button" onClick="{{ goPieces }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center">Tout voir</button>
               </div>
               <sc-for list="{{ recentPieces }}" as="p" hint-placeholder-count="4">
                 <button type="button" onClick="{{ p.open }}" style="display:flex;width:100%;align-items:center;gap:14px;padding:12px 0;border-top:1px solid rgba(0,0,0,.08);background:none;border-left:0;border-right:0;border-bottom:0;text-align:left;cursor:pointer;font-family:inherit" style-hover="opacity:.7">
@@ -338,7 +338,7 @@
             <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:24px">
               <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
                 <p style="margin:0;font-family:var(--font-display);font-size:19px;color:rgb(71,29,27)">Commandes récentes</p>
-                <button type="button" onClick="{{ goCommandes }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27)">Tout voir</button>
+                <button type="button" onClick="{{ goCommandes }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center">Tout voir</button>
               </div>
               <sc-for list="{{ recentOrders }}" as="o" hint-placeholder-count="4">
                 <button type="button" onClick="{{ o.open }}" style="display:flex;width:100%;justify-content:space-between;gap:14px;padding:12px 0;border-top:1px solid rgba(0,0,0,.08);background:none;border-left:0;border-right:0;border-bottom:0;text-align:left;cursor:pointer;font-family:inherit" style-hover="opacity:.7">
@@ -353,7 +353,7 @@
             <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:24px">
               <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
                 <p style="margin:0;font-family:var(--font-display);font-size:19px;color:rgb(71,29,27)">Associations récentes</p>
-                <button type="button" onClick="{{ goProprietaires }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27)">Tout voir</button>
+                <button type="button" onClick="{{ goProprietaires }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center">Tout voir</button>
               </div>
               <sc-for list="{{ recentOwners }}" as="o" hint-placeholder-count="3">
                 <button type="button" onClick="{{ o.open }}" style="display:block;width:100%;padding:12px 0;border-top:1px solid rgba(0,0,0,.08);background:none;border-left:0;border-right:0;border-bottom:0;text-align:left;cursor:pointer;font-family:inherit" style-hover="opacity:.7">
@@ -414,7 +414,7 @@
           <sc-if value="{{ lotFocusOn }}">
             <div class="bo-no-print" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:0 0 12px;padding:10px 14px;background:rgb(255,251,248);box-shadow:inset 3px 0 0 rgb(71,29,27),inset 0 0 0 1px rgba(0,0,0,.08);font-size:13px;color:rgb(71,29,27)">
               <span><strong style="font-weight:700">{{ lotFocusLabel }}</strong> · {{ lotFocusDetail }}</span>
-              <button type="button" onClick="{{ clearLotFocus }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);text-align:left;font-family:inherit">Afficher tout le registre</button>
+              <button type="button" onClick="{{ clearLotFocus }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center;text-align:left;font-family:inherit">Afficher tout le registre</button>
             </div>
           </sc-if>
           <p style="margin:0 0 10px;font-size:13px;color:rgb(94,94,94)">{{ piecesCount }}</p>
@@ -452,20 +452,23 @@
                       <span style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ p.statutBg }};color:{{ p.statutFg }};box-shadow:{{ p.statutShadow }}">{{ p.statutLabel }}</span>
                     </td>
                     <td style="padding:14px 18px;text-align:right;border-bottom:1px solid rgba(0,0,0,.06)">
-                      <button type="button" onClick="{{ p.edit }}" aria-label="{{ p.editLabel }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27)">Modifier</button>
+                      <button type="button" onClick="{{ p.edit }}" aria-label="{{ p.editLabel }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center">Modifier</button>
                     </td>
                   </tr>
                 </sc-for>
               </tbody>
             </table>
             <sc-if value="{{ noPieces }}">
-              <p style="margin:0;padding:40px;text-align:center;font-size:14px;color:rgb(94,94,94)">Aucune pièce ne correspond à cette recherche.</p>
+              <div style="margin:0;padding:40px;text-align:center">
+                <p style="margin:0;font-size:14px;color:rgb(94,94,94)">{{ noPiecesText }}</p>
+                <sc-if value="{{ registreEmpty }}"><button type="button" onClick="{{ newPiece }}" style="margin-top:14px;background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center;justify-content:center;margin-left:auto;margin-right:auto">Ajouter une pièce</button></sc-if>
+              </div>
             </sc-if>
           </div>
         </sc-if>
 
         <sc-if value="{{ isPieceForm }}">
-          <button type="button" onClick="{{ goPieces }}" style="background:none;border:0;padding:0;margin-bottom:22px;color:rgb(94,94,94);cursor:pointer;font-size:13px">← Retour aux pièces</button>
+          <button type="button" onClick="{{ goPieces }}" style="background:none;border:0;padding:0;margin-bottom:22px;color:rgb(94,94,94);cursor:pointer;font-size:13px;min-height:44px;display:inline-flex;align-items:center">← Retour aux pièces</button>
           <div class="bo-split">
             <form onSubmit="{{ savePiece }}" noValidate style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:clamp(22px,3vw,32px);display:flex;flex-direction:column;gap:18px">
               <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:16px">
@@ -492,7 +495,7 @@
                 <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap">
                   <p style="margin:0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">Identifiants du passeport</p>
                   <sc-if value="{{ canToggleAuto }}">
-                    <button type="button" onClick="{{ toggleAutoIds }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);text-align:left;font-family:inherit;font-size:12px">{{ autoIdsLabel }}</button>
+                    <button type="button" onClick="{{ toggleAutoIds }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center;text-align:left;font-family:inherit;font-size:12px">{{ autoIdsLabel }}</button>
                   </sc-if>
                 </div>
                 <p style="margin:0;font-size:12px;line-height:18px;color:rgb(94,94,94)">{{ idsHint }}</p>
@@ -505,10 +508,10 @@
                     <div style="display:flex;justify-content:space-between;gap:10px">
                       <label for="bo-code">Code d'activation privé</label>
                       <sc-if value="{{ canToggleCode }}">
-                        <button type="button" onClick="{{ toggleCode }}" aria-controls="bo-code" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);text-align:left;font-family:inherit;font-size:12px">{{ codeToggleLabel }}</button>
+                        <button type="button" onClick="{{ toggleCode }}" aria-controls="bo-code" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center;text-align:left;font-family:inherit;font-size:12px">{{ codeToggleLabel }}</button>
                       </sc-if>
                       <sc-if value="{{ canRegenCode }}">
-                        <button type="button" onClick="{{ regenCode }}" aria-controls="bo-code" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);text-align:left;font-family:inherit;font-size:12px">Régénérer</button>
+                        <button type="button" onClick="{{ regenCode }}" aria-controls="bo-code" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center;text-align:left;font-family:inherit;font-size:12px">Régénérer</button>
                       </sc-if>
                     </div>
                     <input id="bo-code" type="{{ codeType }}" autocomplete="off" value="{{ form.code }}" onChange="{{ setF.code }}" readOnly="{{ idsLocked }}" placeholder="8F3K-22QD" aria-invalid="{{ fieldInvalid.code }}" aria-describedby="err-code" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:{{ idsBg }};border:0;box-shadow:{{ fieldShadow.code }};color:rgb(0,0,0);letter-spacing:.06em">
@@ -544,7 +547,7 @@
                       <span style="font-size:12px;color:rgb(94,94,94)">{{ soldInfo.text }}</span>
                     </div>
                     <sc-if value="{{ soldInfo.hasOrder }}">
-                      <button type="button" onClick="{{ soldInfo.open }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);text-align:left;font-family:inherit;margin-top:8px;font-size:12px">Voir la commande {{ soldInfo.no }}</button>
+                      <button type="button" onClick="{{ soldInfo.open }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center;text-align:left;font-family:inherit;margin-top:8px;font-size:12px">Voir la commande {{ soldInfo.no }}</button>
                     </sc-if>
                   </div>
                 </sc-if>
@@ -556,7 +559,7 @@
               <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding-top:14px;border-top:1px solid rgba(0,0,0,.08)">
                 <x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="primary" dc-props="{{ btnUpperSm }}" hint-size="auto,46px">Enregistrer la pièce</x-import>
                 <sc-if value="{{ isEditing }}">
-                  <button type="button" onClick="{{ deletePiece }}" style="background:none;border:0;padding:0;color:rgb(155,24,33);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(155,24,33)">Supprimer cette pièce</button>
+                  <button type="button" onClick="{{ deletePiece }}" style="background:none;border:0;padding:0;color:rgb(155,24,33);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(155,24,33);min-height:44px;display:inline-flex;align-items:center">Supprimer cette pièce</button>
                 </sc-if>
               </div>
             </form>
@@ -612,8 +615,8 @@
                   <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:10px;flex-wrap:wrap">
                     <span style="font-size:12px;color:rgb(94,94,94);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ videoName }} · {{ videoSizeLabel }}</span>
                     <div style="display:flex;gap:16px;flex:0 0 auto">
-                      <button type="button" onClick="{{ pickVideo }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:12px;border-bottom:1px solid rgb(71,29,27)">Remplacer</button>
-                      <button type="button" onClick="{{ removeVideo }}" style="background:none;border:0;padding:0;color:rgb(155,24,33);cursor:pointer;font-size:12px;border-bottom:1px solid rgb(155,24,33)">Retirer</button>
+                      <button type="button" onClick="{{ pickVideo }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:12px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center">Remplacer</button>
+                      <button type="button" onClick="{{ removeVideo }}" style="background:none;border:0;padding:0;color:rgb(155,24,33);cursor:pointer;font-size:12px;border-bottom:1px solid rgb(155,24,33);min-height:44px;display:inline-flex;align-items:center">Retirer</button>
                     </div>
                   </div>
                 </sc-if>
@@ -646,7 +649,7 @@
                     <p style="margin:0;font-size:14px;color:rgb(0,0,0)">{{ formOwner.owner }}</p>
                     <p style="margin:6px 0 0;font-size:13px;color:rgb(94,94,94)">{{ formOwner.email }}</p>
                     <p style="margin:6px 0 0;font-size:13px;color:rgb(94,94,94)">Associée le {{ formOwner.date }}</p>
-                    <button type="button" onClick="{{ formOwner.open }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);text-align:left;font-family:inherit;margin-top:12px">Voir la fiche propriétaire</button>
+                    <button type="button" onClick="{{ formOwner.open }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center;text-align:left;font-family:inherit;margin-top:12px">Voir la fiche propriétaire</button>
                   </sc-if>
                   <sc-if value="{{ noOwnerForForm }}">
                     <p style="margin:0;font-size:14px;color:rgb(94,94,94)">Pièce non encore associée à un propriétaire.</p>
@@ -670,7 +673,7 @@
         </sc-if>
 
         <sc-if value="{{ isPieceDetail }}">
-          <button type="button" onClick="{{ goPieces }}" style="background:none;border:0;padding:0;margin-bottom:22px;color:rgb(94,94,94);cursor:pointer;font-size:13px">← Retour aux pièces</button>
+          <button type="button" onClick="{{ goPieces }}" style="background:none;border:0;padding:0;margin-bottom:22px;color:rgb(94,94,94);cursor:pointer;font-size:13px;min-height:44px;display:inline-flex;align-items:center">← Retour aux pièces</button>
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:24px;align-items:start;max-width:1000px">
             <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:clamp(22px,3vw,32px);display:flex;flex-direction:column;gap:18px">
               <div style="display:flex;align-items:center;gap:16px">
@@ -704,14 +707,14 @@
                 <span style="color:rgb(94,94,94)">Code d'activation</span>
                 <span style="display:flex;align-items:center;gap:10px">
                   <span style="font-variant-numeric:tabular-nums;letter-spacing:.04em">{{ viewPiece.codeMasked }}</span>
-                  <button type="button" onClick="{{ viewPiece.toggleCode }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:12px;border-bottom:1px solid rgb(71,29,27)">{{ viewPiece.codeToggleLabel }}</button>
+                  <button type="button" onClick="{{ viewPiece.toggleCode }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:12px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center">{{ viewPiece.codeToggleLabel }}</button>
                 </span>
               </div>
               <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Prix</span><span style="font-variant-numeric:tabular-nums">{{ viewPiece.prixLabel }}</span></div>
               <sc-if value="{{ viewPiece.matiere }}"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Matière</span><span style="text-align:right">{{ viewPiece.matiere }}</span></div></sc-if>
               <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Fabrication</span><span>{{ viewPiece.dateFabLabel }}</span></div>
-              <sc-if value="{{ viewPiece.hasOrder }}"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Commande</span><button type="button" onClick="{{ viewPiece.openOrder }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:14px;border-bottom:1px solid rgb(71,29,27);text-align:right">{{ viewPiece.orderLabel }}</button></div></sc-if>
-              <sc-if value="{{ viewPiece.hasOwner }}"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Propriétaire</span><button type="button" onClick="{{ viewPiece.openOwner }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:14px;border-bottom:1px solid rgb(71,29,27);text-align:right">{{ viewPiece.ownerName }}</button></div></sc-if>
+              <sc-if value="{{ viewPiece.hasOrder }}"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Commande</span><button type="button" onClick="{{ viewPiece.openOrder }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:14px;border-bottom:1px solid rgb(71,29,27);text-align:right;min-height:44px;display:inline-flex;align-items:center">{{ viewPiece.orderLabel }}</button></div></sc-if>
+              <sc-if value="{{ viewPiece.hasOwner }}"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Propriétaire</span><button type="button" onClick="{{ viewPiece.openOwner }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:14px;border-bottom:1px solid rgb(71,29,27);text-align:right;min-height:44px;display:inline-flex;align-items:center">{{ viewPiece.ownerName }}</button></div></sc-if>
               <div style="border-top:1px solid rgba(0,0,0,.08)"></div>
 
               <sc-if value="{{ viewPiece.hasSav }}">
@@ -737,7 +740,7 @@
         </sc-if>
 
         <sc-if value="{{ isLotForm }}">
-          <button type="button" onClick="{{ goPieces }}" style="background:none;border:0;padding:0;margin-bottom:22px;color:rgb(94,94,94);cursor:pointer;font-size:13px">← Retour aux pièces</button>
+          <button type="button" onClick="{{ goPieces }}" style="background:none;border:0;padding:0;margin-bottom:22px;color:rgb(94,94,94);cursor:pointer;font-size:13px;min-height:44px;display:inline-flex;align-items:center">← Retour aux pièces</button>
           <form onSubmit="{{ generateLot }}" noValidate style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:clamp(22px,3vw,32px);display:flex;flex-direction:column;gap:18px;max-width:640px">
             <p style="margin:0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">Préparer un lot avant fabrication</p>
             <p style="margin:0;font-size:13px;line-height:20px;color:rgb(94,94,94)">Les numéros de série et codes d'activation sont générés automatiquement, à la suite des derniers émis : aucun doublon possible, même en plusieurs lots séparés dans le temps. Chaque pièce entre au registre avec le statut « Réservée (en fabrication) » et n'apparaît pas à la vente tant qu'elle n'est pas reçue de l'atelier.</p>
@@ -791,7 +794,7 @@
                   </div>
                 </sc-for>
               </div>
-              <button type="button" onClick="{{ addLotVariant }}" style="margin-top:12px;background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27)">+ Ajouter une couleur</button>
+              <button type="button" onClick="{{ addLotVariant }}" style="margin-top:12px;background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center">+ Ajouter une couleur</button>
               <sc-if value="{{ lotErr.variants }}"><p role="alert" style="margin:10px 0 0;font-size:12px;color:rgb(155,24,33)">{{ lotErr.variants }}</p></sc-if>
             </div>
             <p aria-live="polite" style="margin:-6px 0 0;font-size:12px;line-height:18px;color:rgb(94,94,94)">{{ lotRangeText }}</p>
@@ -806,7 +809,7 @@
 
         <sc-if value="{{ isQrSheet }}">
           <div class="bo-no-print" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:22px">
-            <button type="button" onClick="{{ goPieces }}" style="background:none;border:0;padding:0;color:rgb(94,94,94);cursor:pointer;font-size:13px">← Retour aux pièces</button>
+            <button type="button" onClick="{{ goPieces }}" style="background:none;border:0;padding:0;color:rgb(94,94,94);cursor:pointer;font-size:13px;min-height:44px;display:inline-flex;align-items:center">← Retour aux pièces</button>
             <x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="primary" onClick="{{ printQrSheet }}" dc-props="{{ btnUpperSm }}" hint-size="auto,46px">Imprimer</x-import>
           </div>
           <p class="bo-no-print" style="margin:0 0 22px;font-size:13px;line-height:20px;color:rgb(94,94,94);max-width:64ch">Numéro de série, code d'activation et QR code vers la page d'authentification. Le code d'activation quitte le back-office sur cette planche — gardez-la hors de vue du public avant la remise en main propre.</p>
@@ -860,7 +863,7 @@
                   <option value="livree">Livrée</option>
                   <option value="annulee">Annulée</option>
                 </select>
-                <button type="button" class="bo-only-mobile" onClick="{{ exportOrdersCsv }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);text-align:left;font-family:inherit;min-height:44px;align-items:center">Exporter la liste (CSV)</button>
+                <button type="button" class="bo-only-mobile" onClick="{{ exportOrdersCsv }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center;text-align:left;font-family:inherit;min-height:44px;align-items:center">Exporter la liste (CSV)</button>
               </div>
             </div>
             <div style="display:flex;gap:10px;flex-wrap:wrap">
@@ -903,14 +906,17 @@
                     <td data-label="Date" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);white-space:nowrap">{{ o.dateLabel }}</td>
                     <td data-label="Statut" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)"><span style="display:inline-block;white-space:nowrap;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ o.statutBg }};color:{{ o.statutFg }};box-shadow:{{ o.statutShadow }}">{{ o.statutLabel }}</span></td>
                     <td style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);text-align:right">
-                      <button type="button" onClick="{{ o.open }}" aria-label="{{ o.detailLabel }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);text-align:left;font-family:inherit">Détail</button>
+                      <button type="button" onClick="{{ o.open }}" aria-label="{{ o.detailLabel }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center;text-align:left;font-family:inherit">Détail</button>
                     </td>
                   </tr>
                 </sc-for>
               </tbody>
             </table>
             <sc-if value="{{ noOrders }}">
-              <p style="margin:0;padding:40px;text-align:center;font-size:14px;color:rgb(94,94,94)">Aucune commande ne correspond à cette recherche.</p>
+              <div style="margin:0;padding:40px;text-align:center">
+                <p style="margin:0;font-size:14px;color:rgb(94,94,94)">{{ noOrdersText }}</p>
+                <sc-if value="{{ ordersEmpty }}"><button type="button" onClick="{{ openVente }}" style="margin-top:14px;background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center;justify-content:center;margin-left:auto;margin-right:auto">Enregistrer une vente</button></sc-if>
+              </div>
             </sc-if>
           </div>
         </sc-if>
@@ -935,7 +941,7 @@
                 <option value="encours">En cours</option>
                 <option value="traite">Traité</option>
               </select>
-              <button type="button" onClick="{{ exportReqCsv }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);font-family:inherit">Exporter en CSV</button>
+              <button type="button" onClick="{{ exportReqCsv }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center;font-family:inherit">Exporter en CSV</button>
             </div>
             <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);overflow:auto">
               <table class="bo-table" style="width:100%;border-collapse:collapse;min-width:760px">
@@ -963,7 +969,7 @@
           <sc-if value="{{ isDemAlertes }}">
             <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:20px">
               <p style="margin:0;font-size:14px;color:rgb(70,70,70);max-width:62ch">Clients ayant demandé à être prévenus du retour d'un modèle. Quand une pièce de ce modèle est de nouveau disponible, prévenez-les en un clic.</p>
-              <button type="button" onClick="{{ exportAlertsCsv }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);font-family:inherit">Exporter en CSV</button>
+              <button type="button" onClick="{{ exportAlertsCsv }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center;font-family:inherit">Exporter en CSV</button>
             </div>
             <sc-if value="{{ !hasAlerts }}"><p style="margin:0;padding:28px;text-align:center;font-size:14px;color:rgb(94,94,94);background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)">Aucun client n'attend le retour d'un modèle.</p></sc-if>
             <div style="display:flex;flex-direction:column;gap:20px">
@@ -976,7 +982,7 @@
                   <sc-for list="{{ g.subs }}" as="a" hint-placeholder-count="2">
                     <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px;flex-wrap:wrap">
                       <span style="overflow-wrap:anywhere">{{ a.email }}</span>
-                      <span style="display:flex;align-items:center;gap:16px;font-size:13px;color:rgb(94,94,94)"><span>{{ a.dateLabel }} · {{ a.statusLabel }}</span><button type="button" onClick="{{ a.remove }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);font-family:inherit;color:rgb(94,94,94);border-bottom-color:rgb(94,94,94)">Retirer</button></span>
+                      <span style="display:flex;align-items:center;gap:16px;font-size:13px;color:rgb(94,94,94)"><span>{{ a.dateLabel }} · {{ a.statusLabel }}</span><button type="button" onClick="{{ a.remove }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center;font-family:inherit;color:rgb(94,94,94);border-bottom-color:rgb(94,94,94)">Retirer</button></span>
                     </div>
                   </sc-for>
                   <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:14px">
@@ -990,7 +996,7 @@
         </sc-if>
 
         <sc-if value="{{ isDemandeDetail }}">
-          <button type="button" onClick="{{ goDemandes }}" style="background:none;border:0;padding:0;margin-bottom:22px;color:rgb(94,94,94);cursor:pointer;font-size:13px">← Retour aux demandes</button>
+          <button type="button" onClick="{{ goDemandes }}" style="background:none;border:0;padding:0;margin-bottom:22px;color:rgb(94,94,94);cursor:pointer;font-size:13px;min-height:44px;display:inline-flex;align-items:center">← Retour aux demandes</button>
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:24px;align-items:start;max-width:1000px">
             <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:clamp(22px,3vw,32px)">
               <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 6px">
@@ -1002,7 +1008,7 @@
               <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">E-mail</span><span style="overflow-wrap:anywhere;text-align:right">{{ viewReq.email }}</span></div>
               <sc-if value="{{ viewReq.hasTel }}"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Téléphone</span><span style="text-align:right">{{ viewReq.telephone }}</span></div></sc-if>
               <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Préférence de contact</span><span style="text-align:right">{{ viewReq.prefLabel }}</span></div>
-              <sc-if value="{{ viewReq.hasCommande }}"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Commande</span><span><sc-if value="{{ viewReq.hasOrder }}"><button type="button" onClick="{{ viewReq.openOrder }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);font-family:inherit;font-size:14px">{{ viewReq.commandeNo }}</button></sc-if><sc-if value="{{ !viewReq.hasOrder }}">{{ viewReq.commandeNo }}</sc-if></span></div></sc-if>
+              <sc-if value="{{ viewReq.hasCommande }}"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Commande</span><span><sc-if value="{{ viewReq.hasOrder }}"><button type="button" onClick="{{ viewReq.openOrder }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center;font-family:inherit;font-size:14px">{{ viewReq.commandeNo }}</button></sc-if><sc-if value="{{ !viewReq.hasOrder }}">{{ viewReq.commandeNo }}</sc-if></span></div></sc-if>
               <sc-if value="{{ viewReq.hasPj }}"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Pièce jointe</span><span style="text-align:right">{{ viewReq.pjLabel }}</span></div></sc-if>
               <div style="padding:16px 0 0;border-top:1px solid rgba(0,0,0,.08)">
                 <p style="margin:0 0 8px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">Message</p>
@@ -1033,7 +1039,7 @@
               <option value="tous">Tous les modèles</option>
               <option value="alertes">Ruptures et stock bas</option>
             </select>
-            <button type="button" onClick="{{ exportStockCsv }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);font-family:inherit">Exporter en CSV</button>
+            <button type="button" onClick="{{ exportStockCsv }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center;font-family:inherit">Exporter en CSV</button>
           </div>
           <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);overflow:auto">
             <table class="bo-table" style="width:100%;border-collapse:collapse;min-width:820px">
@@ -1050,7 +1056,7 @@
                     <td data-label="Vendues" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)">{{ r.vendue }}</td>
                     <td data-label="Seuil d'alerte" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)"><input type="number" min="0" step="1" inputMode="numeric" aria-label="Seuil d'alerte {{ r.modele }} {{ r.couleur }}" value="{{ r.seuil }}" onChange="{{ r.onSeuil }}" style="width:72px;height:38px;padding:0 10px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0);font-size:14px"></td>
                     <td data-label="Statut" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)"><span style="display:inline-block;white-space:nowrap;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ r.statutBg }};color:{{ r.statutFg }};box-shadow:{{ r.statutShadow }}">{{ r.levelLabel }}</span></td>
-                    <td style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);text-align:right"><button type="button" onClick="{{ r.makeLot }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);font-family:inherit">Générer un lot</button></td>
+                    <td style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);text-align:right"><button type="button" onClick="{{ r.makeLot }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center;font-family:inherit">Générer un lot</button></td>
                   </tr>
                 </sc-for>
               </tbody>
@@ -1061,7 +1067,7 @@
         </sc-if>
 
         <sc-if value="{{ isCommandeDetail }}">
-          <button type="button" onClick="{{ goCommandes }}" style="background:none;border:0;padding:0;margin-bottom:22px;color:rgb(94,94,94);cursor:pointer;font-size:13px">← Retour aux commandes</button>
+          <button type="button" onClick="{{ goCommandes }}" style="background:none;border:0;padding:0;margin-bottom:22px;color:rgb(94,94,94);cursor:pointer;font-size:13px;min-height:44px;display:inline-flex;align-items:center">← Retour aux commandes</button>
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:24px;align-items:start;max-width:1000px">
             <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:clamp(22px,3vw,32px)">
               <p style="margin:0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);margin-bottom:4px">{{ viewOrder.kindLabel }}</p>
@@ -1078,7 +1084,7 @@
                   <sc-for list="{{ viewOrder.pieces }}" as="vp" hint-placeholder-count="1">
                     <span style="display:flex;align-items:center;gap:8px">
                       <sc-if value="{{ vp.hasGift }}"><span aria-label="Cadeau" title="Cadeau" style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:3px 7px;background:rgb(255,251,248);color:rgb(71,29,27);box-shadow:inset 0 0 0 1px rgb(71,29,27)">Cadeau</span></sc-if>
-                      <button type="button" onClick="{{ vp.open }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);text-align:left;font-family:inherit;font-size:14px;text-align:right">{{ vp.label }}</button>
+                      <button type="button" onClick="{{ vp.open }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center;text-align:left;font-family:inherit;font-size:14px;text-align:right">{{ vp.label }}</button>
                     </span>
                   </sc-for>
                 </div>
@@ -1195,7 +1201,7 @@
               <sc-if value="{{ viewOrder.notOnline }}">
               <div style="border-top:1px solid rgba(0,0,0,.08);padding-top:16px;margin-top:4px">
                 <sc-if value="{{ isOrderDeleteClosed }}">
-                  <button type="button" onClick="{{ openOrderDelete }}" style="background:none;border:0;padding:0;color:rgb(155,24,33);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(155,24,33)">Supprimer cette vente</button>
+                  <button type="button" onClick="{{ openOrderDelete }}" style="background:none;border:0;padding:0;color:rgb(155,24,33);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(155,24,33);min-height:44px;display:inline-flex;align-items:center">Supprimer cette vente</button>
                 </sc-if>
                 <sc-if value="{{ isOrderDeleteOpen }}">
                   <p style="margin:0 0 10px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(155,24,33)">Supprimer cette vente</p>
@@ -1205,7 +1211,7 @@
                   </label>
                   <div style="display:flex;gap:16px;align-items:center;margin-top:10px">
                     <button type="button" onClick="{{ confirmDeleteOrder }}" disabled="{{ orderDeleteDisabled }}" style="height:46px;padding:0 22px;background:rgb(155,24,33);border:0;color:rgb(255,255,255);cursor:pointer;font-size:13px;letter-spacing:.08em;text-transform:uppercase;opacity:{{ orderDeleteOpacity }}">Confirmer la suppression</button>
-                    <button type="button" onClick="{{ closeOrderDelete }}" style="background:none;border:0;padding:0;color:rgb(94,94,94);cursor:pointer;font-size:13px">Annuler</button>
+                    <button type="button" onClick="{{ closeOrderDelete }}" style="background:none;border:0;padding:0;color:rgb(94,94,94);cursor:pointer;font-size:13px;min-height:44px;display:inline-flex;align-items:center">Annuler</button>
                   </div>
                 </sc-if>
               </div>
@@ -1215,7 +1221,7 @@
         </sc-if>
 
         <sc-if value="{{ isVenteForm }}">
-          <button type="button" onClick="{{ goCommandes }}" style="background:none;border:0;padding:0;margin-bottom:22px;color:rgb(94,94,94);cursor:pointer;font-size:13px">← Retour aux commandes</button>
+          <button type="button" onClick="{{ goCommandes }}" style="background:none;border:0;padding:0;margin-bottom:22px;color:rgb(94,94,94);cursor:pointer;font-size:13px;min-height:44px;display:inline-flex;align-items:center">← Retour aux commandes</button>
           <form onSubmit="{{ saveVente }}" noValidate style="display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start;max-width:1100px">
             <div style="flex:999 1 520px;min-width:0;background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:clamp(22px,3vw,32px);display:flex;flex-direction:column;gap:18px">
               <div role="tablist" aria-label="Étapes de la vente" class="bo-tabs-scroll" style="display:flex;gap:28px;overflow-x:auto;box-shadow:inset 0 -1px 0 rgba(0,0,0,.1)">
@@ -1235,14 +1241,14 @@
                   <input type="search" aria-label="Filtrer les pièces disponibles" value="{{ venteSearch }}" onChange="{{ setVenteSearch }}" placeholder="Filtrer par modèle ou n° de série…" style="margin-top:8px;width:100%;height:46px;padding:0 12px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);color:rgb(0,0,0);font-size:14px;padding:0 16px">
                   <div role="group" aria-label="Pièces disponibles" style="margin-top:8px;max-height:320px;overflow:auto;box-shadow:{{ ventePiecesShadow }}">
                     <sc-for list="{{ ventePieces }}" as="v" hint-placeholder-count="4">
-                      <label style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid rgba(0,0,0,.06);cursor:pointer;background:{{ v.bg }};opacity:{{ v.rowOpacity }}">
+                      <label style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid rgba(0,0,0,.06);cursor:{{ v.rowCursor }};background:{{ v.bg }}">
                         <input type="checkbox" checked="{{ v.checked }}" disabled="{{ v.notSellable }}" onChange="{{ v.toggle }}" aria-describedby="err-vente-pieces" style="flex:0 0 auto;width:18px;height:18px;margin:0;accent-color:rgb(71,29,27)">
-                        <div style="flex:0 0 40px;width:40px;height:40px;border-radius:50%;overflow:hidden;background:rgb(252,249,248);outline:1px solid oklch(0 0 0 / 0.1);outline-offset:-1px;display:flex;align-items:center;justify-content:center">
+                        <div style="flex:0 0 40px;width:40px;height:40px;border-radius:50%;overflow:hidden;background:rgb(252,249,248);outline:1px solid oklch(0 0 0 / 0.1);outline-offset:-1px;display:flex;align-items:center;justify-content:center;opacity:{{ v.photoOpacity }}">
                           <sc-if value="{{ v.hasPhoto }}"><img src="{{ v.photoSrc }}" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></sc-if>
                           <sc-if value="{{ v.noPhoto }}"><svg aria-hidden="true" viewBox="0 0 24 24" style="width:40%;height:40%;opacity:.3" fill="none" stroke="rgb(164,164,164)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h12l1 12H5L6 8Z"></path><path d="M9 8V6a3 3 0 0 1 6 0v2"></path></svg></sc-if>
                         </div>
                         <span style="flex:1;min-width:0">
-                          <span style="display:block;font-size:14px;color:rgb(0,0,0)">{{ v.modele }}</span>
+                          <span style="display:block;font-size:14px;color:{{ v.modeleColor }}">{{ v.modele }}</span>
                           <span style="display:block;margin-top:2px;font-size:12px;color:rgb(94,94,94)">{{ v.sub }}<sc-if value="{{ v.statutNote }}"> · {{ v.statutNote }}</sc-if></span>
                         </span>
                         <span style="flex:0 0 auto;font-size:13px;color:rgb(70,70,70);font-variant-numeric:tabular-nums">{{ v.prixLabel }}</span>
@@ -1382,13 +1388,13 @@
                       <td style="padding:14px 18px;text-align:right;border-bottom:1px solid rgba(0,0,0,.06)">
                         <sc-if value="{{ t.isInvite }}">
                           <div style="display:inline-flex;gap:16px;flex-wrap:wrap;justify-content:flex-end">
-                            <button type="button" onClick="{{ t.copyLink }}" aria-label="{{ t.copyAria }}" style="background:none;border:0;padding:0;color:rgb(70,70,70);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(70,70,70);white-space:nowrap">Copier le lien</button>
-                            <button type="button" onClick="{{ t.resend }}" aria-label="{{ t.resendAria }}" style="background:none;border:0;padding:0;color:rgb(70,70,70);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(70,70,70);white-space:nowrap">Renvoyer</button>
-                            <button type="button" onClick="{{ t.revoke }}" aria-label="{{ t.revokeAria }}" style="background:none;border:0;padding:0;color:rgb(70,70,70);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(70,70,70);white-space:nowrap">Annuler l'invitation</button>
+                            <button type="button" onClick="{{ t.copyLink }}" aria-label="{{ t.copyAria }}" style="background:none;border:0;padding:0;color:rgb(70,70,70);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(70,70,70);min-height:44px;display:inline-flex;align-items:center;white-space:nowrap">Copier le lien</button>
+                            <button type="button" onClick="{{ t.resend }}" aria-label="{{ t.resendAria }}" style="background:none;border:0;padding:0;color:rgb(70,70,70);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(70,70,70);min-height:44px;display:inline-flex;align-items:center;white-space:nowrap">Renvoyer</button>
+                            <button type="button" onClick="{{ t.revoke }}" aria-label="{{ t.revokeAria }}" style="background:none;border:0;padding:0;color:rgb(70,70,70);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(70,70,70);min-height:44px;display:inline-flex;align-items:center;white-space:nowrap">Annuler l'invitation</button>
                           </div>
                         </sc-if>
                         <sc-if value="{{ t.canToggle }}">
-                          <button type="button" onClick="{{ t.toggle }}" aria-label="{{ t.toggleAria }}" style="background:none;border:0;padding:0;color:rgb(70,70,70);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(70,70,70)">{{ t.toggleLabel }}</button>
+                          <button type="button" onClick="{{ t.toggle }}" aria-label="{{ t.toggleAria }}" style="background:none;border:0;padding:0;color:rgb(70,70,70);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(70,70,70);min-height:44px;display:inline-flex;align-items:center">{{ t.toggleLabel }}</button>
                         </sc-if>
                         <sc-if value="{{ t.lockedLabel }}">
                           <span style="font-size:12px;color:rgb(94,94,94)">{{ t.lockedLabel }}</span>
@@ -1486,7 +1492,7 @@
                       </div>
                     </td>
                     <td data-label="Pièce" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)">
-                      <button type="button" onClick="{{ o.openPiece }}" aria-label="{{ o.pieceAria }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);text-align:left;font-family:inherit">{{ o.pieceLabel }}</button>
+                      <button type="button" onClick="{{ o.openPiece }}" aria-label="{{ o.pieceAria }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center;text-align:left;font-family:inherit">{{ o.pieceLabel }}</button>
                     </td>
                     <td data-label="Pays" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)">{{ o.pays }}</td>
                     <td data-label="Association" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);font-variant-numeric:tabular-nums">{{ o.date }}</td>
@@ -1495,7 +1501,7 @@
                       <sc-if value="{{ o.noSav }}"><span style="color:rgb(94,94,94)">—</span></sc-if>
                     </td>
                     <td style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);text-align:right">
-                      <button type="button" onClick="{{ o.open }}" aria-label="{{ o.openAria }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);text-align:left;font-family:inherit">Fiche</button>
+                      <button type="button" onClick="{{ o.open }}" aria-label="{{ o.openAria }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center;text-align:left;font-family:inherit">Fiche</button>
                     </td>
                   </tr>
                 </sc-for>
@@ -1508,7 +1514,7 @@
         </sc-if>
 
         <sc-if value="{{ isProprietaire }}">
-          <button type="button" onClick="{{ goProprietaires }}" style="background:none;border:0;padding:0;margin-bottom:22px;color:rgb(94,94,94);cursor:pointer;font-size:13px">← Retour aux propriétaires</button>
+          <button type="button" onClick="{{ goProprietaires }}" style="background:none;border:0;padding:0;margin-bottom:22px;color:rgb(94,94,94);cursor:pointer;font-size:13px;min-height:44px;display:inline-flex;align-items:center">← Retour aux propriétaires</button>
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:24px;align-items:start;max-width:1100px">
             <div style="display:flex;flex-direction:column;gap:20px">
               <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:clamp(22px,3vw,32px)">
@@ -1518,7 +1524,7 @@
                 <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Pays</span><span>{{ viewOwner.pays }}</span></div>
                 <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Passeport activé le</span><span>{{ viewOwner.date }}</span></div>
                 <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px;border-bottom:1px solid rgba(0,0,0,.08)"><span style="color:rgb(94,94,94)">Commande d'origine</span>
-                  <sc-if value="{{ viewOwner.hasOrder }}"><button type="button" onClick="{{ viewOwner.openOrder }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);text-align:left;font-family:inherit;font-size:14px">{{ viewOwner.orderLabel }}</button></sc-if>
+                  <sc-if value="{{ viewOwner.hasOrder }}"><button type="button" onClick="{{ viewOwner.openOrder }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center;text-align:left;font-family:inherit;font-size:14px">{{ viewOwner.orderLabel }}</button></sc-if>
                   <sc-if value="{{ viewOwner.noOrder }}"><span style="color:rgb(94,94,94)">—</span></sc-if>
                 </div>
               </div>
@@ -1564,7 +1570,7 @@
                   </div>
                   <sc-if value="{{ savNoEffect }}">
                     <p style="margin:0;padding:12px 14px;background:rgb(255,251,248);font-size:12px;line-height:18px;color:rgb(70,70,70)">Cet évènement est une trace dans l'historique : il ne remet pas la pièce en stock et ne dissocie pas le passeport. Pour la remettre en vente, annulez sa commande d'origine.
-                      <sc-if value="{{ viewOwner.hasOrder }}"><button type="button" onClick="{{ viewOwner.openOrder }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);text-align:left;font-family:inherit;display:block;margin-top:6px;font-size:12px">Ouvrir la commande {{ viewOwner.orderLabel }}</button></sc-if>
+                      <sc-if value="{{ viewOwner.hasOrder }}"><button type="button" onClick="{{ viewOwner.openOrder }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center;text-align:left;font-family:inherit;display:block;margin-top:6px;font-size:12px">Ouvrir la commande {{ viewOwner.orderLabel }}</button></sc-if>
                     </p>
                   </sc-if>
                   <sc-if value="{{ savNeedsReplacement }}">
@@ -1599,11 +1605,11 @@
                     </div>
                     <sc-if value="{{ e.note }}"><p style="margin:10px 0 0;font-size:14px;line-height:21px;color:rgb(0,0,0)">{{ e.note }}</p></sc-if>
                     <sc-if value="{{ e.replacementLabel }}">
-                      <p style="margin:8px 0 0;font-size:13px;color:rgb(70,70,70)">Remplacée par <button type="button" onClick="{{ e.openReplacement }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);text-align:left;font-family:inherit">{{ e.replacementLabel }}</button></p>
+                      <p style="margin:8px 0 0;font-size:13px;color:rgb(70,70,70)">Remplacée par <button type="button" onClick="{{ e.openReplacement }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center;text-align:left;font-family:inherit">{{ e.replacementLabel }}</button></p>
                     </sc-if>
                     <div style="display:flex;justify-content:space-between;gap:12px;margin-top:8px">
                       <span style="font-size:12px;color:rgb(94,94,94)">Ajouté par {{ e.auteur }}</span>
-                      <button type="button" onClick="{{ e.remove }}" aria-label="{{ e.removeAria }}" style="background:none;border:0;padding:0;color:rgb(94,94,94);cursor:pointer;font-size:12px;border-bottom:1px solid rgba(0,0,0,.3)">Retirer</button>
+                      <button type="button" onClick="{{ e.remove }}" aria-label="{{ e.removeAria }}" style="background:none;border:0;padding:0;color:rgb(94,94,94);cursor:pointer;font-size:12px;border-bottom:1px solid rgba(0,0,0,.3);min-height:44px;display:inline-flex;align-items:center">Retirer</button>
                     </div>
                   </div>
                 </sc-for>
@@ -2182,6 +2188,18 @@ class Component extends DCLogic {
       this._mq.addEventListener('change', this._onMq);
     } catch(e) {}
     this._onKey = e => {
+      // Piège le Tab à l'intérieur de la boîte de dialogue ouverte (confirmation ou invitation) :
+      // sans ça, Tab/Shift+Tab fait sortir le focus vers la page derrière, invisible sous l'overlay.
+      if (e.key === 'Tab' && (this.state.confirm || this.state.invite)) {
+        const dialog = document.querySelector('[role="dialog"]');
+        const focusables = dialog ? Array.from(dialog.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')).filter(el => !el.disabled && el.offsetParent !== null) : [];
+        if (focusables.length) {
+          const first = focusables[0], last = focusables[focusables.length - 1];
+          if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+          else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+        }
+        return;
+      }
       if (e.key !== 'Escape') return;
       if (this.state.confirm) this.setState({confirm:null});
       else if (this.state.invite) this.setState({invite:null});
@@ -2510,8 +2528,10 @@ class Component extends DCLogic {
         livraisonTelephone: o.livraison ? (o.livraison.telephone || '') : '',
         livraisonCodePostal: o.livraison ? (o.livraison.codePostal || '') : '',
         // Le total encaissé ventile en « prix du sac » (les pièces) + frais de livraison, quand ces frais sont connus.
-        hasFrais: !!(o.livraison && Number(o.livraison.frais) > 0),
-        fraisLabel: o.livraison ? fmtFcfa(o.livraison.frais) : '',
+        // On distingue « pas de frais connus » (frais absent) de « livraison offerte » (frais=0) : les deux
+        // n'ont pas le même sens pour la cliente, la seconde mérite d'être dite plutôt que masquée.
+        hasFrais: !!(o.livraison && o.livraison.frais !== undefined && o.livraison.frais !== null && o.livraison.frais !== ''),
+        fraisLabel: !o.livraison ? '' : (Number(o.livraison.frais) === 0 ? 'Offerte' : fmtFcfa(o.livraison.frais)),
         prixArticlesLabel: fmtFcfa((Number(o.total) || 0) - (o.livraison && Number(o.livraison.frais) > 0 ? Number(o.livraison.frais) : 0)),
         transporteurLabel: o.transporteur || '—',
         dateExpeditionLabel: o.dateExpedition ? fmtIsoDate(o.dateExpedition) : '',
@@ -2721,7 +2741,7 @@ class Component extends DCLogic {
       leaveAccept: () => this.leaveAccept(),
       loginErr: s.loginErr, loginInfo: s.loginInfo,
       submitLogin: e => this.submitLogin(e),
-      forgotPassword: () => this.setState({loginErr:'', loginInfo:"Demandez à la Direction de réinitialiser votre accès depuis l'espace Équipe."}),
+      forgotPassword: () => this.setState({loginErr:'', loginInfo:"Demandez à la Direction : elle peut désactiver puis réinviter votre compte depuis l'espace Équipe."}),
       btnBlock, btnUpperSm, btnUpperSmDanger, btnUpperSmModal,
       me: {nom:displayName(me), roleLabel:(ROLES.find(r => r.key===me.role)||ROLES[0]).label},
 
@@ -2943,6 +2963,8 @@ class Component extends DCLogic {
       orderStatutFilter: s.orderStatutFilter, setOrderStatutFilter: e => this.setState({orderStatutFilter:e.target.value}),
       canalFilter: s.canalFilter, setCanalFilter: e => this.setState({canalFilter:e.target.value}),
       filteredOrders, noOrders: filteredOrders.length===0,
+      ordersEmpty: s.orders.length===0,
+      noOrdersText: s.orders.length===0 ? 'Aucune commande pour l\'instant.' : 'Aucune commande ne correspond à cette recherche.',
       ordersCount: (() => {
         const horsSite = s.orders.filter(o => o.canal!=='en_ligne').length;
         const base = filteredOrders.length===s.orders.length ? s.orders.length + ' commandes' : filteredOrders.length + ' sur ' + s.orders.length + ' commandes';
@@ -3089,8 +3111,12 @@ class Component extends DCLogic {
             const sellable = p.eff==='disponible';
             return {...p, checked: v.pieceIds.includes(p.id), sellable, notSellable: !sellable,
               statutNote: NON_SELLABLE_NOTE[p.eff] || '',
-              bg: v.pieceIds.includes(p.id) ? 'rgb(255,251,248)' : 'rgb(255,255,255)',
-              rowOpacity: sellable ? 1 : .45,
+              // Griser via opacity sur toute la ligne rendait le motif (le texte le plus utile ici) illisible
+              // (contraste ~2:1). On mute seulement la couleur du nom, et on assombrit juste la photo.
+              bg: sellable ? (v.pieceIds.includes(p.id) ? 'rgb(255,251,248)' : 'rgb(255,255,255)') : 'rgb(249,247,246)',
+              rowCursor: sellable ? 'pointer' : 'not-allowed',
+              modeleColor: sellable ? 'rgb(0,0,0)' : 'rgb(110,110,110)',
+              photoOpacity: sellable ? 1 : .5,
               sub: p.serie + (p.couleur ? ' · ' + p.couleur : ''),
               toggle: sellable ? () => this.setState(st => {
                 const ids = st.vente.pieceIds.includes(p.id) ? st.vente.pieceIds.filter(x => x!==p.id) : st.vente.pieceIds.concat([p.id]);
@@ -3258,6 +3284,8 @@ class Component extends DCLogic {
       statutFilter: s.statutFilter, setStatutFilter: e => this.setState({statutFilter:e.target.value}),
       sortBy: s.sortBy, setSortBy: e => this.setState({sortBy:e.target.value}),
       filteredPieces, noPieces: filteredPieces.length===0,
+      registreEmpty: s.pieces.length===0,
+      noPiecesText: s.pieces.length===0 ? "Aucune pièce au registre pour l'instant." : 'Aucune pièce ne correspond à cette recherche.',
       piecesCount: (() => {
         const nDispo = decPieces.filter(p => p.eff==='disponible').length;
         const nRes = decPieces.filter(p => p.eff==='reserve').length;
