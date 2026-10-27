@@ -1176,6 +1176,7 @@
               </sc-if>
               <x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="primary" disabled="{{ orderUnchanged }}" dc-props="{{ btnBlock }}" hint-size="100%,58px">Mettre à jour</x-import>
 
+              <sc-if value="{{ viewOrder.notOnline }}">
               <div style="border-top:1px solid rgba(0,0,0,.08);padding-top:16px;margin-top:4px">
                 <sc-if value="{{ isOrderDeleteClosed }}">
                   <button type="button" onClick="{{ openOrderDelete }}" style="background:none;border:0;padding:0;color:rgb(155,24,33);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(155,24,33)">Supprimer cette vente</button>
@@ -1192,6 +1193,7 @@
                   </div>
                 </sc-if>
               </div>
+              </sc-if>
             </form>
           </div>
         </sc-if>
