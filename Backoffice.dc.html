@@ -3473,7 +3473,7 @@ class Component extends DCLogic {
         const start = serieCounter(s.pieces, s.serieMax, key) + 1;
         const first = fmtSerie(key, start);
         const n = lf.variants.reduce((t,v) => t + (Number(v.quantite) || 0), 0);
-        if (n >= 1 && n <= 500) {
+        if (n >= 1 && n <= 5000) {
           const last = fmtSerie(key, start + n - 1);
           return n === 1 ? 'Numéro de série émis : ' + first + '.' : 'Numéros de série émis : ' + first + ' → ' + last + ' (' + n + ' pièces).';
         }
@@ -3515,7 +3515,7 @@ class Component extends DCLogic {
           }
         }
         const quantiteNum = rows.reduce((t,v) => t + (Number(v.quantite) || 0), 0);
-        if (!err.variants && quantiteNum > 500) err.variants = 'Générez au plus 500 pièces à la fois, toutes couleurs confondues.';
+        if (!err.variants && quantiteNum > 5000) err.variants = 'Générez au plus 5 000 pièces à la fois, toutes couleurs confondues : au-delà, faites plusieurs lots.';
         if (Object.keys(err).length) { this.setState({lotErr:err}, () => this.focusFirstInvalid()); return; }
         const annee = /^\d{4}$/.test(raw.annee) ? raw.annee : String(new Date().getFullYear());
         const sKey = serieKey(modele, annee);
