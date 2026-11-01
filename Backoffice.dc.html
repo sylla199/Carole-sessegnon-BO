@@ -419,13 +419,14 @@
           </sc-if>
           <p style="margin:0 0 10px;font-size:13px;color:rgb(94,94,94)">{{ piecesCount }}</p>
           <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);overflow:auto">
-            <table class="bo-table" style="width:100%;border-collapse:collapse;min-width:760px">
+            <table class="bo-table" style="width:100%;border-collapse:collapse;min-width:880px">
               <thead>
                 <tr style="text-align:left">
                   <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Pièce</th>
                   <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">N° de série</th>
                   <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Prix</th>
                   <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Fabrication</th>
+                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Stock disponible</th>
                   <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Statut</th>
                   <th style="padding:14px 18px;border-bottom:1px solid rgba(0,0,0,.1)"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Actions</span></th>
                 </tr>
@@ -448,6 +449,7 @@
                     <td data-label="N° de série" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);font-variant-numeric:tabular-nums;border-bottom:1px solid rgba(0,0,0,.06)">{{ p.serie }}</td>
                     <td data-label="Prix" style="padding:14px 18px;font-size:13px;color:{{ p.prixColor }};font-variant-numeric:tabular-nums;white-space:nowrap;border-bottom:1px solid rgba(0,0,0,.06)">{{ p.prixLabel }}</td>
                     <td data-label="Fabrication" style="padding:14px 18px;font-size:13px;color:{{ p.dateFabColor }};border-bottom:1px solid rgba(0,0,0,.06)">{{ p.dateFabLabel }}</td>
+                    <td data-label="Stock disponible" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);font-variant-numeric:tabular-nums;white-space:nowrap;border-bottom:1px solid rgba(0,0,0,.06)">{{ p.dispoLabel }}</td>
                     <td data-label="Statut" style="padding:14px 18px;border-bottom:1px solid rgba(0,0,0,.06)">
                       <span style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ p.statutBg }};color:{{ p.statutFg }};box-shadow:{{ p.statutShadow }}">{{ p.statutLabel }}</span>
                     </td>
@@ -711,6 +713,7 @@
                 </span>
               </div>
               <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Prix</span><span style="font-variant-numeric:tabular-nums">{{ viewPiece.prixLabel }}</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Stock disponible</span><span style="font-variant-numeric:tabular-nums">{{ viewPiece.dispoLabel }}</span></div>
               <sc-if value="{{ viewPiece.matiere }}"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Matière</span><span style="text-align:right">{{ viewPiece.matiere }}</span></div></sc-if>
               <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Fabrication</span><span>{{ viewPiece.dateFabLabel }}</span></div>
               <sc-if value="{{ viewPiece.hasOrder }}"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Commande</span><button type="button" onClick="{{ viewPiece.openOrder }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:14px;border-bottom:1px solid rgb(71,29,27);text-align:right;min-height:44px;display:inline-flex;align-items:center">{{ viewPiece.orderLabel }}</button></div></sc-if>
@@ -2478,6 +2481,12 @@ class Component extends DCLogic {
         open: () => viewPiece(p),
         edit: e => { if (e && e.stopPropagation) e.stopPropagation(); openPieceEdit(p); }};
     });
+    // Stock disponible par modèle + couleur, affiché sur chaque pièce (liste et fiche détail) :
+    // combien d'exemplaires de ce modèle, dans cette couleur, sont actuellement à la vente.
+    const dispoByKey = {};
+    decPieces.forEach(p => { if (p.eff==='disponible') { const k = p.modele + '\u0001' + (p.couleur||''); dispoByKey[k] = (dispoByKey[k]||0) + 1; } });
+    const dispoCountFor = (modele, couleur) => dispoByKey[modele + '\u0001' + (couleur||'')] || 0;
+    decPieces.forEach(p => { p.dispoCount = dispoCountFor(p.modele, p.couleur); p.dispoLabel = p.dispoCount + (p.dispoCount>1 ? ' disponibles' : ' disponible'); });
     const q = s.search.trim().toLowerCase();
     // Juste après la génération d'un lot, on n'affiche que ce lot (bandeau « Afficher tout le registre »)
     // sans modifier la recherche ni les filtres de l'utilisateur.
@@ -3485,6 +3494,7 @@ class Component extends DCLogic {
         return {...p, eff,
           statutLabel:STATUT_LABEL[eff] || eff, ...BADGE[STATUT_KIND[eff] || 'neutral'],
           refLabel: [p.reference, p.couleur].filter(Boolean).join(' · '),
+          dispoLabel: dispoCountFor(p.modele, p.couleur) + (dispoCountFor(p.modele, p.couleur)>1 ? ' disponibles' : ' disponible'),
           prixLabel: fmtFcfa(p.prix), dateFabLabel: fmtIsoDate(p.dateFab),
           hasPhotos: photos.length>0, noPhotos: photos.length===0,
           hasMultiplePhotos: photos.length>1,
