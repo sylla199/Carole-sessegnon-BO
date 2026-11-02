@@ -1089,9 +1089,19 @@
         </sc-if>
 
         <sc-if value="{{ isStock }}">
-          <div style="display:flex;gap:10px 28px;flex-wrap:wrap;margin-bottom:18px;font-size:14px;color:rgb(70,70,70)">
-            <span style="color:rgb(0,0,0)"><strong style="font-weight:600">{{ stockTotalLabel }}</strong></span>
-            <sc-for list="{{ stockParPays }}" as="sp"><span>{{ sp.label }}</span></sc-for>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:16px;margin-bottom:24px">
+            <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:22px">
+              <p style="margin:0 0 10px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">Stock global</p>
+              <p style="margin:0;font-family:var(--font-display);font-size:clamp(26px,2.4vw,32px);color:rgb(71,29,27)">{{ stockTotal }}</p>
+              <p style="margin:8px 0 0;font-size:12px;color:rgb(94,94,94)">pièces disponibles, tous pays</p>
+            </div>
+            <sc-for list="{{ stockParPays }}" as="sp" hint-placeholder-count="2">
+              <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:22px">
+                <p style="margin:0 0 10px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">{{ sp.lieu }}</p>
+                <p style="margin:0;font-family:var(--font-display);font-size:clamp(26px,2.4vw,32px);color:rgb(71,29,27)">{{ sp.n }}</p>
+                <p style="margin:8px 0 0;font-size:12px;color:rgb(94,94,94)">{{ sp.hint }}</p>
+              </div>
+            </sc-for>
           </div>
           <div role="tablist" aria-label="Stock" class="bo-tabs-scroll" style="display:flex;gap:28px;overflow-x:auto;margin-bottom:24px;box-shadow:inset 0 -1px 0 rgba(0,0,0,.1)">
             <sc-for list="{{ stockTabs }}" as="tab" hint-placeholder-count="3">
@@ -2859,7 +2869,7 @@ class Component extends DCLogic {
         dispoColor: level==='rupture' ? 'rgb(155,24,33)' : 'rgb(0,0,0)',
         makeLot: () => this.go('lot-form', {lotForm:(() => { const c = r.couleur === 'Sans couleur précisée' ? '' : r.couleur; return Object.assign(this._emptyLot(), {modele:r.modele, couleur:c, variants:[{couleur:c, quantite:'', prix:''}]}); })(), lotErr:{}, lotSource:''})};
     }).sort((a,b) => ({rupture:0, bas:1, ok:2})[a.level] - ({rupture:0, bas:1, ok:2})[b.level] || a.modele.localeCompare(b.modele) || a.couleur.localeCompare(b.couleur));
-    const stockParPays = LIEUX.map(l => { const n = stockRows.reduce((t, r) => t + (r.byLieu[l] || 0), 0); return {label: l + ' : ' + n + (n>1 ? ' pièces disponibles' : ' pièce disponible')}; });
+    const stockParPays = LIEUX.map(l => { const n = stockRows.reduce((t, r) => t + (r.byLieu[l] || 0), 0); return {lieu:l, n, hint: n>1 ? 'pièces disponibles' : 'pièce disponible'}; });
     const stockRupture = stockRows.filter(r => r.level==='rupture').length;
     const stockBas = stockRows.filter(r => r.level==='bas').length;
     const stockToWatch = stockRupture + stockBas;
