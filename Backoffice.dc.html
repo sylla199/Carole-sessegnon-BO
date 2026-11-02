@@ -1122,32 +1122,41 @@
           </div>
           <sc-if value="{{ isStockTab }}">
           <p style="margin:0 0 20px;font-size:14px;color:rgb(70,70,70);max-width:68ch">Calculé depuis le registre : une pièce vendue sort du stock, une pièce reçue de l'atelier y entre. Réglez un seuil par modèle, couleur et pays pour être prévenu avant la rupture.</p>
+          <p style="margin:0 0 10px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">Filtrer</p>
           <div style="display:flex;gap:10px 16px;flex-wrap:wrap;align-items:center;margin-bottom:20px">
-            <span style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:6px 11px;background:rgba(155,24,33,.08);color:rgb(155,24,33)">{{ stockRuptureLabel }}</span>
-            <span style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:6px 11px;background:rgb(250,241,235);color:rgb(115,60,8);box-shadow:inset 0 0 0 1px rgb(233,199,176)">{{ stockBasLabel }}</span>
-            <sc-if value="{{ stockOk }}"><span style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:6px 11px;background:rgb(71,29,27);color:rgb(255,255,255)">{{ stockOkLabel }}</span></sc-if>
+            <sc-if value="{{ stockRupture }}"><button type="button" aria-pressed="{{ stockAlertesPressed }}" onClick="{{ setStockAlertes }}" style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:6px 11px;background:rgba(155,24,33,.08);color:rgb(155,24,33);border:0;cursor:pointer;box-shadow:{{ stockAlertesShadow }}">{{ stockRuptureLabel }}</button></sc-if>
+            <sc-if value="{{ stockBas }}"><button type="button" aria-pressed="{{ stockAlertesPressed }}" onClick="{{ setStockAlertes }}" style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:6px 11px;background:rgb(250,241,235);color:rgb(115,60,8);border:0;cursor:pointer;box-shadow:inset 0 0 0 1px rgb(233,199,176)">{{ stockBasLabel }}</button></sc-if>
+            <button type="button" aria-pressed="{{ stockTousPressed }}" onClick="{{ setStockTous }}" style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:6px 11px;background:{{ stockTousBg }};color:{{ stockTousFg }};border:0;cursor:pointer">{{ stockOkLabel }}</button>
             <sc-if value="{{ transitCount }}"><button type="button" onClick="{{ goTransferts }}" style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:6px 11px;background:rgb(255,255,255);color:rgb(71,29,27);border:0;cursor:pointer;box-shadow:inset 0 0 0 1px rgb(71,29,27);min-height:32px">{{ transitCount }} en transit</button></sc-if>
             <span style="flex:1 1 auto"></span>
-            <select aria-label="Filtrer le stock" value="{{ stockFilter }}" onChange="{{ onStockFilter }}" style="height:46px;padding:0 14px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0);font-size:14px">
-              <option value="tous">Tous les modèles</option>
-              <option value="alertes">Ruptures et stock bas</option>
-            </select>
             <button type="button" onClick="{{ exportStockCsv }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center;font-family:inherit">Exporter en CSV</button>
           </div>
           <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);overflow:auto">
             <table class="bo-table" style="width:100%;border-collapse:collapse;min-width:760px">
               <thead><tr>
-                <th style="padding:12px 12px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Modèle</th><th style="padding:12px 12px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Couleur</th><th style="padding:12px 12px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Statut</th><th style="padding:12px 12px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Disponibles · seuil</th><th style="padding:12px 12px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Fabrication</th><th style="padding:12px 12px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Vendues</th><th style="position:relative;padding:12px 12px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Actions</span></th>
+                <th style="padding:12px 12px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Modèle</th><th style="padding:12px 12px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Couleur</th><th style="padding:12px 12px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Disponible par pays</th><th style="padding:12px 12px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Fabrication</th><th style="padding:12px 12px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Vendues</th><th style="position:relative;padding:12px 12px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Actions</span></th>
               </tr></thead>
               <tbody>
                 <sc-for list="{{ stockRows }}" as="r" hint-placeholder-count="5">
-                  <tr>
-                    <td data-label="Modèle" style="padding:14px 12px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);color:rgb(0,0,0)">{{ r.modele }}</td>
+                  <tr style="box-shadow:{{ r.accentShadow }}">
+                    <td data-label="Modèle" style="padding:14px 12px 14px 16px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);color:rgb(0,0,0)">{{ r.modele }}</td>
                     <td data-label="Couleur" style="padding:14px 12px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)">{{ r.couleur }}</td>
-                    <td data-label="Statut" style="padding:14px 12px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)"><span style="display:inline-block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ r.statutBg }};color:{{ r.statutFg }};box-shadow:{{ r.statutShadow }}">{{ r.levelLabel }}</span></td>
-                    <td data-label="Par pays" style="padding:14px 12px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)"><div style="display:flex;flex-direction:column;gap:6px">
-                      <sc-for list="{{ r.lieux }}" as="lx" hint-placeholder-count="2"><div style="display:flex;align-items:center;gap:10px;white-space:nowrap"><span style="min-width:92px">{{ lx.lieu }}</span><span style="font-family:var(--font-display);font-size:20px;min-width:24px;text-align:center;color:{{ lx.color }}" title="Pièces disponibles">{{ lx.n }}</span><span style="font-size:12px;color:rgb(94,94,94)">seuil</span><input type="number" min="0" step="1" inputMode="numeric" aria-label="{{ lx.label }}" value="{{ lx.seuil }}" onChange="{{ lx.onSeuil }}" style="width:56px;height:44px;padding:0 8px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0);font-size:14px"></div></sc-for>
-                    </div></td>
+                    <td data-label="Disponible par pays" style="padding:14px 12px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)">
+                      <div style="display:flex;gap:10px;flex-wrap:wrap">
+                        <sc-for list="{{ r.lieux }}" as="lx" hint-placeholder-count="2">
+                          <div style="min-width:118px;padding:8px 10px;background:rgb(252,249,248);box-shadow:{{ lx.chipShadow }}">
+                            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px">
+                              <span style="font-size:11px;letter-spacing:.02em;color:rgb(94,94,94);white-space:nowrap">{{ lx.lieu }}</span>
+                              <sc-if value="{{ lx.levelWord }}"><span style="font-size:10px;letter-spacing:.04em;text-transform:uppercase;color:{{ lx.color }}">{{ lx.levelWord }}</span></sc-if>
+                            </div>
+                            <span style="display:block;margin-top:2px;font-family:var(--font-display);font-size:22px;color:{{ lx.color }}" title="Pièces disponibles">{{ lx.n }}</span>
+                            <label style="display:flex;align-items:center;gap:6px;margin-top:6px;font-size:11px;color:rgb(94,94,94)">Seuil
+                              <input type="number" min="0" step="1" inputMode="numeric" aria-label="{{ lx.label }}" value="{{ lx.seuil }}" onChange="{{ lx.onSeuil }}" style="width:48px;height:36px;padding:0 6px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0);font-size:13px">
+                            </label>
+                          </div>
+                        </sc-for>
+                      </div>
+                    </td>
                     <td data-label="En fabrication" style="padding:14px 12px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)">{{ r.fabLabel }}</td>
                     <td data-label="Vendues" style="padding:14px 12px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)">{{ r.vendue }}</td>
                     <td style="padding:14px 12px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);text-align:right"><button type="button" onClick="{{ r.makeLot }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);font-family:inherit;min-height:44px;display:inline-flex;align-items:center;white-space:nowrap">Générer un lot</button></td>
@@ -2946,7 +2955,10 @@ class Component extends DCLogic {
     const stockRows = Object.values(stockMap).map(r => {
       const lieux = LIEUX.concat(Object.keys(r.byLieu).filter(l => !LIEUX.includes(l))).map(l => {
         const n = r.byLieu[l] || 0, seuil = seuilOf(r.key, l);
-        return {lieu:l, n, seuil, low: seuil>0 && n<=seuil, color: (seuil>0 && n===0) ? 'rgb(155,24,33)' : (seuil>0 && n<=seuil) ? 'rgb(115,60,8)' : 'rgb(0,0,0)',
+        const isRupture = seuil>0 && n===0, isBas = seuil>0 && n>0 && n<=seuil;
+        return {lieu:l, n, seuil, low: isRupture || isBas, levelWord: isRupture ? 'Rupture' : isBas ? 'Bas' : '',
+          color: isRupture ? 'rgb(155,24,33)' : isBas ? 'rgb(115,60,8)' : 'rgb(0,0,0)',
+          chipShadow: isRupture ? 'inset 0 0 0 1px rgb(155,24,33)' : isBas ? 'inset 0 0 0 1px rgb(233,199,176)' : 'inset 0 0 0 1px rgba(0,0,0,.08)',
           label: 'Seuil d\'alerte ' + r.modele + ' ' + r.couleur + ' ' + l,
           onSeuil: e => {
             const v = Math.max(0, Math.floor(Number(e.target.value) || 0));
@@ -2957,7 +2969,8 @@ class Component extends DCLogic {
       const lowLieux = lieux.filter(x => x.low).map(x => x.lieu);
       const level = r.dispo===0 ? 'rupture' : (lowLieux.length ? 'bas' : 'ok');
       const b = BADGE[level==='ok' ? 'doneFilled' : level==='bas' ? 'offsale' : 'alert'];
-      return {...r, ...b, lieux, level, fabLabel: r.fab ? String(r.fab) : '—', bientotLabel: r.bientot ? String(r.bientot) : '—',
+      const accentShadow = level==='rupture' ? 'inset 3px 0 0 rgb(155,24,33)' : level==='bas' ? 'inset 3px 0 0 rgb(202,150,114)' : 'none';
+      return {...r, ...b, lieux, level, accentShadow, fabLabel: r.fab ? String(r.fab) : '—', bientotLabel: r.bientot ? String(r.bientot) : '—',
         levelLabel: level==='ok' ? 'En stock' : level==='bas' ? [lieux.filter(x => x.low && x.n===0).map(x => x.lieu).join(', ') && 'Manque : ' + lieux.filter(x => x.low && x.n===0).map(x => x.lieu).join(', '), lieux.filter(x => x.low && x.n>0).map(x => x.lieu).join(', ') && 'Bas : ' + lieux.filter(x => x.low && x.n>0).map(x => x.lieu).join(', ')].filter(Boolean).join(' · ') : (r.fab ? 'Rupture · en fabrication' : 'Rupture'),
         dispoColor: level==='rupture' ? 'rgb(155,24,33)' : 'rgb(0,0,0)',
         makeLot: () => this.go('lot-form', {lotForm:(() => { const c = r.couleur === 'Sans couleur précisée' ? '' : r.couleur; return Object.assign(this._emptyLot(), {modele:r.modele, couleur:c, variants:[{couleur:c, quantite:'', prix:''}]}); })(), lotErr:{}, lotSource:''})};
@@ -3200,11 +3213,15 @@ class Component extends DCLogic {
       receiveAll: () => receive(transitList, 'recevoir'), receiveAllLabel: 'Tout réceptionner (' + transitCount + ')',
       retoursList, hasRetours: retoursList.length>0, inventaire,
       stockParPays, stockRows: stockShown, hasStock: stockShown.length>0, stockFilter: s.stockFilter,
-      onStockFilter: e => this.setState({stockFilter:e.target.value}),
       stockRupture, stockBas, stockOk: stockRows.length - stockToWatch, stockToWatch,
+      stockAlertesPressed: s.stockFilter==='alertes' ? 'true' : 'false', stockTousPressed: s.stockFilter!=='alertes' ? 'true' : 'false',
+      stockAlertesShadow: s.stockFilter==='alertes' ? 'inset 0 0 0 1.5px rgb(155,24,33)' : 'none',
+      stockTousBg: s.stockFilter!=='alertes' ? 'rgb(71,29,27)' : 'rgb(255,255,255)',
+      stockTousFg: s.stockFilter!=='alertes' ? 'rgb(255,255,255)' : 'rgb(71,29,27)',
+      setStockAlertes: () => this.setState({stockFilter:'alertes'}), setStockTous: () => this.setState({stockFilter:'tous'}),
       stockRuptureLabel: stockRupture + (stockRupture>1 ? ' ruptures' : ' rupture'),
       stockBasLabel: stockBas + ' en stock bas',
-      stockOkLabel: (stockRows.length - stockToWatch) + ' en stock',
+      stockOkLabel: 'Tout voir (' + stockRows.length + ')',
       defaultSeuil: DEFAULT_SEUIL,
       exportStockCsv: () => this.downloadCsv('stock-carole-sessegnon.csv',
         [['Modèle','Couleur','Disponibles (total)'].concat(LIEUX.map(l => 'Disponibles — ' + l), LIEUX.map(l => 'Seuil — ' + l), ['En fabrication','Bientôt disponibles','Vendues','Statut'])]
