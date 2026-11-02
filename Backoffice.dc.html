@@ -916,6 +916,10 @@
                   <option value="popup">Pop-up</option>
                   <option value="directe">Vente directe</option>
                 </select>
+                <select aria-label="Filtrer par pays" value="{{ paysFilter }}" onChange="{{ setPaysFilter }}" style="flex:1 1 160px;height:46px;padding:0 12px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);color:rgb(0,0,0);font-size:14px">
+                  <option value="tous">Tous les pays</option>
+                  <sc-for list="{{ paysFilterOpts }}" as="pf"><option value="{{ pf.value }}">{{ pf.value }}</option></sc-for>
+                </select>
                 <select aria-label="Filtrer par statut" value="{{ orderStatutFilter }}" onChange="{{ setOrderStatutFilter }}" style="flex:1 1 160px;height:46px;padding:0 12px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);color:rgb(0,0,0);font-size:14px">
                   <option value="tous">Tous les statuts</option>
                   <option value="preparation">En préparation</option>
@@ -937,7 +941,7 @@
               <thead>
                 <tr style="text-align:left">
                   <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">N° de commande</th>
-                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Canal</th>
+                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Provenance</th>
                   <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Client</th>
                   <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Pièces</th>
                   <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Total</th>
@@ -950,9 +954,9 @@
                 <sc-for list="{{ filteredOrders }}" as="o" hint-placeholder-count="5">
                   <tr onClick="{{ o.open }}" style="cursor:pointer;transition:background-color .15s" style-hover="background:rgb(255,251,248)">
                     <td style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);font-size:14px;color:rgb(0,0,0);font-variant-numeric:tabular-nums;white-space:nowrap">{{ o.no }}<sc-if value="{{ o.hasGift }}"><span style="display:inline-block;margin-left:8px;font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:3px 7px;background:rgb(255,251,248);color:rgb(71,29,27);box-shadow:inset 0 0 0 1px rgb(71,29,27)">Cadeau</span></sc-if></td>
-                    <td data-label="Canal" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);max-width:160px">
+                    <td data-label="Provenance" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);max-width:220px">
                       <div>
-                        <span style="display:block">{{ o.canalLabel }}</span>
+                        <span style="display:block">{{ o.provenance }}</span>
                         <sc-if value="{{ o.evenement }}"><span title="{{ o.evenement }}" style="display:block;margin-top:2px;font-size:12px;color:rgb(94,94,94);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ o.evenement }}</span></sc-if>
                       </div>
                     </td>
@@ -1223,7 +1227,13 @@
                 <p style="margin:0;font-family:var(--font-display);font-size:24px;color:rgb(71,29,27)">{{ viewOrder.no }}</p>
                 <span style="display:inline-block;white-space:nowrap;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ viewOrder.statutBg }};color:{{ viewOrder.statutFg }};box-shadow:{{ viewOrder.statutShadow }}">{{ viewOrder.statutLabel }}</span>
               </div>
-              <p style="margin:0 0 22px;font-size:13px;color:rgb(94,94,94)">{{ viewOrder.subline }}</p>
+              <p style="margin:0 0 18px;font-size:13px;color:rgb(94,94,94)">{{ viewOrder.subline }}</p>
+              <div style="margin:0 0 22px;padding:14px 18px;background:rgb(255,251,248);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)">
+                <p style="margin:0 0 4px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(71,29,27)">Provenance de la commande</p>
+                <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:0;font-size:14px"><span style="color:rgb(94,94,94)">Canal</span><span style="text-align:right">{{ viewOrder.canalLabel }}</span></div>
+                <sc-if value="{{ viewOrder.evenement }}"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Événement ou lieu</span><span style="text-align:right">{{ viewOrder.evenement }}</span></div></sc-if>
+                <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Pays</span><span style="text-align:right">{{ viewOrder.paysLabel }}</span></div>
+              </div>
               <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Client</span><span style="text-align:right">{{ viewOrder.clientLabel }}</span></div>
               <sc-if value="{{ viewOrder.email }}"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">E-mail</span><span style="overflow-wrap:anywhere;text-align:right">{{ viewOrder.email }}</span></div></sc-if>
               <sc-if value="{{ viewOrder.telephone }}"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Téléphone</span><span style="text-align:right">{{ viewOrder.telephone }}</span></div></sc-if>
@@ -1245,7 +1255,6 @@
               <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Date</span><span>{{ viewOrder.dateLabel }}</span></div>
               <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Paiement</span><span style="text-align:right">{{ viewOrder.paiementLabel }}</span></div>
               <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Réception</span><span style="text-align:right">{{ viewOrder.mode }}</span></div>
-              <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Pays</span><span style="text-align:right">{{ viewOrder.paysLabel }}</span></div>
               <sc-if value="{{ viewOrder.isOnline }}">
                 <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Code de suivi</span><span style="text-align:right;letter-spacing:.04em">{{ viewOrder.trackingLabel }}</span></div>
                 <sc-if value="{{ viewOrder.transporteur }}"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Transporteur</span><span style="text-align:right">{{ viewOrder.transporteurLabel }}</span></div></sc-if>
@@ -2199,7 +2208,7 @@ class Component extends DCLogic {
     caPeriod:'tout', stockTab:'stock', retourOpen:false, retourMotif:MOTIFS_RETOUR[0], retourNote:'', retourLieux:{}, invCombo:'', invLieu:LIEU_DEFAUT, invCount:'', invSel:null, invMotif:MOTIFS_RETRAIT[0], invNote:'', sidebarWide:true, isMobile:false, navOpen:false,
     pieces:SEED_PIECES, owners:SEED_OWNERS, orders:SEED_ORDERS, team:SEED_TEAM, audit:SEED_AUDIT,
     search:'', statutFilter:'tous', lieuFilter:'tous', sortBy:'recent', registreOpen:false,
-    ownerSearch:'', orderSearch:'', orderStatutFilter:'tous', canalFilter:'tous',
+    ownerSearch:'', orderSearch:'', orderStatutFilter:'tous', canalFilter:'tous', paysFilter:'tous',
     vente:null, venteErr:{}, venteSearch:'', venteStep:0, venteMax:0,
     viewOwnerId:null, savForm:this._emptySav(), savFormOpen:false, filtersOpen:false,
     serieMax:maxSerie(SEED_PIECES),
@@ -2714,7 +2723,7 @@ class Component extends DCLogic {
         clientLabel: o.client || 'Client non renseigné',
         clientLine: (o.client || 'Client non renseigné') + ' · ' + canalLabel,
         totalLabel: fmtFcfa(o.total), dateLabel: fmtIsoDate(o.dateIso),
-        paiementLabel: o.paiement || '—', paysLabel: paysOf(o) || '—',
+        paiementLabel: o.paiement || '—', paysLabel: paysOf(o) || '—', provenance: canalLabel + (paysOf(o) ? ' · ' + paysOf(o) : ''),
         trackingLabel: o.tracking || '—',
         detailLabel: 'Détail de la commande ' + o.no,
         pieces: ps.filter(Boolean).map(p => {
@@ -2727,6 +2736,7 @@ class Component extends DCLogic {
     const filteredOrders = decOrders.filter(o =>
       (!oSq || (o.no+' '+o.client+' '+o.items+' '+(o.evenement||'')).toLowerCase().includes(oSq)) &&
       (s.canalFilter==='tous' || o.canal===s.canalFilter) &&
+      (s.paysFilter==='tous' || paysOf(o)===s.paysFilter) &&
       (s.orderStatutFilter==='tous' || o.statut===s.orderStatutFilter));
 
     // Propriétaires et suivi après-vente (l'historique est porté par la pièce)
@@ -3091,7 +3101,7 @@ class Component extends DCLogic {
       toggleFilters: () => this.setState(st => ({filtersOpen:!st.filtersOpen})),
       filtersOpen: s.filtersOpen,
       filtersClass: 'bo-filters' + (s.filtersOpen ? '' : ' is-collapsed'),
-      ordersFiltersLabel: (n => 'Filtres' + (n ? ' (' + n + ')' : ''))((s.canalFilter!=='tous' ? 1 : 0) + (s.orderStatutFilter!=='tous' ? 1 : 0)),
+      ordersFiltersLabel: (n => 'Filtres' + (n ? ' (' + n + ')' : ''))((s.canalFilter!=='tous' ? 1 : 0) + (s.paysFilter!=='tous' ? 1 : 0) + (s.orderStatutFilter!=='tous' ? 1 : 0)),
       piecesFiltersLabel: (n => 'Filtres' + (n ? ' (' + n + ')' : ''))((s.statutFilter!=='tous' ? 1 : 0) + (s.lieuFilter!=='tous' ? 1 : 0) + (s.sortBy!=='recent' ? 1 : 0)),
 
       crumb: ({'piece-form':'Pièces', 'piece-detail':'Pièces', 'lot-form':'Pièces', 'qr-sheet':'Pièces', 'commande-detail':'Commandes', 'vente-form':'Commandes', 'demande-detail':'Demandes', 'proprietaire':'Propriétaires'})[s.route] || '',
@@ -3218,6 +3228,8 @@ class Component extends DCLogic {
       orderSearch: s.orderSearch, setOrderSearch: e => this.setState({orderSearch:e.target.value}),
       orderStatutFilter: s.orderStatutFilter, setOrderStatutFilter: e => this.setState({orderStatutFilter:e.target.value}),
       canalFilter: s.canalFilter, setCanalFilter: e => this.setState({canalFilter:e.target.value}),
+      paysFilter: s.paysFilter, setPaysFilter: e => this.setState({paysFilter:e.target.value}),
+      paysFilterOpts: Array.from(new Set(s.orders.map(paysOf).filter(Boolean))).sort().map(p => ({value:p})),
       filteredOrders, noOrders: filteredOrders.length===0,
       ordersEmpty: s.orders.length===0,
       noOrdersText: s.orders.length===0 ? 'Aucune commande pour l\'instant.' : 'Aucune commande ne correspond à cette recherche.',
@@ -3227,8 +3239,8 @@ class Component extends DCLogic {
         return base + ' · dont ' + horsSite + ' hors site';
       })(),
       exportOrdersCsv: () => this.downloadCsv('commandes-carole-sessegnon.csv',
-        [['N° de commande','Canal','Événement','Client','E-mail','Téléphone','Pièces','Prix du sac (FCFA)','Frais de livraison (FCFA)','Total (FCFA)','Date','Paiement','Réception','Code de suivi','Transporteur','Date d\'expédition','Statut','Civilité','Nom du destinataire','Adresse de livraison','Code postal','E-mail destinataire','Téléphone destinataire','Cadeaux (par pièce)']]
-          .concat(decOrders.map(o => [o.no,o.canalLabel,o.evenement||'',o.client||'',o.email||'',o.telephone||'',o.items,
+        [['N° de commande','Canal','Événement','Pays','Client','E-mail','Téléphone','Pièces','Prix du sac (FCFA)','Frais de livraison (FCFA)','Total (FCFA)','Date','Paiement','Réception','Code de suivi','Transporteur','Date d\'expédition','Statut','Civilité','Nom du destinataire','Adresse de livraison','Code postal','E-mail destinataire','Téléphone destinataire','Cadeaux (par pièce)']]
+          .concat(decOrders.map(o => [o.no,o.canalLabel,o.evenement||'',paysOf(o),o.client||'',o.email||'',o.telephone||'',o.items,
             o.livraison ? (Number(o.total)||0) - (Number(o.livraison.frais)||0) : o.total, o.livraison ? (Number(o.livraison.frais)||0) : '', o.total,o.dateIso,o.paiement||'',o.mode||'',o.tracking||'',o.transporteur||'',o.dateExpedition||'',ORDER_STATUT_LABEL[o.statut],
             o.civiliteLabel,o.livraisonNom,o.livraisonLabel,o.livraisonCodePostal,o.livraisonEmail,o.livraisonTelephone,
             o.gifts.map(g => g.modele + ' : ' + (g.isVierge ? 'carte vierge' : g.message)).join(' | ')]))),
