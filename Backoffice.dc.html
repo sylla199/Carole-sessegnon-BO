@@ -398,6 +398,8 @@
                   <option value="reserve">Réservée (en fabrication)</option>
                   <option value="prototype">Prototype</option>
                   <option value="offerte">Offerte</option>
+                  <option value="retournee">Retournée (à contrôler)</option>
+                  <option value="retiree">Retirée du stock</option>
                 </select>
                 <select aria-label="Filtrer par lieu de stock" value="{{ lieuFilter }}" onChange="{{ setLieuFilter }}" style="flex:0 0 auto;width:180px;height:46px;padding:0 12px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);color:rgb(0,0,0);font-size:14px">
                   <option value="tous">Tous les lieux</option>
@@ -566,6 +568,8 @@
                       <option value="reserve">Réservée (en fabrication)</option>
                       <option value="prototype">Prototype</option>
                       <option value="offerte">Offerte</option>
+                  <option value="retournee">Retournée (à contrôler)</option>
+                  <option value="retiree">Retirée du stock</option>
                     </select>
                   </label>
                 </sc-if>
@@ -743,6 +747,8 @@
               <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Prix</span><span style="font-variant-numeric:tabular-nums">{{ viewPiece.prixLabel }}</span></div>
               <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Stock disponible</span><span style="font-variant-numeric:tabular-nums">{{ viewPiece.dispoLabel }}</span></div>
               <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Lieu de stock</span><span style="font-variant-numeric:tabular-nums">{{ viewPiece.lieuLabel }}</span></div>
+              <sc-if value="{{ viewPiece.hasRetour }}"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Retour</span><span style="text-align:right;max-width:70%">{{ viewPiece.retourText }}</span></div></sc-if>
+              <sc-if value="{{ viewPiece.hasRetrait }}"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Retrait du stock</span><span style="text-align:right;max-width:70%">{{ viewPiece.retraitText }}</span></div></sc-if>
               <sc-if value="{{ viewPiece.matiere }}"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Matière</span><span style="text-align:right">{{ viewPiece.matiere }}</span></div></sc-if>
               <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Fabrication</span><span>{{ viewPiece.dateFabLabel }}</span></div>
               <sc-if value="{{ viewPiece.hasOrder }}"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Commande</span><button type="button" onClick="{{ viewPiece.openOrder }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:14px;border-bottom:1px solid rgb(71,29,27);text-align:right;min-height:44px;display:inline-flex;align-items:center">{{ viewPiece.orderLabel }}</button></div></sc-if>
@@ -766,6 +772,23 @@
               <x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="primary" onClick="{{ viewPiece.edit }}" dc-props="{{ btnBlock }}" hint-size="100%,58px">Modifier la pièce</x-import>
               <x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="secondary" onClick="{{ viewPiece.print }}" dc-props="{{ btnBlock }}" hint-size="100%,58px">Imprimer le certificat</x-import>
               <x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="secondary" onClick="{{ viewPiece.makeLot }}" dc-props="{{ btnBlock }}" hint-size="100%,58px">Générer un lot à partir de cette pièce</x-import>
+              <sc-if value="{{ viewPiece.canReturn }}"><button type="button" onClick="{{ viewPiece.openRetour }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);font-family:inherit;min-height:44px;align-self:flex-start">Enregistrer un retour</button></sc-if>
+              <sc-if value="{{ retourOpen }}">
+                <div style="background:rgb(255,251,248);padding:20px;display:flex;flex-direction:column;gap:14px">
+                  <p style="margin:0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">Retour de la pièce</p>
+                  <p style="margin:0;font-size:13px;line-height:20px;color:rgb(94,94,94)">La pièce sort des ventes et attend un contrôle dans Stock › Retours. Pensez à passer la commande en « Annulée » si elle est remboursée.</p>
+                  <label style="display:block;font-size:13px;color:rgb(70,70,70)">Motif
+                    <select value="{{ retourMotif }}" onChange="{{ onRetourMotif }}" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)"><sc-for list="{{ motifsRetour }}" as="mo"><option value="{{ mo.value }}">{{ mo.value }}</option></sc-for></select>
+                  </label>
+                  <label style="display:block;font-size:13px;color:rgb(70,70,70)">Note <span style="color:rgb(94,94,94)">(facultatif)</span>
+                    <input value="{{ retourNote }}" onChange="{{ onRetourNote }}" autocomplete="off" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+                  </label>
+                  <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
+                    <button type="button" onClick="{{ saveRetour }}" style="height:46px;padding:0 22px;background:rgb(71,29,27);color:rgb(255,255,255);border:0;cursor:pointer;font-size:13px;letter-spacing:.08em;text-transform:uppercase">Enregistrer le retour</button>
+                    <button type="button" onClick="{{ closeRetour }}" style="background:none;border:0;padding:0;color:rgb(94,94,94);cursor:pointer;font-size:13px">Annuler</button>
+                  </div>
+                </div>
+              </sc-if>
               <button type="button" onClick="{{ viewPiece.remove }}" style="background:none;border:0;padding:12px 0;color:rgb(155,24,33);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(155,24,33);align-self:flex-start">Supprimer cette pièce</button>
             </div>
           </div>
@@ -1067,8 +1090,15 @@
 
         <sc-if value="{{ isStock }}">
           <div style="display:flex;gap:10px 28px;flex-wrap:wrap;margin-bottom:18px;font-size:14px;color:rgb(70,70,70)">
+            <span style="color:rgb(0,0,0)"><strong style="font-weight:600">{{ stockTotalLabel }}</strong></span>
             <sc-for list="{{ stockParPays }}" as="sp"><span>{{ sp.label }}</span></sc-for>
           </div>
+          <div role="tablist" aria-label="Stock" class="bo-tabs-scroll" style="display:flex;gap:28px;overflow-x:auto;margin-bottom:24px;box-shadow:inset 0 -1px 0 rgba(0,0,0,.1)">
+            <sc-for list="{{ stockTabs }}" as="tab" hint-placeholder-count="3">
+              <button type="button" role="tab" aria-selected="{{ tab.selected }}" onClick="{{ tab.select }}" style="flex:0 0 auto;background:none;border:0;padding:12px 0;cursor:pointer;font-size:13px;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;color:{{ tab.color }};box-shadow:{{ tab.underline }}">{{ tab.label }}</button>
+            </sc-for>
+          </div>
+          <sc-if value="{{ isStockTab }}">
           <p style="margin:0 0 20px;font-size:14px;color:rgb(70,70,70);max-width:68ch">Calculé depuis le registre : une pièce vendue sort du stock, une pièce reçue de l'atelier y entre. Réglez un seuil par modèle, couleur et pays pour être prévenu avant la rupture.</p>
           <div style="display:flex;gap:10px 16px;flex-wrap:wrap;align-items:center;margin-bottom:20px">
             <span style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:6px 11px;background:rgba(155,24,33,.08);color:rgb(155,24,33)">{{ stockRuptureLabel }}</span>
@@ -1106,6 +1136,72 @@
             <sc-if value="{{ !hasStock }}"><p style="margin:0;padding:28px;text-align:center;font-size:14px;color:rgb(94,94,94)">Aucun modèle en rupture ni en stock bas.</p></sc-if>
           </div>
           <p style="margin:16px 0 0;font-size:13px;color:rgb(94,94,94)">Seuil par défaut : {{ defaultSeuil }} pièces en Côte d'Ivoire, aucun pour les autres pays tant que vous n'en réglez pas. « Stock bas » = disponibles inférieures ou égales au seuil ; « Rupture » = aucune pièce disponible.</p>
+          </sc-if>
+
+          <sc-if value="{{ isRetoursTab }}">
+            <p style="margin:0 0 20px;font-size:14px;color:rgb(70,70,70);max-width:68ch">Pièces retournées par les clientes, à contrôler avant de les remettre en vente. Un retour s'enregistre depuis la fiche de la pièce vendue.</p>
+            <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);overflow:auto">
+              <table class="bo-table" style="width:100%;border-collapse:collapse;min-width:820px">
+                <thead><tr><th style="padding:12px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Pièce</th><th style="padding:12px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Commande</th><th style="padding:12px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Retournée le</th><th style="padding:12px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Motif</th><th style="padding:12px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Lieu de remise en stock</th><th style="padding:12px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)"></th></tr></thead>
+                <tbody>
+                  <sc-for list="{{ retoursList }}" as="r" hint-placeholder-count="2">
+                    <tr>
+                      <td data-label="Pièce" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);color:rgb(0,0,0)">{{ r.label }}</td>
+                      <td data-label="Commande" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);white-space:nowrap">{{ r.commande }}</td>
+                      <td data-label="Retournée le" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);white-space:nowrap">{{ r.dateLabel }}</td>
+                      <td data-label="Motif" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)">{{ r.motif }}</td>
+                      <td data-label="Lieu" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)"><select aria-label="{{ r.lieuAria }}" value="{{ r.lieu }}" onChange="{{ r.onLieu }}" style="height:46px;padding:0 12px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0);font-size:14px"><sc-for list="{{ lieuxOpts }}" as="lx"><option value="{{ lx.value }}">{{ lx.label }}</option></sc-for></select></td>
+                      <td style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);text-align:right;white-space:nowrap"><button type="button" onClick="{{ r.restock }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);font-family:inherit;min-height:44px;margin-right:18px">Remettre en stock</button><button type="button" onClick="{{ r.reform }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);font-family:inherit;min-height:44px;color:rgb(155,24,33);border-bottom-color:rgb(155,24,33)">Réformer</button></td>
+                    </tr>
+                  </sc-for>
+                </tbody>
+              </table>
+              <sc-if value="{{ !hasRetours }}"><p style="margin:0;padding:28px;text-align:center;font-size:14px;color:rgb(94,94,94)">Aucune pièce retournée à contrôler.</p></sc-if>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isInventaireTab }}">
+            <p style="margin:0 0 20px;font-size:14px;color:rgb(70,70,70);max-width:68ch">Le registre indique plus de pièces que vous n'en avez réellement ? Indiquez la quantité comptée : le back-office propose les pièces à retirer, sans jamais supprimer leur historique.</p>
+            <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:clamp(22px,3vw,32px);max-width:760px;display:flex;flex-direction:column;gap:18px">
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:16px">
+                <label style="display:block;font-size:13px;color:rgb(70,70,70)">Modèle et couleur
+                  <select value="{{ inventaire.combo }}" onChange="{{ inventaire.onCombo }}" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)"><sc-for list="{{ inventaire.combos }}" as="c"><option value="{{ c.value }}">{{ c.label }}</option></sc-for></select>
+                </label>
+                <label style="display:block;font-size:13px;color:rgb(70,70,70)">Lieu de stock
+                  <select value="{{ inventaire.lieu }}" onChange="{{ inventaire.onLieu }}" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)"><sc-for list="{{ lieuxOpts }}" as="lx"><option value="{{ lx.value }}">{{ lx.label }}</option></sc-for></select>
+                </label>
+                <label style="display:block;font-size:13px;color:rgb(70,70,70)">Quantité réellement comptée
+                  <input type="number" min="0" step="1" inputMode="numeric" value="{{ inventaire.count }}" onChange="{{ inventaire.onCount }}" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+                </label>
+              </div>
+              <p style="margin:0;font-size:13px;color:rgb(94,94,94)">{{ inventaire.recordedLabel }}.</p>
+              <sc-if value="{{ inventaire.showOk }}"><p style="margin:0;font-size:14px;color:rgb(71,29,27)">Aucun écart : le registre correspond au comptage.</p></sc-if>
+              <sc-if value="{{ inventaire.showSurplus }}">
+                <p style="margin:0;font-size:14px;line-height:22px;color:rgb(155,24,33)">{{ inventaire.surplusLabel }}</p>
+                <button type="button" onClick="{{ inventaire.makeLot }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);font-family:inherit;min-height:44px;align-self:flex-start">Générer un lot</button>
+              </sc-if>
+              <sc-if value="{{ inventaire.showEcart }}">
+                <p style="margin:0;font-size:14px;line-height:22px;color:rgb(155,24,33)">{{ inventaire.ecartLabel }}</p>
+                <div>
+                  <p style="margin:0 0 8px;font-size:13px;color:rgb(70,70,70)">Pièces à retirer du stock (les dernières numérotées sont proposées) — {{ inventaire.pickLabel }}</p>
+                  <div style="max-height:260px;overflow:auto;box-shadow:inset 0 0 0 1px rgba(0,0,0,.1)">
+                    <sc-for list="{{ inventaire.pieces }}" as="ip" hint-placeholder-count="4">
+                      <label style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid rgba(0,0,0,.06);font-size:14px;cursor:pointer;min-height:44px"><input type="checkbox" checked="{{ ip.checked }}" onChange="{{ ip.toggle }}" style="width:18px;height:18px;margin:0;accent-color:rgb(71,29,27)"><span>{{ ip.label }}</span></label>
+                    </sc-for>
+                  </div>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:16px">
+                  <label style="display:block;font-size:13px;color:rgb(70,70,70)">Motif
+                    <select value="{{ inventaire.motif }}" onChange="{{ inventaire.onMotif }}" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)"><sc-for list="{{ motifsRetrait }}" as="mo"><option value="{{ mo.value }}">{{ mo.value }}</option></sc-for></select>
+                  </label>
+                  <label style="display:block;font-size:13px;color:rgb(70,70,70)">Note <span style="color:rgb(94,94,94)">(facultatif)</span>
+                    <input value="{{ inventaire.note }}" onChange="{{ inventaire.onNote }}" autocomplete="off" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+                  </label>
+                </div>
+                <div><button type="button" onClick="{{ inventaire.apply }}" disabled="{{ inventaire.applyDisabled }}" style="height:46px;padding:0 22px;background:rgb(71,29,27);color:rgb(255,255,255);border:0;cursor:pointer;font-size:13px;letter-spacing:.08em;text-transform:uppercase;opacity:{{ inventaire.applyOpacity }}">{{ inventaire.applyLabel }}</button></div>
+              </sc-if>
+            </div>
+          </sc-if>
         </sc-if>
 
         <sc-if value="{{ isCommandeDetail }}">
@@ -1877,8 +1973,10 @@ const BADGE = {
   offsale:     {statutBg:'rgb(250,241,235)',   statutFg:'rgb(115,60,8)',   statutShadow:'inset 0 0 0 1px rgb(233,199,176)'},
   offsaleLine: {statutBg:'rgb(255,255,255)',   statutFg:'rgb(149,83,28)',  statutShadow:'inset 0 0 0 1px rgb(202,150,114)'}
 };
-const STATUT_LABEL = {disponible:'Disponible', vendue:'Vendue', bientot:'Bientôt disponible', prototype:'Prototype', offerte:'Offerte', reserve:'Réservée (en fabrication)'};
-const STATUT_KIND = {disponible:'progress', vendue:'done', bientot:'neutral', prototype:'offsaleLine', offerte:'offsale', reserve:'neutral'};
+const STATUT_LABEL = {disponible:'Disponible', vendue:'Vendue', bientot:'Bientôt disponible', prototype:'Prototype', offerte:'Offerte', reserve:'Réservée (en fabrication)', retournee:'Retournée (à contrôler)', retiree:'Retirée du stock'};
+const STATUT_KIND = {disponible:'progress', vendue:'done', bientot:'neutral', prototype:'offsaleLine', offerte:'offsale', reserve:'neutral', retournee:'offsale', retiree:'neutral'};
+const MOTIFS_RETOUR = ['Non conforme', 'Défaut de fabrication', 'Changement d\'avis', 'Taille ou couleur non adaptée', 'Autre'];
+const MOTIFS_RETRAIT = ['Erreur de saisie', 'Perte', 'Casse', 'Vol', 'Autre'];
 const CANAL_LABEL = {en_ligne:'En ligne', popup:'Pop-up', directe:'Vente directe'};
 // Étapes de « Enregistrer une vente » ; fields = erreurs vérifiées par l'étape
 const VENTE_STEPS = [
@@ -1993,7 +2091,12 @@ const genCode = pieces => {
 };
 // Une pièce est « Vendue » dès qu'une commande non annulée la contient, quel que soit le canal.
 const saleOf = (pieceId, orders) => orders.find(o => o.statut!=='annulee' && (o.pieceIds || []).includes(pieceId));
-const effStatut = (p, orders) => saleOf(p.id, orders) ? 'vendue' : p.statut;
+// Une pièce retournée ou retirée n'est plus « vendue » ; une pièce remise en stock après retour ignore la commande dont elle a été retournée.
+const effStatut = (p, orders) => {
+  if (p.statut==='retournee' || p.statut==='retiree') return p.statut;
+  const sold = orders.some(o => o.statut!=='annulee' && (o.pieceIds || []).includes(p.id) && !(p.retour && p.retour.orderId===o.id));
+  return sold ? 'vendue' : p.statut;
+};
 const pieceLabel = p => p ? (p.modele || 'Pièce sans nom') + ' — ' + (p.serie || 'sans n°') : 'Pièce introuvable';
 const nowLabel = () => {
   const d = new Date();
@@ -2083,7 +2186,7 @@ const migratePiece = p => {
 class Component extends DCLogic {
   state = {
     authed:false, loginErr:'', loginInfo:'', route:'dashboard',
-    caPeriod:'tout', sidebarWide:true, isMobile:false, navOpen:false,
+    caPeriod:'tout', stockTab:'stock', retourOpen:false, retourMotif:MOTIFS_RETOUR[0], retourNote:'', retourLieux:{}, invCombo:'', invLieu:LIEU_DEFAUT, invCount:'', invSel:null, invMotif:MOTIFS_RETRAIT[0], invNote:'', sidebarWide:true, isMobile:false, navOpen:false,
     pieces:SEED_PIECES, owners:SEED_OWNERS, orders:SEED_ORDERS, team:SEED_TEAM, audit:SEED_AUDIT,
     search:'', statutFilter:'tous', lieuFilter:'tous', sortBy:'recent', registreOpen:false,
     ownerSearch:'', orderSearch:'', orderStatutFilter:'tous', canalFilter:'tous',
@@ -2762,6 +2865,68 @@ class Component extends DCLogic {
     const stockToWatch = stockRupture + stockBas;
     const stockShown = s.stockFilter==='alertes' ? stockRows.filter(r => r.level!=='ok') : stockRows;
 
+    // Stock : total global, retours à contrôler, régularisation d'inventaire
+    const stockTotal = s.pieces.filter(p => effStatut(p, s.orders)==='disponible').length;
+    const stockTab = ['stock','retours','inventaire'].includes(s.stockTab) ? s.stockTab : 'stock';
+    const retoursList = s.pieces.filter(p => effStatut(p, s.orders)==='retournee').map(p => {
+      const lieu = (s.retourLieux && s.retourLieux[p.id]) || lieuOf(p);
+      return {id:p.id, label:pieceLabel(p), couleur:p.couleur || '—', commande:(p.retour && p.retour.orderNo) || '—', motif:p.retour ? p.retour.motif + (p.retour.note ? ' — ' + p.retour.note : '') : '—',
+        dateLabel: p.retour ? fmtIsoDate(p.retour.date) : '—', lieu, lieuAria:'Lieu de remise en stock de ' + pieceLabel(p),
+        onLieu: e => { const v = e.target.value; this.setState(st => ({retourLieux:Object.assign({}, st.retourLieux, {[p.id]:v})})); },
+        restock: () => {
+          this.setState(st => ({pieces: st.pieces.map(x => x.id===p.id ? Object.assign({}, x, {statut:'disponible', lieu, retour:Object.assign({}, x.retour, {issue:'stock', closeDate:isoToday()})}) : x)}), () => this.persist());
+          this.logAudit('Pièce retournée remise en stock — ' + pieceLabel(p) + ' (' + lieu + ')');
+          this.showFlash(pieceLabel(p) + ' est de nouveau disponible (' + lieu + ').');
+        },
+        reform: () => this.askConfirm({title:'Réformer cette pièce ?', body:pieceLabel(p) + ' sera retirée définitivement du stock (abîmée ou non réparable). Son numéro de série n\'est jamais réattribué.', okLabel:'Réformer', tone:'danger',
+          onOk: () => {
+            this.setState(st => ({pieces: st.pieces.map(x => x.id===p.id ? Object.assign({}, x, {statut:'retiree', retour:Object.assign({}, x.retour, {issue:'reforme', closeDate:isoToday()}), retrait:{date:isoToday(), motif:'Retour non réutilisable', note:'', lieu:lieuOf(x)}}) : x)}), () => this.persist());
+            this.logAudit('Pièce retournée réformée — ' + pieceLabel(p));
+          }})};
+    });
+    const invKeyOf = p => p.modele + '|' + (p.couleur || 'Sans couleur précisée');
+    const invCombos = Array.from(new Set(s.pieces.filter(p => ['disponible','reserve','bientot','vendue'].includes(effStatut(p, s.orders))).map(invKeyOf))).sort().map(k => ({value:k, label:k.replace('|', ' · ')}));
+    const invSelected = s.invCombo || (invCombos[0] ? invCombos[0].value : '');
+    const invRecorded = s.pieces.filter(p => effStatut(p, s.orders)==='disponible' && invKeyOf(p)===invSelected && lieuOf(p)===s.invLieu)
+      .sort((a,b) => ((serieParse(b.serie) || {n:0}).n - (serieParse(a.serie) || {n:0}).n) || String(b.serie).localeCompare(String(a.serie)));
+    const invCounted = String(s.invCount).trim()==='' ? null : Number(s.invCount);
+    const invValid = invCounted!==null && Number.isInteger(invCounted) && invCounted>=0;
+    const invEcart = invValid ? invRecorded.length - invCounted : 0;
+    const invProposed = {}; invRecorded.slice(0, Math.max(invEcart, 0)).forEach(p => { invProposed[p.id] = true; });
+    const invSel = s.invSel || invProposed;
+    const invChosen = invRecorded.filter(p => invSel[p.id]);
+    const invCanApply = invValid && invEcart>0 && invChosen.length===invEcart;
+    const invReset = {invSel:null};
+    const inventaire = {
+      combos: invCombos, combo: invSelected, lieu: s.invLieu, count: s.invCount, motif: s.invMotif, note: s.invNote,
+      recordedLabel: invRecorded.length + (invRecorded.length>1 ? ' pièces disponibles' : ' pièce disponible') + ' au registre',
+      hasCombos: invCombos.length>0,
+      showEcart: invValid && invEcart>0, showSurplus: invValid && invEcart<0, showOk: invValid && invEcart===0,
+      ecartLabel: invEcart + (invEcart>1 ? ' pièces en trop' : ' pièce en trop') + ' dans le registre (' + invRecorded.length + ' enregistrées, ' + invCounted + ' comptées).',
+      surplusLabel: 'Vous avez compté ' + (-invEcart) + ' pièce' + (-invEcart>1 ? 's' : '') + ' de plus que le registre : vérifiez le comptage, ou créez les pièces manquantes avec « Générer un lot ».',
+      pickLabel: invChosen.length + ' sélectionnée' + (invChosen.length>1 ? 's' : '') + ' sur ' + invEcart + ' à retirer.',
+      canApply: invCanApply, applyDisabled: !invCanApply, applyOpacity: invCanApply ? 1 : .4,
+      applyLabel: 'Retirer ' + invEcart + ' pièce' + (invEcart>1 ? 's' : '') + ' du stock',
+      pieces: invRecorded.map(p => ({label:pieceLabel(p), checked:!!invSel[p.id], toggle: () => this.setState(st => ({invSel:Object.assign({}, st.invSel || invProposed, {[p.id]:!(st.invSel || invProposed)[p.id]})}))})),
+      onCombo: e => this.setState({invCombo:e.target.value, ...invReset}), onLieu: e => this.setState({invLieu:e.target.value, ...invReset}),
+      onCount: e => this.setState({invCount:e.target.value, ...invReset}), onMotif: e => this.setState({invMotif:e.target.value}), onNote: e => this.setState({invNote:e.target.value}),
+      makeLot: () => { const p = invRecorded[0] || s.pieces.find(x => invKeyOf(x)===invSelected); this.go('lot-form', {lotForm: p ? this.lotFromPiece(p) : this._emptyLot(), lotErr:{}, lotSource:''}); },
+      apply: () => {
+        if (!invCanApply) return;
+        const ids = new Set(invChosen.map(p => p.id)), motif = s.invMotif, note = s.invNote.trim(), lieu = s.invLieu;
+        this.askConfirm({title:'Retirer ' + invChosen.length + ' pièce' + (invChosen.length>1 ? 's' : '') + ' du stock ?',
+          body:'Elles restent au registre avec le statut « Retirée du stock » (motif : ' + motif + '), ne comptent plus dans le stock et leurs numéros ne sont jamais réattribués.',
+          okLabel:'Retirer du stock', tone:'danger',
+          onOk: () => {
+            this.setState(st => ({pieces: st.pieces.map(x => ids.has(x.id) ? Object.assign({}, x, {statut:'retiree', retrait:{date:isoToday(), motif, note, lieu}}) : x), invCount:'', invSel:null, invNote:''}), () => this.persist());
+            const serials = invChosen.map(p => p.serie).slice(0, 8).join(', ') + (invChosen.length>8 ? '…' : '');
+            this.logAudit('Régularisation d\'inventaire — ' + invSelected.replace('|', ' · ') + ' · ' + lieu + ' : ' + invRecorded.length + ' → ' + invCounted + ' (' + motif + ') ; retirées : ' + serials);
+            this.showFlash('Stock régularisé : ' + invChosen.length + ' pièce' + (invChosen.length>1 ? 's' : '') + ' retirée' + (invChosen.length>1 ? 's' : '') + ' du stock.', 7000);
+          }});
+      }
+    };
+    const stockTabs = [{key:'stock', label:'Stock'}, {key:'retours', label:'Retours' + (retoursList.length ? ' (' + retoursList.length + ')' : '')}, {key:'inventaire', label:'Inventaire'}];
+
     const navKeys = [
       {key:'dashboard', label:'Tableau de bord', icon:'dashboard'},
       {key:'pieces', label:'Pièces', icon:'pieces'},
@@ -2869,6 +3034,11 @@ class Component extends DCLogic {
       goPieces: () => this.go('pieces'),
       goCommandes: () => this.go('commandes'),
       isStock: s.route==='stock', goStock: () => this.go('stock'),
+      stockTotal, stockTotalLabel: 'Total : ' + stockTotal + (stockTotal>1 ? ' pièces disponibles' : ' pièce disponible'),
+      stockTabs: stockTabs.map(t => ({label:t.label, selected: stockTab===t.key ? 'true' : 'false', color: stockTab===t.key ? 'rgb(71,29,27)' : 'rgb(94,94,94)',
+        underline: stockTab===t.key ? 'inset 0 -2px 0 rgb(71,29,27)' : 'none', select: () => this.setState({stockTab:t.key})})),
+      isStockTab: stockTab==='stock', isRetoursTab: stockTab==='retours', isInventaireTab: stockTab==='inventaire',
+      retoursList, hasRetours: retoursList.length>0, inventaire,
       stockParPays, stockRows: stockShown, hasStock: stockShown.length>0, stockFilter: s.stockFilter,
       onStockFilter: e => this.setState({stockFilter:e.target.value}),
       stockRupture, stockBas, stockOk: stockRows.length - stockToWatch, stockToWatch,
@@ -3374,6 +3544,18 @@ class Component extends DCLogic {
       // Liste des pièces
       search: s.search, setSearch: e => this.setState({search:e.target.value}),
       statutFilter: s.statutFilter, setStatutFilter: e => this.setState({statutFilter:e.target.value}),
+      retourOpen: s.retourOpen, retourMotif: s.retourMotif, retourNote: s.retourNote,
+      motifsRetour: MOTIFS_RETOUR.map(v => ({value:v})), motifsRetrait: MOTIFS_RETRAIT.map(v => ({value:v})),
+      onRetourMotif: e => this.setState({retourMotif:e.target.value}), onRetourNote: e => this.setState({retourNote:e.target.value}),
+      closeRetour: () => this.setState({retourOpen:false}),
+      saveRetour: () => {
+        const p = pieceById(s.viewPieceId), sale = p ? saleOf(p.id, s.orders) : null;
+        if (!p || !sale) return;
+        const retour = {date:isoToday(), motif:s.retourMotif, note:s.retourNote.trim(), orderId:sale.id, orderNo:sale.no, issue:'controle'};
+        this.setState(st => ({pieces: st.pieces.map(x => x.id===p.id ? Object.assign({}, x, {statut:'retournee', retour}) : x), retourOpen:false}), () => this.persist());
+        this.logAudit('Retour enregistré — ' + pieceLabel(p) + ' (' + sale.no + ') : ' + retour.motif);
+        this.showFlash('Retour enregistré : ' + pieceLabel(p) + ' est à contrôler dans Stock › Retours.', 6000);
+      },
       lieuFilter: s.lieuFilter, setLieuFilter: e => this.setState({lieuFilter:e.target.value}),
       lieuxOpts: LIEUX.map(l => ({value:l, label:l})), paysSuggestions: PAYS_SUGGESTIONS.map(p => ({value:p})),
       sortBy: s.sortBy, setSortBy: e => this.setState({sortBy:e.target.value}),
@@ -3579,6 +3761,12 @@ class Component extends DCLogic {
         return {...p, eff,
           statutLabel:STATUT_LABEL[eff] || eff, ...BADGE[STATUT_KIND[eff] || 'neutral'],
           refLabel: [p.reference, p.couleur, lieuOf(p)].filter(Boolean).join(' · '), lieuLabel: lieuOf(p),
+          canReturn: eff==='vendue' && !!sale,
+          hasRetour: !!p.retour && (eff==='retournee' || eff==='disponible'),
+          retourText: p.retour ? fmtIsoDate(p.retour.date) + ' · ' + p.retour.motif + (p.retour.note ? ' — ' + p.retour.note : '') + (p.retour.issue==='stock' ? ' · remise en stock' : p.retour.issue==='reforme' ? ' · réformée' : ' · à contrôler') : '',
+          hasRetrait: eff==='retiree' && !!p.retrait,
+          retraitText: p.retrait ? fmtIsoDate(p.retrait.date) + ' · ' + p.retrait.motif + (p.retrait.note ? ' — ' + p.retrait.note : '') : '',
+          openRetour: () => this.setState({retourOpen:true, retourMotif:MOTIFS_RETOUR[0], retourNote:''}),
           dispoLabel: dispoCountFor(p.modele, p.couleur) + (dispoCountFor(p.modele, p.couleur)>1 ? ' disponibles' : ' disponible'),
           prixLabel: fmtFcfa(p.prix), dateFabLabel: fmtIsoDate(p.dateFab),
           hasPhotos: photos.length>0, noPhotos: photos.length===0,
