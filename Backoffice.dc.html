@@ -264,6 +264,25 @@
               <div style="display:flex;gap:20px"><button type="button" onClick="{{ goDemandes }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center;font-family:inherit">Voir les messages</button><button type="button" onClick="{{ goAlertes }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center;font-family:inherit">Voir les alertes</button><button type="button" onClick="{{ goStock }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center;font-family:inherit">Voir le stock</button></div>
             </div>
           </sc-if>
+          <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:24px;margin-bottom:20px">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px">
+              <p style="margin:0;font-family:var(--font-display);font-size:19px;color:rgb(71,29,27)">Chiffre d'affaires par pays</p>
+              <select aria-label="Période du chiffre d'affaires" value="{{ caPeriod }}" onChange="{{ onCaPeriod }}" style="height:40px;padding:0 12px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);color:rgb(0,0,0);font-size:13px">
+                <option value="tout">Depuis l'ouverture</option>
+                <option value="annee">Cette année</option>
+                <option value="30j">30 derniers jours</option>
+              </select>
+            </div>
+            <p style="margin:0 0 14px;font-size:12px;color:rgb(94,94,94)">Pays du client (livraison ou lieu de vente), commandes annulées exclues, montants encaissés en FCFA.</p>
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <sc-for list="{{ caParPays }}" as="c" hint-placeholder-count="3">
+                <div>
+                  <div style="display:flex;justify-content:space-between;gap:12px;margin-bottom:6px;font-size:13px;color:rgb(70,70,70)"><span>{{ c.pays }}</span><span><strong style="font-weight:600;color:rgb(0,0,0)">{{ c.totalLabel }}</strong> · {{ c.label }}</span></div>
+                  <div style="height:6px;background:rgba(0,0,0,.06)"><div style="height:100%;width:{{ c.pct }}%;background:rgb(71,29,27)"></div></div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
           <sc-if value="{{ geoRepartition.length }}">
             <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:24px;margin-bottom:20px">
               <p style="margin:0 0 16px;font-family:var(--font-display);font-size:19px;color:rgb(71,29,27)">Répartition géographique des activations</p>
@@ -379,6 +398,10 @@
                   <option value="reserve">Réservée (en fabrication)</option>
                   <option value="prototype">Prototype</option>
                   <option value="offerte">Offerte</option>
+                </select>
+                <select aria-label="Filtrer par lieu de stock" value="{{ lieuFilter }}" onChange="{{ setLieuFilter }}" style="flex:0 0 auto;width:180px;height:46px;padding:0 12px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);color:rgb(0,0,0);font-size:14px">
+                  <option value="tous">Tous les lieux</option>
+                  <sc-for list="{{ lieuxOpts }}" as="lx"><option value="{{ lx.value }}">{{ lx.label }}</option></sc-for>
                 </select>
                 <select aria-label="Trier les pièces" value="{{ sortBy }}" onChange="{{ setSortBy }}" style="flex:0 0 auto;width:196px;height:46px;padding:0 12px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);color:rgb(0,0,0);font-size:14px">
                   <option value="recent">Plus récentes d'abord</option>
@@ -529,6 +552,11 @@
               <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:16px">
                 <label style="display:block;font-size:13px;color:rgb(70,70,70)">Date de fabrication
                   <input type="date" value="{{ form.dateFab }}" onChange="{{ setF.dateFab }}" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+                </label>
+                <label style="display:block;font-size:13px;color:rgb(70,70,70)">Lieu de stock
+                  <select value="{{ form.lieu }}" onChange="{{ setF.lieu }}" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+                    <sc-for list="{{ lieuxOpts }}" as="lx"><option value="{{ lx.value }}">{{ lx.label }}</option></sc-for>
+                  </select>
                 </label>
                 <sc-if value="{{ statutSelectable }}">
                   <label style="display:block;font-size:13px;color:rgb(70,70,70)">Statut
@@ -714,6 +742,7 @@
               </div>
               <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Prix</span><span style="font-variant-numeric:tabular-nums">{{ viewPiece.prixLabel }}</span></div>
               <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Stock disponible</span><span style="font-variant-numeric:tabular-nums">{{ viewPiece.dispoLabel }}</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Lieu de stock</span><span style="font-variant-numeric:tabular-nums">{{ viewPiece.lieuLabel }}</span></div>
               <sc-if value="{{ viewPiece.matiere }}"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Matière</span><span style="text-align:right">{{ viewPiece.matiere }}</span></div></sc-if>
               <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Fabrication</span><span>{{ viewPiece.dateFabLabel }}</span></div>
               <sc-if value="{{ viewPiece.hasOrder }}"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Commande</span><button type="button" onClick="{{ viewPiece.openOrder }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:14px;border-bottom:1px solid rgb(71,29,27);text-align:right;min-height:44px;display:inline-flex;align-items:center">{{ viewPiece.orderLabel }}</button></div></sc-if>
@@ -771,6 +800,11 @@
               <label style="display:block;font-size:13px;color:rgb(70,70,70)">Année de fabrication prévue
                 <select value="{{ lotForm.annee }}" onChange="{{ setLot.annee }}" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
                   <sc-for list="{{ lotYears }}" as="y" hint-placeholder-count="2"><option value="{{ y.value }}">{{ y.label }}</option></sc-for>
+                </select>
+              </label>
+              <label style="display:block;font-size:13px;color:rgb(70,70,70)">Lieu de stock
+                <select value="{{ lotForm.lieu }}" onChange="{{ setLot.lieu }}" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+                  <sc-for list="{{ lieuxOpts }}" as="lx"><option value="{{ lx.value }}">{{ lx.label }}</option></sc-for>
                 </select>
               </label>
             </div>
@@ -1032,7 +1066,10 @@
         </sc-if>
 
         <sc-if value="{{ isStock }}">
-          <p style="margin:0 0 20px;font-size:14px;color:rgb(70,70,70);max-width:68ch">Calculé depuis le registre : une pièce vendue sort du stock, une pièce reçue de l'atelier y entre. Réglez un seuil par modèle et couleur pour être prévenu avant la rupture.</p>
+          <div style="display:flex;gap:10px 28px;flex-wrap:wrap;margin-bottom:18px;font-size:14px;color:rgb(70,70,70)">
+            <sc-for list="{{ stockParPays }}" as="sp"><span>{{ sp.label }}</span></sc-for>
+          </div>
+          <p style="margin:0 0 20px;font-size:14px;color:rgb(70,70,70);max-width:68ch">Calculé depuis le registre : une pièce vendue sort du stock, une pièce reçue de l'atelier y entre. Réglez un seuil par modèle, couleur et pays pour être prévenu avant la rupture.</p>
           <div style="display:flex;gap:10px 16px;flex-wrap:wrap;align-items:center;margin-bottom:20px">
             <span style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:6px 11px;background:rgba(155,24,33,.08);color:rgb(155,24,33)">{{ stockRuptureLabel }}</span>
             <span style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:6px 11px;background:rgb(250,241,235);color:rgb(115,60,8);box-shadow:inset 0 0 0 1px rgb(233,199,176)">{{ stockBasLabel }}</span>
@@ -1047,7 +1084,7 @@
           <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);overflow:auto">
             <table class="bo-table" style="width:100%;border-collapse:collapse;min-width:820px">
               <thead><tr>
-                <th style="padding:12px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Modèle</th><th style="padding:12px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Couleur</th><th style="padding:12px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Disponibles</th><th style="padding:12px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">En fabrication</th><th style="padding:12px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Vendues</th><th style="padding:12px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Seuil d'alerte</th><th style="padding:12px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Statut</th><th style="padding:12px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)"></th>
+                <th style="padding:12px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Modèle</th><th style="padding:12px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Couleur</th><th style="padding:12px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Disponibles</th><th style="padding:12px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">En fabrication</th><th style="padding:12px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Vendues</th><th style="padding:12px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Par pays : disponibles et seuil d'alerte</th><th style="padding:12px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Statut</th><th style="padding:12px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)"></th>
               </tr></thead>
               <tbody>
                 <sc-for list="{{ stockRows }}" as="r" hint-placeholder-count="5">
@@ -1057,7 +1094,9 @@
                     <td data-label="Disponibles" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)"><span style="font-family:var(--font-display);font-size:20px;color:{{ r.dispoColor }}">{{ r.dispo }}</span></td>
                     <td data-label="En fabrication" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)">{{ r.fabLabel }}</td>
                     <td data-label="Vendues" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)">{{ r.vendue }}</td>
-                    <td data-label="Seuil d'alerte" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)"><input type="number" min="0" step="1" inputMode="numeric" aria-label="Seuil d'alerte {{ r.modele }} {{ r.couleur }}" value="{{ r.seuil }}" onChange="{{ r.onSeuil }}" style="width:72px;height:38px;padding:0 10px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0);font-size:14px"></td>
+                    <td data-label="Par pays" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)"><div style="display:flex;gap:18px;flex-wrap:wrap">
+                      <sc-for list="{{ r.lieux }}" as="lx" hint-placeholder-count="2"><div style="display:flex;align-items:center;gap:8px"><span style="min-width:96px">{{ lx.lieu }}</span><span style="font-family:var(--font-display);font-size:18px;min-width:22px;color:{{ lx.color }}">{{ lx.n }}</span><input type="number" min="0" step="1" inputMode="numeric" aria-label="{{ lx.label }}" value="{{ lx.seuil }}" onChange="{{ lx.onSeuil }}" style="width:64px;height:36px;padding:0 8px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0);font-size:14px"></div></sc-for>
+                    </div></td>
                     <td data-label="Statut" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)"><span style="display:inline-block;white-space:nowrap;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ r.statutBg }};color:{{ r.statutFg }};box-shadow:{{ r.statutShadow }}">{{ r.levelLabel }}</span></td>
                     <td style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);text-align:right"><button type="button" onClick="{{ r.makeLot }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center;font-family:inherit">Générer un lot</button></td>
                   </tr>
@@ -1066,7 +1105,7 @@
             </table>
             <sc-if value="{{ !hasStock }}"><p style="margin:0;padding:28px;text-align:center;font-size:14px;color:rgb(94,94,94)">Aucun modèle en rupture ni en stock bas.</p></sc-if>
           </div>
-          <p style="margin:16px 0 0;font-size:13px;color:rgb(94,94,94)">Seuil par défaut : {{ defaultSeuil }} pièces. « Stock bas » = disponibles inférieures ou égales au seuil ; « Rupture » = aucune pièce disponible.</p>
+          <p style="margin:16px 0 0;font-size:13px;color:rgb(94,94,94)">Seuil par défaut : {{ defaultSeuil }} pièces en Côte d'Ivoire, aucun pour les autres pays tant que vous n'en réglez pas. « Stock bas » = disponibles inférieures ou égales au seuil ; « Rupture » = aucune pièce disponible.</p>
         </sc-if>
 
         <sc-if value="{{ isCommandeDetail }}">
@@ -1100,6 +1139,7 @@
               <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Date</span><span>{{ viewOrder.dateLabel }}</span></div>
               <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Paiement</span><span style="text-align:right">{{ viewOrder.paiementLabel }}</span></div>
               <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Réception</span><span style="text-align:right">{{ viewOrder.mode }}</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Pays</span><span style="text-align:right">{{ viewOrder.paysLabel }}</span></div>
               <sc-if value="{{ viewOrder.isOnline }}">
                 <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Code de suivi</span><span style="text-align:right;letter-spacing:.04em">{{ viewOrder.trackingLabel }}</span></div>
                 <sc-if value="{{ viewOrder.transporteur }}"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Transporteur</span><span style="text-align:right">{{ viewOrder.transporteurLabel }}</span></div></sc-if>
@@ -1172,6 +1212,9 @@
                   </label>
                   <label style="display:block;font-size:13px;color:rgb(70,70,70)">Événement ou lieu
                     <input value="{{ orderDraft.evenement }}" onChange="{{ setDraft.evenement }}" autocomplete="off" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+                  </label>
+                  <label style="display:block;font-size:13px;color:rgb(70,70,70)">Pays de la vente
+                    <input value="{{ orderDraft.pays }}" onChange="{{ setDraft.pays }}" list="bo-pays-list" autocomplete="off" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
                   </label>
                 </div>
                 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:16px">
@@ -1279,6 +1322,10 @@
                 <label style="display:block;font-size:13px;color:rgb(70,70,70)">Événement ou lieu <span style="color:rgb(94,94,94)">(facultatif)</span>
                   <input value="{{ vente.evenement }}" onChange="{{ setVente.evenement }}" placeholder="Ex. Pop-up Abidjan — Plateau" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
                 </label>
+                <label style="display:block;font-size:13px;color:rgb(70,70,70)">Pays de la vente
+                  <input value="{{ vente.pays }}" onChange="{{ setVente.pays }}" list="bo-pays-list" autocomplete="off" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+                </label>
+                <datalist id="bo-pays-list"><sc-for list="{{ paysSuggestions }}" as="pp"><option value="{{ pp.value }}"></option></sc-for></datalist>
               </sc-if>
               <sc-if value="{{ isVenteStep2 }}">
                 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:16px">
@@ -1732,8 +1779,8 @@ const ICONS = {
 const SEED_PIECES = [
   {id:'p1', reference:'HUP', modele:'Huperano', couleur:'Cuir naturel & bordeaux', serie:'HU260002', code:'8F3K-22QD', matiere:'Cuir de vachette, tannage végétal', dateFab:'2026-03-12', prix:420000, statut:'disponible', sav:[]},
   {id:'p2', reference:'RAD', modele:'Radah', couleur:'Bordeaux', serie:'RA260002', code:'2LK9-77RT', matiere:'Cuir bordeaux, doublure daim', dateFab:'2026-03-20', prix:380000, statut:'disponible', sav:[]},
-  {id:'p3', reference:'NAF', modele:'Nafi', couleur:'Cuir naturel', serie:'NA260002', code:'9QW7-4XMZ', matiere:'Cuir naturel patiné à la main', dateFab:'2026-04-02', prix:300000, statut:'disponible', sav:[]},
-  {id:'p4', reference:'SIK', modele:'Sikadi', couleur:'Cuir grainé', serie:'SI260002', code:'5TY6-88XP', matiere:'Cuir grainé, ferrures bronze', dateFab:'2026-04-15', prix:510000, statut:'disponible', sav:[]},
+  {id:'p3', lieu:'France', reference:'NAF', modele:'Nafi', couleur:'Cuir naturel', serie:'NA260002', code:'9QW7-4XMZ', matiere:'Cuir naturel patiné à la main', dateFab:'2026-04-02', prix:300000, statut:'disponible', sav:[]},
+  {id:'p4', lieu:'France', reference:'SIK', modele:'Sikadi', couleur:'Cuir grainé', serie:'SI260002', code:'5TY6-88XP', matiere:'Cuir grainé, ferrures bronze', dateFab:'2026-04-15', prix:510000, statut:'disponible', sav:[]},
   {id:'p5', reference:'AYA', modele:'Ayaba', couleur:'Cuir tressé', serie:'AY260001', code:'3JH2-K9CV', matiere:'Cuir tressé, pièce d\'atelier', dateFab:'2026-05-01', prix:450000, statut:'bientot', sav:[]},
   {id:'p6', reference:'WEL', modele:'Wèlè', couleur:'Cuir souple', serie:'WE260001', code:'6RF8-33NB', matiere:'Cuir souple, fermoir aimanté', dateFab:'2026-05-10', prix:340000, statut:'disponible', sav:[]},
   {id:'p7', reference:'SIK', modele:'Sikadi', couleur:'Cuir grainé', serie:'SI260001', code:'4MW2-T7HD', matiere:'Cuir grainé, ferrures bronze', dateFab:'2026-02-10', prix:510000, statut:'disponible', sav:[]},
@@ -1744,7 +1791,7 @@ const SEED_PIECES = [
   {id:'p9', reference:'HUP', modele:'Huperano', couleur:'Toile et cuir naturel', serie:'HU260001', code:'PR7T-0TY9', matiere:'Prototype d\'atelier — toile, cuir naturel', dateFab:'2025-11-05', prix:'', statut:'prototype', sav:[]},
   {id:'p10', reference:'RAD', modele:'Radah', couleur:'Bordeaux', serie:'RA260001', code:'G4FT-8WKE', matiere:'Cuir bordeaux, doublure daim', dateFab:'2026-02-14', prix:380000, statut:'offerte', sav:[]},
   // Même modèle, autre couleur : chaque variante a son propre stock et son propre prix (voir « Stock disponible à la vente »).
-  {id:'p11', reference:'HUP', modele:'Huperano', couleur:'Noir Ébène', serie:'HU260003', code:'N3BE-7HKM', matiere:'Cuir de vachette, tannage végétal', dateFab:'2026-06-08', prix:450000, statut:'disponible', sav:[]}
+  {id:'p11', lieu:'France', reference:'HUP', modele:'Huperano', couleur:'Noir Ébène', serie:'HU260003', code:'N3BE-7HKM', matiere:'Cuir de vachette, tannage végétal', dateFab:'2026-06-08', prix:450000, statut:'disponible', sav:[]}
 ];
 // Chaque commande, en ligne ou hors site, désigne les pièces vendues par leur id.
 const SEED_ORDERS = [
@@ -1756,10 +1803,17 @@ const SEED_ORDERS = [
    giftByPiece:{p1:{kind:'vierge'}}},
   {id:'o2', no:'#CS-2026-9120', canal:'en_ligne', evenement:'', client:'Marie Lefèvre', email:'marie.lefevre@exemple.fr', telephone:'', pieceIds:['p7'], total:510000, dateIso:'2026-07-14', mode:'Livraison internationale', paiement:'Carte bancaire', statut:'livree', tracking:'DHL-5521-FR', transporteur:'DHL Express', dateExpedition:'2026-07-16', note:'',
    livraison:{civilite:'Mme', nom:'Marie Lefèvre', adresse:'12 rue des Lilas', ville:'Lyon', pays:'France', codePostal:'69003', telephone:'+33 6 12 34 56 78', frais:18000}},
-  {id:'o3', no:'#CS-2026-9051', canal:'popup', evenement:'Pop-up Dakar — Almadies', client:'Fatou Diop', email:'fatou.diop@exemple.sn', telephone:'+221 77 000 00 00', pieceIds:['p8'], total:300000, dateIso:'2026-07-02', mode:'Remise en main propre', paiement:'Espèces', statut:'livree', tracking:'', note:''},
+  {id:'o3', pays:'Sénégal', no:'#CS-2026-9051', canal:'popup', evenement:'Pop-up Dakar — Almadies', client:'Fatou Diop', email:'fatou.diop@exemple.sn', telephone:'+221 77 000 00 00', pieceIds:['p8'], total:300000, dateIso:'2026-07-02', mode:'Remise en main propre', paiement:'Espèces', statut:'livree', tracking:'', note:''},
   {id:'o4', no:'#CS-2026-8990', canal:'en_ligne', evenement:'', client:'Julien Petit', email:'julien.petit@exemple.fr', telephone:'', pieceIds:['p6'], total:340000, dateIso:'2026-06-20', mode:'Livraison à domicile', paiement:'Carte bancaire', statut:'annulee', tracking:'', transporteur:'', dateExpedition:'', note:'Annulée à la demande du client avant expédition.',
    livraison:{civilite:'M.', nom:'Julien Petit', adresse:'8 avenue de la République', ville:'Lyon', pays:'France', codePostal:'69002', telephone:'+33 6 98 76 54 32', frais:5000}}
 ];
+// Lieux de stock : où se trouve physiquement chaque pièce. Une pièce sans lieu est en Côte d'Ivoire.
+const LIEUX = ['Côte d\'Ivoire', 'France'];
+const LIEU_DEFAUT = LIEUX[0];
+const lieuOf = p => (p && p.lieu) || LIEU_DEFAUT;
+// Pays d'une commande : livraison pour les commandes en ligne, champ « pays » pour les ventes hors site.
+const paysOf = o => (o && o.pays) || (o && o.livraison && o.livraison.pays) || '';
+const PAYS_SUGGESTIONS = ['Côte d\'Ivoire', 'France', 'Sénégal', 'Mali', 'Burkina Faso', 'Bénin', 'Togo', 'Ghana', 'Belgique', 'Royaume-Uni', 'États-Unis'];
 const MAISON = {email:'contact@carolesessegnon.com', telephone:'+225 07 20 00 95 20'};
 const OBJETS = ['Une pièce','Une commande','Le passeport numérique','Presse','Livraison','Retour et échange','Commande en ligne','Service après-vente','Autre demande'];
 const REQ_STATUT_LABEL = {nouveau:'Nouveau', encours:'En cours', traite:'Traité'};
@@ -2029,9 +2083,9 @@ const migratePiece = p => {
 class Component extends DCLogic {
   state = {
     authed:false, loginErr:'', loginInfo:'', route:'dashboard',
-    sidebarWide:true, isMobile:false, navOpen:false,
+    caPeriod:'tout', sidebarWide:true, isMobile:false, navOpen:false,
     pieces:SEED_PIECES, owners:SEED_OWNERS, orders:SEED_ORDERS, team:SEED_TEAM, audit:SEED_AUDIT,
-    search:'', statutFilter:'tous', sortBy:'recent', registreOpen:false,
+    search:'', statutFilter:'tous', lieuFilter:'tous', sortBy:'recent', registreOpen:false,
     ownerSearch:'', orderSearch:'', orderStatutFilter:'tous', canalFilter:'tous',
     vente:null, venteErr:{}, venteSearch:'', venteStep:0, venteMax:0,
     viewOwnerId:null, savForm:this._emptySav(), savFormOpen:false, filtersOpen:false,
@@ -2236,11 +2290,11 @@ class Component extends DCLogic {
     clearTimeout(this._photoT);
   }
 
-  _emptyForm(){ return {modele:'', couleur:'', reference:'', prix:'', serie:'', code:'', matiere:'', dateFab:'', statut:'disponible', autoIds:false, photos:[], video:null}; }
-  _emptyLot(){ return {modele:'', reference:'', prix:'', matiere:'', annee:String(new Date().getFullYear()),
+  _emptyForm(){ return {modele:'', couleur:'', reference:'', prix:'', serie:'', code:'', matiere:'', dateFab:'', statut:'disponible', lieu:LIEU_DEFAUT, autoIds:false, photos:[], video:null}; }
+  _emptyLot(){ return {modele:'', reference:'', prix:'', matiere:'', lieu:LIEU_DEFAUT, annee:String(new Date().getFullYear()),
     variants:[{couleur:'', quantite:'', prix:''}]}; }
   _emptySav(){ return {type:'en_reparation', date:isoToday(), note:'', replacementId:''}; }
-  _emptyVente(){ return {canal:'popup', date:isoToday(), evenement:'', pieceIds:[], client:'', email:'', telephone:'', montant:'', paiement:'Espèces', note:''}; }
+  _emptyVente(){ return {canal:'popup', date:isoToday(), evenement:'', pays:LIEU_DEFAUT, pieceIds:[], client:'', email:'', telephone:'', montant:'', paiement:'Espèces', note:''}; }
 
   noticePhoto(text, undo){
     clearTimeout(this._photoT);
@@ -2321,7 +2375,7 @@ class Component extends DCLogic {
   // Pré-remplit le lot depuis une pièce existante : tout sauf numéro, code, photos et vidéo (générés ou propres à chaque exemplaire).
   lotFromPiece(p){
     const c = p.couleur || '';
-    return Object.assign(this._emptyLot(), {modele:p.modele || '', reference:p.reference || '', matiere:p.matiere || '', prix:p.prix===undefined ? '' : p.prix, couleur:c,
+    return Object.assign(this._emptyLot(), {modele:p.modele || '', reference:p.reference || '', matiere:p.matiere || '', lieu:lieuOf(p), prix:p.prix===undefined ? '' : p.prix, couleur:c,
       variants:[{couleur:c, quantite:'', prix:''}]});
   }
 
@@ -2476,7 +2530,7 @@ class Component extends DCLogic {
         dateFabColor: p.dateFab ? 'rgb(70,70,70)' : 'rgb(164,164,164)',
         prixLabel: fmtFcfa(p.prix),
         prixColor: String(p.prix).trim()!=='' ? 'rgb(70,70,70)' : 'rgb(164,164,164)',
-        refLabel: [p.reference, p.couleur].filter(Boolean).join(' · '),
+        refLabel: [p.reference, p.couleur, lieuOf(p)].filter(Boolean).join(' · '), lieuLabel: lieuOf(p),
         editLabel:'Modifier ' + p.modele + ' ' + p.serie,
         open: () => viewPiece(p),
         edit: e => { if (e && e.stopPropagation) e.stopPropagation(); openPieceEdit(p); }};
@@ -2492,7 +2546,7 @@ class Component extends DCLogic {
     // sans modifier la recherche ni les filtres de l'utilisateur.
     let filteredPieces = s.lotFocus ? decPieces.filter(p => p.lotId===s.lotFocus.id) : decPieces.filter(p =>
       (!q || (p.modele+' '+p.serie+' '+p.matiere+' '+(p.reference||'')+' '+(p.couleur||'')).toLowerCase().includes(q)) &&
-      (s.statutFilter==='tous' || p.eff===s.statutFilter));
+      (s.statutFilter==='tous' || p.eff===s.statutFilter) && (s.lieuFilter==='tous' || lieuOf(p)===s.lieuFilter));
     const sortKey = s.lotFocus ? 'serie' : s.sortBy;
     filteredPieces = filteredPieces.slice().sort((a,b) =>
       sortKey==='serie' ? a.serie.localeCompare(b.serie) :
@@ -2508,7 +2562,7 @@ class Component extends DCLogic {
 
     // Commandes (en ligne et hors site, même suivi)
     const draftFromOrder = o => ({statut:o.statut, tracking:o.tracking||'', transporteur:o.transporteur||'', dateExpedition:o.dateExpedition||'', client:o.client||'', email:o.email||'', telephone:o.telephone||'',
-      evenement:o.evenement||'', montant:String(o.total===undefined ? '' : o.total), paiement:o.paiement||'', note:o.note||'', dateIso:o.dateIso||''});
+      evenement:o.evenement||'', pays:paysOf(o), montant:String(o.total===undefined ? '' : o.total), paiement:o.paiement||'', note:o.note||'', dateIso:o.dateIso||''});
     const openOrder = o => this.go('commande-detail', {viewOrderId:o.id, orderDraft:draftFromOrder(o), orderErr:{}, orderDeleteOpen:false, orderDeleteReason:''});
     const decOrders = s.orders.slice().sort((a,b) => (b.dateIso||'').localeCompare(a.dateIso||'')).map(o => {
       const ps = (o.pieceIds || []).map(pieceById);
@@ -2547,7 +2601,7 @@ class Component extends DCLogic {
         clientLabel: o.client || 'Client non renseigné',
         clientLine: (o.client || 'Client non renseigné') + ' · ' + canalLabel,
         totalLabel: fmtFcfa(o.total), dateLabel: fmtIsoDate(o.dateIso),
-        paiementLabel: o.paiement || '—',
+        paiementLabel: o.paiement || '—', paysLabel: paysOf(o) || '—',
         trackingLabel: o.tracking || '—',
         detailLabel: 'Détail de la commande ' + o.no,
         pieces: ps.filter(Boolean).map(p => {
@@ -2613,7 +2667,7 @@ class Component extends DCLogic {
         d.transporteur.trim()!==(viewOrder.transporteur||'') || d.dateExpedition!==(viewOrder.dateExpedition||'');
       if (viewOrder.isOnline) return core;
       return core || d.client.trim()!==(viewOrder.client||'') || d.email.trim()!==(viewOrder.email||'') ||
-        d.telephone.trim()!==(viewOrder.telephone||'') || d.evenement.trim()!==(viewOrder.evenement||'') ||
+        d.telephone.trim()!==(viewOrder.telephone||'') || d.evenement.trim()!==(viewOrder.evenement||'') || d.pays.trim()!==paysOf(viewOrder) ||
         d.montant!==String(viewOrder.total===undefined ? '' : viewOrder.total) ||
         d.paiement!==(viewOrder.paiement||'') || d.note.trim()!==(viewOrder.note||'') || d.dateIso!==(viewOrder.dateIso||'');
     })();
@@ -2668,28 +2722,41 @@ class Component extends DCLogic {
     // Stock : calculé depuis le registre, une ligne par modèle et couleur
     const DEFAULT_SEUIL = 2;
     const stockMap = {};
+    const seuilOf = (key, lieu) => {
+      const sm = s.seuils || {};
+      if (typeof sm[key + '|' + lieu]==='number') return sm[key + '|' + lieu];
+      if (lieu===LIEU_DEFAUT && typeof sm[key]==='number') return sm[key];
+      return lieu===LIEU_DEFAUT ? DEFAULT_SEUIL : 0;
+    };
     s.pieces.forEach(p => {
       const eff = effStatut(p, s.orders);
       if (!['disponible','reserve','bientot','vendue'].includes(eff)) return;
       const couleur = p.couleur || 'Sans couleur précisée';
       const k = p.modele + '|' + couleur;
-      const r = stockMap[k] = stockMap[k] || {key:k, modele:p.modele, couleur, dispo:0, fab:0, bientot:0, vendue:0};
+      const r = stockMap[k] = stockMap[k] || {key:k, modele:p.modele, couleur, dispo:0, fab:0, bientot:0, vendue:0, byLieu:{}};
+      if (eff==='disponible') r.byLieu[lieuOf(p)] = (r.byLieu[lieuOf(p)] || 0) + 1;
       r[eff==='disponible' ? 'dispo' : eff==='reserve' ? 'fab' : eff] += 1;
     });
     const stockRows = Object.values(stockMap).map(r => {
-      const seuil = (s.seuils && typeof s.seuils[r.key]==='number') ? s.seuils[r.key] : DEFAULT_SEUIL;
-      const level = r.dispo===0 ? 'rupture' : (r.dispo<=seuil ? 'bas' : 'ok');
+      const lieux = LIEUX.concat(Object.keys(r.byLieu).filter(l => !LIEUX.includes(l))).map(l => {
+        const n = r.byLieu[l] || 0, seuil = seuilOf(r.key, l);
+        return {lieu:l, n, seuil, low: seuil>0 && n<=seuil, color: (seuil>0 && n===0) ? 'rgb(155,24,33)' : (seuil>0 && n<=seuil) ? 'rgb(115,60,8)' : 'rgb(0,0,0)',
+          label: 'Seuil d\'alerte ' + r.modele + ' ' + r.couleur + ' ' + l,
+          onSeuil: e => {
+            const v = Math.max(0, Math.floor(Number(e.target.value) || 0));
+            this.setState(st => ({seuils: Object.assign({}, st.seuils, {[r.key + '|' + l]:v})}), () => this.persist());
+            this.logAudit('Seuil de stock — ' + r.modele + ' · ' + r.couleur + ' · ' + l + ' : ' + v);
+          }};
+      });
+      const lowLieux = lieux.filter(x => x.low).map(x => x.lieu);
+      const level = r.dispo===0 ? 'rupture' : (lowLieux.length ? 'bas' : 'ok');
       const b = BADGE[level==='ok' ? 'doneFilled' : level==='bas' ? 'offsale' : 'alert'];
-      return {...r, ...b, seuil, level, fabLabel: r.fab ? String(r.fab) : '—', bientotLabel: r.bientot ? String(r.bientot) : '—',
-        levelLabel: level==='ok' ? 'En stock' : level==='bas' ? 'Stock bas' : (r.fab ? 'Rupture · en fabrication' : 'Rupture'),
+      return {...r, ...b, lieux, level, fabLabel: r.fab ? String(r.fab) : '—', bientotLabel: r.bientot ? String(r.bientot) : '—',
+        levelLabel: level==='ok' ? 'En stock' : level==='bas' ? [lieux.filter(x => x.low && x.n===0).map(x => x.lieu).join(', ') && 'Rupture ' + lieux.filter(x => x.low && x.n===0).map(x => x.lieu).join(', '), lieux.filter(x => x.low && x.n>0).map(x => x.lieu).join(', ') && 'Bas ' + lieux.filter(x => x.low && x.n>0).map(x => x.lieu).join(', ')].filter(Boolean).join(' · ') : (r.fab ? 'Rupture · en fabrication' : 'Rupture'),
         dispoColor: level==='rupture' ? 'rgb(155,24,33)' : 'rgb(0,0,0)',
-        onSeuil: e => {
-          const v = Math.max(0, Math.floor(Number(e.target.value) || 0));
-          this.setState(st => ({seuils: Object.assign({}, st.seuils, {[r.key]:v})}), () => this.persist());
-          this.logAudit('Seuil de stock — ' + r.modele + ' · ' + r.couleur + ' : ' + v);
-        },
         makeLot: () => this.go('lot-form', {lotForm:(() => { const c = r.couleur === 'Sans couleur précisée' ? '' : r.couleur; return Object.assign(this._emptyLot(), {modele:r.modele, couleur:c, variants:[{couleur:c, quantite:'', prix:''}]}); })(), lotErr:{}, lotSource:''})};
     }).sort((a,b) => ({rupture:0, bas:1, ok:2})[a.level] - ({rupture:0, bas:1, ok:2})[b.level] || a.modele.localeCompare(b.modele) || a.couleur.localeCompare(b.couleur));
+    const stockParPays = LIEUX.map(l => { const n = stockRows.reduce((t, r) => t + (r.byLieu[l] || 0), 0); return {label: l + ' : ' + n + (n>1 ? ' pièces disponibles' : ' pièce disponible')}; });
     const stockRupture = stockRows.filter(r => r.level==='rupture').length;
     const stockBas = stockRows.filter(r => r.level==='bas').length;
     const stockToWatch = stockRupture + stockBas;
@@ -2802,7 +2869,7 @@ class Component extends DCLogic {
       goPieces: () => this.go('pieces'),
       goCommandes: () => this.go('commandes'),
       isStock: s.route==='stock', goStock: () => this.go('stock'),
-      stockRows: stockShown, hasStock: stockShown.length>0, stockFilter: s.stockFilter,
+      stockParPays, stockRows: stockShown, hasStock: stockShown.length>0, stockFilter: s.stockFilter,
       onStockFilter: e => this.setState({stockFilter:e.target.value}),
       stockRupture, stockBas, stockOk: stockRows.length - stockToWatch, stockToWatch,
       stockRuptureLabel: stockRupture + (stockRupture>1 ? ' ruptures' : ' rupture'),
@@ -2810,8 +2877,8 @@ class Component extends DCLogic {
       stockOkLabel: (stockRows.length - stockToWatch) + ' en stock',
       defaultSeuil: DEFAULT_SEUIL,
       exportStockCsv: () => this.downloadCsv('stock-carole-sessegnon.csv',
-        [['Modèle','Couleur','Disponibles','En fabrication','Bientôt disponibles','Vendues','Seuil','Statut']]
-          .concat(stockRows.map(r => [r.modele,r.couleur,r.dispo,r.fab,r.bientot,r.vendue,r.seuil,r.levelLabel]))),
+        [['Modèle','Couleur','Disponibles (total)'].concat(LIEUX.map(l => 'Disponibles — ' + l), LIEUX.map(l => 'Seuil — ' + l), ['En fabrication','Bientôt disponibles','Vendues','Statut'])]
+          .concat(stockRows.map(r => [r.modele,r.couleur,r.dispo].concat(LIEUX.map(l => r.byLieu[l] || 0), LIEUX.map(l => seuilOf(r.key, l)), [r.fab,r.bientot,r.vendue,r.levelLabel])))),
       isDemandes: s.route==='demandes', isDemandeDetail: s.route==='demande-detail' && !!viewReq,
       goDemandes: () => this.go('demandes'),
       goAlertes: () => this.go('demandes', {demTab:'alertes'}),
@@ -2845,7 +2912,7 @@ class Component extends DCLogic {
       filtersOpen: s.filtersOpen,
       filtersClass: 'bo-filters' + (s.filtersOpen ? '' : ' is-collapsed'),
       ordersFiltersLabel: (n => 'Filtres' + (n ? ' (' + n + ')' : ''))((s.canalFilter!=='tous' ? 1 : 0) + (s.orderStatutFilter!=='tous' ? 1 : 0)),
-      piecesFiltersLabel: (n => 'Filtres' + (n ? ' (' + n + ')' : ''))((s.statutFilter!=='tous' ? 1 : 0) + (s.sortBy!=='recent' ? 1 : 0)),
+      piecesFiltersLabel: (n => 'Filtres' + (n ? ' (' + n + ')' : ''))((s.statutFilter!=='tous' ? 1 : 0) + (s.lieuFilter!=='tous' ? 1 : 0) + (s.sortBy!=='recent' ? 1 : 0)),
 
       crumb: ({'piece-form':'Pièces', 'piece-detail':'Pièces', 'lot-form':'Pièces', 'qr-sheet':'Pièces', 'commande-detail':'Commandes', 'vente-form':'Commandes', 'demande-detail':'Demandes', 'proprietaire':'Propriétaires'})[s.route] || '',
       crumbGo: () => this.go(NAV_PARENT[s.route] || 'dashboard'),
@@ -2996,7 +3063,7 @@ class Component extends DCLogic {
         montant: (s.orderErr||{}).montant ? FIELD_ERR : FIELD_OK
       },
       // Le moteur de template ne lit que des chemins ({{ a.b }}) : un handler par champ, pas d'appel setDraft('x').
-      setDraft: Object.fromEntries(['statut','tracking','transporteur','dateExpedition','client','email','telephone','evenement','montant','paiement','note','dateIso'].map(key => [key, e => {
+      setDraft: Object.fromEntries(['statut','tracking','transporteur','dateExpedition','client','email','telephone','evenement','pays','montant','paiement','note','dateIso'].map(key => [key, e => {
         const v = e.target.value;
         this.setState(st => {
           const oe = Object.assign({}, st.orderErr); delete oe[key];
@@ -3016,7 +3083,7 @@ class Component extends DCLogic {
           if (raw.montant.trim()==='' || !(Number(raw.montant) >= 0)) err.montant = 'Indiquez un montant en FCFA (chiffres uniquement).';
           if (Object.keys(err).length) { this.setState({orderErr:err}); return; }
           d = Object.assign(d, {client:raw.client.trim(), email:raw.email.trim(), telephone:raw.telephone.trim(),
-            evenement:raw.evenement.trim(), total:Number(raw.montant), paiement:raw.paiement, note:raw.note.trim(), dateIso:raw.dateIso});
+            evenement:raw.evenement.trim(), pays:raw.pays.trim() || LIEU_DEFAUT, total:Number(raw.montant), paiement:raw.paiement, note:raw.note.trim(), dateIso:raw.dateIso});
         }
         const piecesTxt = o.pieces.map(x => x.label).join(', ');
         // Réactiver une commande annulée : ses pièces ne doivent pas avoir été revendues entre-temps.
@@ -3037,7 +3104,7 @@ class Component extends DCLogic {
           if (d.transporteur!==(o.transporteur||'') || d.dateExpedition!==(o.dateExpedition||'')) {
             this.logAudit('Expédition renseignée — commande ' + o.no + (d.transporteur ? ' : ' + d.transporteur : '') + (d.dateExpedition ? ', le ' + fmtIsoDate(d.dateExpedition) : ''));
           }
-          const detailsChanged = !o.isOnline && (['client','email','telephone','evenement','paiement','note','dateIso'].some(k => d[k]!==(o[k]||'')) || d.total!==o.total);
+          const detailsChanged = !o.isOnline && (['client','email','telephone','evenement','paiement','note','dateIso'].some(k => d[k]!==(o[k]||'')) || d.pays!==paysOf(o) || d.total!==o.total);
           if (detailsChanged) this.logAudit('Commande modifiée — ' + o.no + ' (client, montant, paiement ou autre détail)');
           this.showFlash('Commande ' + o.no + ' mise à jour.');
         };
@@ -3178,7 +3245,7 @@ class Component extends DCLogic {
             const year = yearOf(v.date || isoToday());
             const maxNo = s.orders.reduce((m,o) => { const x = /(\d+)$/.exec(o.no || ''); return x ? Math.max(m, Number(x[1])) : m; }, 0);
             const order = {id:'o' + Date.now(), no:'#CS-' + year + '-' + String(maxNo + 1).padStart(4,'0'),
-              canal:v.canal, evenement:v.evenement.trim(), client:v.client.trim(), email:v.email.trim(), telephone:v.telephone.trim(),
+              canal:v.canal, evenement:v.evenement.trim(), pays:v.pays.trim() || LIEU_DEFAUT, client:v.client.trim(), email:v.email.trim(), telephone:v.telephone.trim(),
               pieceIds:ids, total: String(v.montant).trim()!=='' ? Number(v.montant) : suggested, dateIso:v.date || isoToday(),
               mode:'Remise en main propre', paiement:v.paiement, statut:'livree', tracking:'', note:v.note.trim()};
             const labels = ids.map(id => pieceLabel(pieceById(id))).join(', ');
@@ -3275,6 +3342,22 @@ class Component extends DCLogic {
         });
       })(),
       goPiecesDispo: () => this.go('pieces', {statutFilter:'disponible'}),
+      caPeriod: s.caPeriod, onCaPeriod: e => this.setState({caPeriod:e.target.value}),
+      caParPays: (() => {
+        const today = isoToday(), year = today.slice(0,4);
+        const since = new Date(Date.now() - 30*864e5).toISOString().slice(0,10);
+        const inPeriod = o => s.caPeriod==='annee' ? (o.dateIso || '').slice(0,4)===year : s.caPeriod==='30j' ? (o.dateIso || '')>=since : true;
+        const by = {};
+        s.orders.filter(o => o.statut!=='annulee' && inPeriod(o)).forEach(o => {
+          const k = paysOf(o) || 'Non renseigné';
+          const r = by[k] = by[k] || {pays:k, total:0, n:0}; r.total += Number(o.total) || 0; r.n += 1;
+        });
+        const sum = Object.values(by).reduce((t, r) => t + r.total, 0) || 1;
+        return Object.values(by).sort((a,b) => b.total-a.total).map(r => {
+          const pct = Math.round(r.total/sum*100);
+          return {pays:r.pays, pct, totalLabel:fmtFcfa(r.total), label: r.n + (r.n>1 ? ' commandes' : ' commande') + ' · ' + pct + ' %'};
+        });
+      })(),
       geoRepartition: (() => {
         const counts = {};
         s.owners.forEach(o => { counts[o.pays] = (counts[o.pays]||0)+1; });
@@ -3291,6 +3374,8 @@ class Component extends DCLogic {
       // Liste des pièces
       search: s.search, setSearch: e => this.setState({search:e.target.value}),
       statutFilter: s.statutFilter, setStatutFilter: e => this.setState({statutFilter:e.target.value}),
+      lieuFilter: s.lieuFilter, setLieuFilter: e => this.setState({lieuFilter:e.target.value}),
+      lieuxOpts: LIEUX.map(l => ({value:l, label:l})), paysSuggestions: PAYS_SUGGESTIONS.map(p => ({value:p})),
       sortBy: s.sortBy, setSortBy: e => this.setState({sortBy:e.target.value}),
       filteredPieces, noPieces: filteredPieces.length===0,
       registreEmpty: s.pieces.length===0,
@@ -3493,7 +3578,7 @@ class Component extends DCLogic {
         const activeIdx = Math.min(s.viewPhotoIndex || 0, Math.max(photos.length - 1, 0));
         return {...p, eff,
           statutLabel:STATUT_LABEL[eff] || eff, ...BADGE[STATUT_KIND[eff] || 'neutral'],
-          refLabel: [p.reference, p.couleur].filter(Boolean).join(' · '),
+          refLabel: [p.reference, p.couleur, lieuOf(p)].filter(Boolean).join(' · '), lieuLabel: lieuOf(p),
           dispoLabel: dispoCountFor(p.modele, p.couleur) + (dispoCountFor(p.modele, p.couleur)>1 ? ' disponibles' : ' disponible'),
           prixLabel: fmtFcfa(p.prix), dateFabLabel: fmtIsoDate(p.dateFab),
           hasPhotos: photos.length>0, noPhotos: photos.length===0,
@@ -3617,7 +3702,7 @@ class Component extends DCLogic {
               counter++;
               const code = genCode(s.pieces.concat(batch));
               batch.push({id:'p' + Date.now() + '-' + vi + '-' + i, lotId, reference, modele, couleur, matiere, prix,
-                serie:serieOf(counter), code, dateFab:'', statut:'reserve', sav:[], photos:[]});
+                serie:serieOf(counter), code, dateFab:'', statut:'reserve', lieu:raw.lieu || LIEU_DEFAUT, sav:[], photos:[]});
             }
           });
           const first = batch[0].serie, last = batch[batch.length - 1].serie;
