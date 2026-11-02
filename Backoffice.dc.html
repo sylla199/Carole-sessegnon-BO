@@ -50,12 +50,13 @@
     html,body,.bo-shell{background:#fff !important}
   }
   /* Onglets qui débordent horizontalement : dégradé au bord pour signaler qu'il y a plus à voir */
+  .bo-crumb::after{content:'';position:absolute;inset:-14px -10px}
   .bo-tabs-scroll{mask-image:linear-gradient(to right, black calc(100% - 28px), transparent 100%);-webkit-mask-image:linear-gradient(to right, black calc(100% - 28px), transparent 100%)}
   .bo-filters{display:contents}
   .bo-only-mobile{display:none !important}
   /* Photos de la pièce : la vignette entière est le bouton « photo principale » */
   .ph-promote{position:absolute;inset:0;width:100%;height:100%;border:0;padding:0;background:transparent;cursor:pointer}
-  .ph-hint{position:absolute;left:0;right:0;bottom:0;padding:7px 8px;background:rgba(71,29,27,.92);color:#fff;font-size:11px;line-height:14px;text-align:center;opacity:0;transform:translateY(4px);transition:opacity .15s,transform .15s;pointer-events:none}
+  .ph-hint{position:absolute;left:0;right:0;bottom:0;padding:7px 8px;background:rgba(71,29,27,.92);color:#fff;font-size:12px;line-height:14px;text-align:center;opacity:0;transform:translateY(4px);transition:opacity .15s,transform .15s;pointer-events:none}
   .ph-thumb:hover .ph-hint,.ph-promote:focus-visible + .ph-hint{opacity:1;transform:none}
   .ph-promote:focus-visible{outline:2px solid rgb(71,29,27);outline-offset:-4px}
   .ph-x{position:absolute;right:6px;top:6px;width:32px;height:32px;border-radius:50%;border:0;padding:0;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.94);color:rgb(71,29,27);cursor:pointer;box-shadow:0 0 0 1px rgba(0,0,0,.1)}
@@ -87,7 +88,12 @@
     .bo-table td{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:6px 0 !important;border:0 !important;text-align:right !important}
     .bo-modal-actions{flex-direction:column-reverse}
     .bo-modal-actions > *, .bo-modal-actions button{width:100%}
-    .bo-table td[data-label]::before{content:attr(data-label);flex:0 0 auto;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);text-align:left}
+    .bo-stock-cards{grid-template-columns:repeat(3,minmax(0,1fr)) !important;gap:8px !important}
+    .bo-stock-cards > *{padding:12px !important}
+    .bo-stock-cards p:nth-child(1){font-size:12px !important;letter-spacing:.06em !important;margin-bottom:6px !important}
+    .bo-stock-cards p:nth-child(2){font-size:26px !important}
+    .bo-stock-cards p:nth-child(3){display:none}
+    .bo-table td[data-label]::before{content:attr(data-label);flex:0 0 auto;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);text-align:left}
   }
 </style>
 </helmet>
@@ -213,7 +219,7 @@
           </button>
           <div style="min-width:0">
             <sc-if value="{{ crumb }}">
-              <button type="button" onClick="{{ crumbGo }}" style="margin:0 0 4px;padding:0;background:none;border:0;cursor:pointer;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:rgb(94,94,94)">{{ crumb }}</button>
+              <button type="button" class="bo-crumb" onClick="{{ crumbGo }}" style="position:relative;margin:0 0 4px;padding:0;background:none;border:0;cursor:pointer;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:rgb(94,94,94)">{{ crumb }}</button>
             </sc-if>
             <h1 style="margin:0;font-family:var(--font-display);font-weight:400;font-size:clamp(22px,3vw,30px);color:rgb(71,29,27)">{{ pageTitle }}</h1>
           </div>
@@ -259,9 +265,8 @@
             <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:22px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
               <div>
                 <p style="margin:0 0 8px;font-family:var(--font-display);font-size:19px;color:rgb(71,29,27)">À traiter</p>
-                <p style="margin:0;font-size:14px;color:rgb(70,70,70)">{{ todoLabel }}</p>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px"><sc-for list="{{ todoItems }}" as="t" hint-placeholder-count="3"><button type="button" onClick="{{ t.go }}" style="min-height:44px;padding:0 16px;background:rgb(255,251,248);border:0;cursor:pointer;font-size:14px;color:rgb(71,29,27);box-shadow:inset 0 0 0 1px rgb(71,29,27);font-family:inherit">{{ t.label }} →</button></sc-for></div>
               </div>
-              <div style="display:flex;gap:20px"><button type="button" onClick="{{ goDemandes }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center;font-family:inherit">Voir les messages</button><button type="button" onClick="{{ goAlertes }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center;font-family:inherit">Voir les alertes</button><button type="button" onClick="{{ goStock }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center;font-family:inherit">Voir le stock</button></div>
             </div>
           </sc-if>
           <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:24px;margin-bottom:20px">
@@ -273,7 +278,7 @@
                 <option value="30j">30 derniers jours</option>
               </select>
             </div>
-            <p style="margin:0 0 14px;font-size:12px;color:rgb(94,94,94)">Pays du client (livraison ou lieu de vente), commandes annulées exclues, montants encaissés en FCFA.</p>
+            <p style="margin:0 0 14px;font-size:12px;color:rgb(94,94,94)">Pays du client, commandes annulées exclues (FCFA).</p>
             <div style="display:flex;flex-direction:column;gap:12px">
               <sc-for list="{{ caParPays }}" as="c" hint-placeholder-count="3">
                 <div>
@@ -350,7 +355,7 @@
                     <p style="margin:0;font-size:14px;color:rgb(0,0,0)">{{ p.modele }}</p>
                     <p style="margin:3px 0 0;font-size:12px;color:rgb(94,94,94);font-variant-numeric:tabular-nums">{{ p.serie }}</p>
                   </div>
-                  <span style="flex:0 0 auto;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ p.statutBg }};color:{{ p.statutFg }};box-shadow:{{ p.statutShadow }}">{{ p.statutLabel }}</span>
+                  <span style="flex:0 0 auto;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ p.statutBg }};color:{{ p.statutFg }};box-shadow:{{ p.statutShadow }}">{{ p.statutLabel }}</span>
                 </button>
               </sc-for>
             </div>
@@ -365,7 +370,7 @@
                     <p style="margin:0;font-size:14px;color:rgb(0,0,0)">{{ o.no }}</p>
                     <p style="margin:3px 0 0;font-size:12px;color:rgb(94,94,94)">{{ o.clientLine }}</p>
                   </div>
-                  <span style="flex:0 0 auto;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ o.statutBg }};color:{{ o.statutFg }};box-shadow:{{ o.statutShadow }};align-self:flex-start">{{ o.statutLabel }}</span>
+                  <span style="flex:0 0 auto;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ o.statutBg }};color:{{ o.statutFg }};box-shadow:{{ o.statutShadow }};align-self:flex-start">{{ o.statutLabel }}</span>
                 </button>
               </sc-for>
             </div>
@@ -447,12 +452,12 @@
             <table class="bo-table" style="width:100%;border-collapse:collapse;min-width:880px">
               <thead>
                 <tr style="text-align:left">
-                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Pièce</th>
-                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">N° de série</th>
-                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Prix</th>
-                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Fabrication</th>
-                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Stock disponible</th>
-                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Statut</th>
+                  <th style="padding:14px 18px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Pièce</th>
+                  <th style="padding:14px 18px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">N° de série</th>
+                  <th style="padding:14px 18px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Prix</th>
+                  <th style="padding:14px 18px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Fabrication</th>
+                  <th style="padding:14px 18px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Stock disponible</th>
+                  <th style="padding:14px 18px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Statut</th>
                   <th style="padding:14px 18px;border-bottom:1px solid rgba(0,0,0,.1)"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Actions</span></th>
                 </tr>
               </thead>
@@ -476,7 +481,7 @@
                     <td data-label="Fabrication" style="padding:14px 18px;font-size:13px;color:{{ p.dateFabColor }};border-bottom:1px solid rgba(0,0,0,.06)">{{ p.dateFabLabel }}</td>
                     <td data-label="Stock disponible" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);font-variant-numeric:tabular-nums;white-space:nowrap;border-bottom:1px solid rgba(0,0,0,.06)">{{ p.dispoLabel }}</td>
                     <td data-label="Statut" style="padding:14px 18px;border-bottom:1px solid rgba(0,0,0,.06)">
-                      <span style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ p.statutBg }};color:{{ p.statutFg }};box-shadow:{{ p.statutShadow }}">{{ p.statutLabel }}</span>
+                      <span style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ p.statutBg }};color:{{ p.statutFg }};box-shadow:{{ p.statutShadow }}">{{ p.statutLabel }}</span>
                     </td>
                     <td style="padding:14px 18px;text-align:right;border-bottom:1px solid rgba(0,0,0,.06)">
                       <button type="button" onClick="{{ p.edit }}" aria-label="{{ p.editLabel }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center">Modifier</button>
@@ -696,7 +701,7 @@
                   <p style="margin:0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);margin-bottom:6px">Suivi après-vente</p>
                   <sc-for list="{{ formSav }}" as="e" hint-placeholder-count="2">
                     <div style="padding:12px 0;border-top:1px solid rgba(0,0,0,.08)">
-                      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><span style="display:inline-block;white-space:nowrap;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ e.statutBg }};color:{{ e.statutFg }};box-shadow:{{ e.statutShadow }}">{{ e.statutLabel }}</span><span style="font-size:12px;color:rgb(94,94,94)">{{ e.dateLabel }}</span></div>
+                      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><span style="display:inline-block;white-space:nowrap;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ e.statutBg }};color:{{ e.statutFg }};box-shadow:{{ e.statutShadow }}">{{ e.statutLabel }}</span><span style="font-size:12px;color:rgb(94,94,94)">{{ e.dateLabel }}</span></div>
                       <sc-if value="{{ e.note }}"><p style="margin:8px 0 0;font-size:13px;line-height:20px;color:rgb(70,70,70)">{{ e.note }}</p></sc-if>
                     </div>
                   </sc-for>
@@ -718,7 +723,7 @@
                 <div style="min-width:0">
                   <p style="margin:0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">{{ viewPiece.refLabel }}</p>
                   <p style="margin:2px 0 0;font-family:var(--font-display);font-size:24px;color:rgb(71,29,27)">{{ viewPiece.modele }}</p>
-                  <span style="display:inline-block;margin-top:6px;white-space:nowrap;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ viewPiece.statutBg }};color:{{ viewPiece.statutFg }};box-shadow:{{ viewPiece.statutShadow }}">{{ viewPiece.statutLabel }}</span>
+                  <span style="display:inline-block;margin-top:6px;white-space:nowrap;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ viewPiece.statutBg }};color:{{ viewPiece.statutFg }};box-shadow:{{ viewPiece.statutShadow }}">{{ viewPiece.statutLabel }}</span>
                 </div>
               </div>
 
@@ -760,7 +765,7 @@
                   <p style="margin:0 0 6px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">Suivi après-vente</p>
                   <sc-for list="{{ viewPiece.sav }}" as="e" hint-placeholder-count="2">
                     <div style="padding:10px 0;border-top:1px solid rgba(0,0,0,.08)">
-                      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><span style="display:inline-block;white-space:nowrap;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ e.statutBg }};color:{{ e.statutFg }};box-shadow:{{ e.statutShadow }}">{{ e.statutLabel }}</span><span style="font-size:12px;color:rgb(94,94,94)">{{ e.dateLabel }}</span></div>
+                      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><span style="display:inline-block;white-space:nowrap;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ e.statutBg }};color:{{ e.statutFg }};box-shadow:{{ e.statutShadow }}">{{ e.statutLabel }}</span><span style="font-size:12px;color:rgb(94,94,94)">{{ e.dateLabel }}</span></div>
                       <sc-if value="{{ e.note }}"><p style="margin:8px 0 0;font-size:13px;line-height:20px;color:rgb(70,70,70)">{{ e.note }}</p></sc-if>
                     </div>
                   </sc-for>
@@ -881,7 +886,7 @@
               <div class="bo-qr-card" style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.12);padding:20px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center">
                 <div class="bo-qr-screen" style="display:flex;flex-direction:column;align-items:center;gap:10px">
                   <div>
-                    <p style="margin:0;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">{{ q.reference }}</p>
+                    <p style="margin:0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">{{ q.reference }}</p>
                     <p style="margin:2px 0 0;font-family:var(--font-display);font-size:18px;color:rgb(71,29,27)">{{ q.modele }}</p>
                   </div>
                   <img src="{{ q.qrDataUrl }}" alt="QR code d'authentification — {{ q.serie }}" width="140" height="140" style="width:140px;height:140px;image-rendering:pixelated">
@@ -907,7 +912,7 @@
         <sc-if value="{{ isCommandes }}">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:20px">
             <div style="display:flex;gap:10px;flex-wrap:wrap;flex:1 1 520px;min-width:0">
-              <input type="search" aria-label="Rechercher une commande" value="{{ orderSearch }}" onChange="{{ setOrderSearch }}" placeholder="Client, pièce, n° de commande…" style="flex:1 1 240px;min-width:0;height:46px;padding:0 12px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);color:rgb(0,0,0);font-size:14px;padding:0 16px">
+              <input type="search" aria-label="Rechercher une commande" value="{{ orderSearch }}" onChange="{{ setOrderSearch }}" placeholder="Client, pièce, n° de commande…" style="flex:1 1 100%;min-width:0;height:46px;padding:0 12px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);color:rgb(0,0,0);font-size:14px;padding:0 16px">
               <button type="button" class="bo-only-mobile" onClick="{{ toggleFilters }}" aria-expanded="{{ filtersOpen }}" aria-controls="bo-filters-orders" style="height:46px;padding:0 16px;align-items:center;justify-content:center;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);color:rgb(0,0,0);cursor:pointer;font-size:14px">{{ ordersFiltersLabel }}</button>
               <div id="bo-filters-orders" class="{{ filtersClass }}">
                 <select aria-label="Filtrer par canal" value="{{ canalFilter }}" onChange="{{ setCanalFilter }}" style="flex:1 1 160px;height:46px;padding:0 12px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);color:rgb(0,0,0);font-size:14px">
@@ -940,37 +945,37 @@
             <table class="bo-table" style="width:100%;border-collapse:collapse;min-width:900px">
               <thead>
                 <tr style="text-align:left">
-                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">N° de commande</th>
-                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Provenance</th>
-                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Client</th>
-                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Pièces</th>
-                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Total</th>
-                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Date</th>
-                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Statut</th>
-                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Actions</span></th>
+                  <th style="padding:14px 10px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">N° de commande</th>
+                  <th style="padding:14px 10px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Provenance</th>
+                  <th style="padding:14px 10px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Client</th>
+                  <th style="padding:14px 10px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Pièces</th>
+                  <th style="padding:14px 10px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Total</th>
+                  <th style="padding:14px 10px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Date</th>
+                  <th style="padding:14px 10px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Statut</th>
+                  <th style="position:relative;padding:14px 10px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)"><span style="position:absolute;white-space:nowrap;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Actions</span></th>
                 </tr>
               </thead>
               <tbody>
                 <sc-for list="{{ filteredOrders }}" as="o" hint-placeholder-count="5">
                   <tr onClick="{{ o.open }}" style="cursor:pointer;transition:background-color .15s" style-hover="background:rgb(255,251,248)">
-                    <td style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);font-size:14px;color:rgb(0,0,0);font-variant-numeric:tabular-nums;white-space:nowrap">{{ o.no }}<sc-if value="{{ o.hasGift }}"><span style="display:inline-block;margin-left:8px;font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:3px 7px;background:rgb(255,251,248);color:rgb(71,29,27);box-shadow:inset 0 0 0 1px rgb(71,29,27)">Cadeau</span></sc-if></td>
-                    <td data-label="Provenance" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);max-width:220px">
+                    <td style="padding:14px 10px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);font-size:14px;color:rgb(0,0,0);font-variant-numeric:tabular-nums;white-space:nowrap">{{ o.no }}<sc-if value="{{ o.hasGift }}"><span style="display:block;width:max-content;margin-top:4px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:3px 7px;background:rgb(255,251,248);color:rgb(71,29,27);box-shadow:inset 0 0 0 1px rgb(71,29,27)">Cadeau</span></sc-if></td>
+                    <td data-label="Provenance" style="padding:14px 10px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);max-width:220px">
                       <div>
                         <span style="display:block">{{ o.provenance }}</span>
                         <sc-if value="{{ o.evenement }}"><span title="{{ o.evenement }}" style="display:block;margin-top:2px;font-size:12px;color:rgb(94,94,94);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ o.evenement }}</span></sc-if>
                       </div>
                     </td>
-                    <td data-label="Client" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);white-space:nowrap">{{ o.clientLabel }}</td>
-                    <td data-label="Pièces" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)">
+                    <td data-label="Client" style="padding:14px 10px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);white-space:nowrap">{{ o.clientLabel }}</td>
+                    <td data-label="Pièces" style="padding:14px 10px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)">
                       <div style="display:flex;flex-direction:column;align-items:inherit;gap:2px">
-                        <sc-for list="{{ o.itemList }}" as="it" hint-placeholder-count="1"><span style="white-space:nowrap">{{ it.label }}</span></sc-for>
+                        <sc-for list="{{ o.itemList }}" as="it" hint-placeholder-count="1"><span>{{ it.label }}</span></sc-for>
                       </div>
                     </td>
-                    <td data-label="Total" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);font-variant-numeric:tabular-nums;white-space:nowrap">{{ o.totalLabel }}</td>
-                    <td data-label="Date" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);white-space:nowrap">{{ o.dateLabel }}</td>
-                    <td data-label="Statut" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)"><span style="display:inline-block;white-space:nowrap;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ o.statutBg }};color:{{ o.statutFg }};box-shadow:{{ o.statutShadow }}">{{ o.statutLabel }}</span></td>
-                    <td style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);text-align:right">
-                      <button type="button" onClick="{{ o.open }}" aria-label="{{ o.detailLabel }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center;text-align:left;font-family:inherit">Détail</button>
+                    <td data-label="Total" style="padding:14px 10px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);font-variant-numeric:tabular-nums;white-space:nowrap">{{ o.totalLabel }}</td>
+                    <td data-label="Date" style="padding:14px 10px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);white-space:nowrap">{{ o.dateShort }}</td>
+                    <td data-label="Statut" style="padding:14px 10px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)"><span style="display:inline-block;white-space:nowrap;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ o.statutBg }};color:{{ o.statutFg }};box-shadow:{{ o.statutShadow }}">{{ o.statutLabel }}</span></td>
+                    <td style="padding:14px 10px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);text-align:right">
+                      <button type="button" onClick="{{ o.open }}" aria-label="{{ o.detailLabel }}" style="background:none;border:0;padding:0;min-width:44px;justify-content:center;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center;text-align:left;font-family:inherit">Détail</button>
                     </td>
                   </tr>
                 </sc-for>
@@ -1010,7 +1015,7 @@
             <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);overflow:auto">
               <table class="bo-table" style="width:100%;border-collapse:collapse;min-width:760px">
                 <thead><tr>
-                  <th style="padding:12px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Date</th><th style="padding:12px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Contact</th><th style="padding:12px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Objet</th><th style="padding:12px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">N° de commande</th><th style="padding:12px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Message</th><th style="padding:12px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Statut</th>
+                  <th style="padding:12px 18px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Date</th><th style="padding:12px 18px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Contact</th><th style="padding:12px 18px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Objet</th><th style="padding:12px 18px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">N° de commande</th><th style="padding:12px 18px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Message</th><th style="padding:12px 18px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Statut</th>
                 </tr></thead>
                 <tbody>
                   <sc-for list="{{ filteredReq }}" as="r" hint-placeholder-count="4">
@@ -1020,7 +1025,7 @@
                       <td data-label="Objet" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);white-space:nowrap">{{ r.objet }}<sc-if value="{{ r.hasPj }}"><span title="Pièce jointe" style="margin-left:6px;color:rgb(94,94,94)">📎</span></sc-if></td>
                       <td data-label="N° de commande" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);white-space:nowrap">{{ r.commandeLabel }}</td>
                       <td data-label="Message" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);max-width:320px;overflow:hidden;text-overflow:ellipsis">{{ r.preview }}</td>
-                      <td data-label="Statut" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)"><span style="display:inline-block;white-space:nowrap;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ r.statutBg }};color:{{ r.statutFg }};box-shadow:{{ r.statutShadow }}">{{ r.statutLabel }}</span></td>
+                      <td data-label="Statut" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)"><span style="display:inline-block;white-space:nowrap;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ r.statutBg }};color:{{ r.statutFg }};box-shadow:{{ r.statutShadow }}">{{ r.statutLabel }}</span></td>
                     </tr>
                   </sc-for>
                 </tbody>
@@ -1041,7 +1046,7 @@
                 <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:22px">
                   <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:10px">
                     <p style="margin:0;font-family:var(--font-display);font-size:19px;color:rgb(71,29,27)">{{ g.modele }}</p>
-                    <span style="display:inline-block;white-space:nowrap;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ g.stockBg }};color:{{ g.stockFg }};box-shadow:{{ g.stockShadow }}">{{ g.stockLabel }}</span>
+                    <span style="display:inline-block;white-space:nowrap;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ g.stockBg }};color:{{ g.stockFg }};box-shadow:{{ g.stockShadow }}">{{ g.stockLabel }}</span>
                   </div>
                   <sc-for list="{{ g.subs }}" as="a" hint-placeholder-count="2">
                     <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px;flex-wrap:wrap">
@@ -1065,7 +1070,7 @@
             <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:clamp(22px,3vw,32px)">
               <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 6px">
                 <p style="margin:0;font-family:var(--font-display);font-size:24px;color:rgb(71,29,27)">{{ viewReq.objet }}</p>
-                <span style="display:inline-block;white-space:nowrap;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ viewReq.statutBg }};color:{{ viewReq.statutFg }};box-shadow:{{ viewReq.statutShadow }}">{{ viewReq.statutLabel }}</span>
+                <span style="display:inline-block;white-space:nowrap;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ viewReq.statutBg }};color:{{ viewReq.statutFg }};box-shadow:{{ viewReq.statutShadow }}">{{ viewReq.statutLabel }}</span>
               </div>
               <p style="margin:0 0 22px;font-size:13px;color:rgb(94,94,94)">Reçue le {{ viewReq.dateLabel }}</p>
               <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px"><span style="color:rgb(94,94,94)">Contact</span><span style="text-align:right">{{ viewReq.who }}</span></div>
@@ -1093,11 +1098,11 @@
         </sc-if>
 
         <sc-if value="{{ isStock }}">
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:16px;margin-bottom:24px">
+          <div class="bo-stock-cards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:16px;margin-bottom:24px">
             <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:22px">
-              <p style="margin:0 0 10px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">Stock global</p>
+              <p style="margin:0 0 10px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">Stock disponible</p>
               <p style="margin:0;font-family:var(--font-display);font-size:clamp(26px,2.4vw,32px);color:rgb(71,29,27)">{{ stockTotal }}</p>
-              <p style="margin:8px 0 0;font-size:12px;color:rgb(94,94,94)">pièces disponibles, tous pays</p>
+              <p style="margin:8px 0 0;font-size:12px;color:rgb(94,94,94)">tous pays confondus</p>
             </div>
             <sc-for list="{{ stockParPays }}" as="sp" hint-placeholder-count="2">
               <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:22px">
@@ -1115,9 +1120,9 @@
           <sc-if value="{{ isStockTab }}">
           <p style="margin:0 0 20px;font-size:14px;color:rgb(70,70,70);max-width:68ch">Calculé depuis le registre : une pièce vendue sort du stock, une pièce reçue de l'atelier y entre. Réglez un seuil par modèle, couleur et pays pour être prévenu avant la rupture.</p>
           <div style="display:flex;gap:10px 16px;flex-wrap:wrap;align-items:center;margin-bottom:20px">
-            <span style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:6px 11px;background:rgba(155,24,33,.08);color:rgb(155,24,33)">{{ stockRuptureLabel }}</span>
-            <span style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:6px 11px;background:rgb(250,241,235);color:rgb(115,60,8);box-shadow:inset 0 0 0 1px rgb(233,199,176)">{{ stockBasLabel }}</span>
-            <span style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:6px 11px;background:rgb(71,29,27);color:rgb(255,255,255)">{{ stockOkLabel }}</span>
+            <span style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:6px 11px;background:rgba(155,24,33,.08);color:rgb(155,24,33)">{{ stockRuptureLabel }}</span>
+            <span style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:6px 11px;background:rgb(250,241,235);color:rgb(115,60,8);box-shadow:inset 0 0 0 1px rgb(233,199,176)">{{ stockBasLabel }}</span>
+            <sc-if value="{{ stockOk }}"><span style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:6px 11px;background:rgb(71,29,27);color:rgb(255,255,255)">{{ stockOkLabel }}</span></sc-if>
             <span style="flex:1 1 auto"></span>
             <select aria-label="Filtrer le stock" value="{{ stockFilter }}" onChange="{{ onStockFilter }}" style="height:46px;padding:0 14px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0);font-size:14px">
               <option value="tous">Tous les modèles</option>
@@ -1126,37 +1131,36 @@
             <button type="button" onClick="{{ exportStockCsv }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center;font-family:inherit">Exporter en CSV</button>
           </div>
           <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);overflow:auto">
-            <table class="bo-table" style="width:100%;border-collapse:collapse;min-width:820px">
+            <table class="bo-table" style="width:100%;border-collapse:collapse;min-width:760px">
               <thead><tr>
-                <th style="padding:12px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Modèle</th><th style="padding:12px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Couleur</th><th style="padding:12px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Disponibles</th><th style="padding:12px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">En fabrication</th><th style="padding:12px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Vendues</th><th style="padding:12px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Par pays : disponibles et seuil d'alerte</th><th style="padding:12px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Statut</th><th style="padding:12px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)"></th>
+                <th style="padding:12px 12px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Modèle</th><th style="padding:12px 12px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Couleur</th><th style="padding:12px 12px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Statut</th><th style="padding:12px 12px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Disponibles · seuil</th><th style="padding:12px 12px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Fabrication</th><th style="padding:12px 12px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Vendues</th><th style="position:relative;padding:12px 12px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Actions</span></th>
               </tr></thead>
               <tbody>
                 <sc-for list="{{ stockRows }}" as="r" hint-placeholder-count="5">
                   <tr>
-                    <td data-label="Modèle" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);color:rgb(0,0,0)">{{ r.modele }}</td>
-                    <td data-label="Couleur" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)">{{ r.couleur }}</td>
-                    <td data-label="Disponibles" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)"><span style="font-family:var(--font-display);font-size:20px;color:{{ r.dispoColor }}">{{ r.dispo }}</span></td>
-                    <td data-label="En fabrication" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)">{{ r.fabLabel }}</td>
-                    <td data-label="Vendues" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)">{{ r.vendue }}</td>
-                    <td data-label="Par pays" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)"><div style="display:flex;gap:18px;flex-wrap:wrap">
-                      <sc-for list="{{ r.lieux }}" as="lx" hint-placeholder-count="2"><div style="display:flex;align-items:center;gap:8px"><span style="min-width:96px">{{ lx.lieu }}</span><span style="font-family:var(--font-display);font-size:18px;min-width:22px;color:{{ lx.color }}">{{ lx.n }}</span><input type="number" min="0" step="1" inputMode="numeric" aria-label="{{ lx.label }}" value="{{ lx.seuil }}" onChange="{{ lx.onSeuil }}" style="width:64px;height:36px;padding:0 8px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0);font-size:14px"></div></sc-for>
+                    <td data-label="Modèle" style="padding:14px 12px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);color:rgb(0,0,0)">{{ r.modele }}</td>
+                    <td data-label="Couleur" style="padding:14px 12px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)">{{ r.couleur }}</td>
+                    <td data-label="Statut" style="padding:14px 12px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)"><span style="display:inline-block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ r.statutBg }};color:{{ r.statutFg }};box-shadow:{{ r.statutShadow }}">{{ r.levelLabel }}</span></td>
+                    <td data-label="Par pays" style="padding:14px 12px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)"><div style="display:flex;flex-direction:column;gap:6px">
+                      <sc-for list="{{ r.lieux }}" as="lx" hint-placeholder-count="2"><div style="display:flex;align-items:center;gap:10px;white-space:nowrap"><span style="min-width:92px">{{ lx.lieu }}</span><span style="font-family:var(--font-display);font-size:20px;min-width:24px;text-align:center;color:{{ lx.color }}" title="Pièces disponibles">{{ lx.n }}</span><span style="font-size:12px;color:rgb(94,94,94)">seuil</span><input type="number" min="0" step="1" inputMode="numeric" aria-label="{{ lx.label }}" value="{{ lx.seuil }}" onChange="{{ lx.onSeuil }}" style="width:56px;height:44px;padding:0 8px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0);font-size:14px"></div></sc-for>
                     </div></td>
-                    <td data-label="Statut" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)"><span style="display:inline-block;white-space:nowrap;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ r.statutBg }};color:{{ r.statutFg }};box-shadow:{{ r.statutShadow }}">{{ r.levelLabel }}</span></td>
-                    <td style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);text-align:right"><button type="button" onClick="{{ r.makeLot }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center;font-family:inherit">Générer un lot</button></td>
+                    <td data-label="En fabrication" style="padding:14px 12px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)">{{ r.fabLabel }}</td>
+                    <td data-label="Vendues" style="padding:14px 12px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)">{{ r.vendue }}</td>
+                    <td style="padding:14px 12px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);text-align:right"><button type="button" onClick="{{ r.makeLot }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);font-family:inherit;min-height:44px;display:inline-flex;align-items:center;white-space:nowrap">Générer un lot</button></td>
                   </tr>
                 </sc-for>
               </tbody>
             </table>
             <sc-if value="{{ !hasStock }}"><p style="margin:0;padding:28px;text-align:center;font-size:14px;color:rgb(94,94,94)">Aucun modèle en rupture ni en stock bas.</p></sc-if>
           </div>
-          <p style="margin:16px 0 0;font-size:13px;color:rgb(94,94,94)">Seuil par défaut : {{ defaultSeuil }} pièces en Côte d'Ivoire, aucun pour les autres pays tant que vous n'en réglez pas. « Stock bas » = disponibles inférieures ou égales au seuil ; « Rupture » = aucune pièce disponible.</p>
+          <p style="margin:16px 0 0;font-size:13px;color:rgb(94,94,94)">Seuil par défaut : {{ defaultSeuil }} pièce en Côte d'Ivoire, aucun pour les autres pays tant que vous n'en réglez pas. « Stock bas » = disponibles inférieures ou égales au seuil ; « Rupture » = aucune pièce disponible.</p>
           </sc-if>
 
           <sc-if value="{{ isRetoursTab }}">
             <p style="margin:0 0 20px;font-size:14px;color:rgb(70,70,70);max-width:68ch">Pièces retournées par les clientes, à contrôler avant de les remettre en vente. Un retour s'enregistre depuis la fiche de la pièce vendue.</p>
             <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);overflow:auto">
               <table class="bo-table" style="width:100%;border-collapse:collapse;min-width:820px">
-                <thead><tr><th style="padding:12px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Pièce</th><th style="padding:12px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Commande</th><th style="padding:12px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Retournée le</th><th style="padding:12px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Motif</th><th style="padding:12px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Lieu de remise en stock</th><th style="padding:12px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)"></th></tr></thead>
+                <thead><tr><th style="padding:12px 18px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Pièce</th><th style="padding:12px 18px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Commande</th><th style="padding:12px 18px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Retournée le</th><th style="padding:12px 18px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Motif</th><th style="padding:12px 18px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)">Lieu de remise en stock</th><th style="padding:12px 18px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:rgb(94,94,94);text-align:left;border-bottom:1px solid rgba(0,0,0,.1)"></th></tr></thead>
                 <tbody>
                   <sc-for list="{{ retoursList }}" as="r" hint-placeholder-count="2">
                     <tr>
@@ -1225,7 +1229,7 @@
               <p style="margin:0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);margin-bottom:4px">{{ viewOrder.kindLabel }}</p>
               <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 6px">
                 <p style="margin:0;font-family:var(--font-display);font-size:24px;color:rgb(71,29,27)">{{ viewOrder.no }}</p>
-                <span style="display:inline-block;white-space:nowrap;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ viewOrder.statutBg }};color:{{ viewOrder.statutFg }};box-shadow:{{ viewOrder.statutShadow }}">{{ viewOrder.statutLabel }}</span>
+                <span style="display:inline-block;white-space:nowrap;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ viewOrder.statutBg }};color:{{ viewOrder.statutFg }};box-shadow:{{ viewOrder.statutShadow }}">{{ viewOrder.statutLabel }}</span>
               </div>
               <p style="margin:0 0 18px;font-size:13px;color:rgb(94,94,94)">{{ viewOrder.subline }}</p>
               <div style="margin:0 0 22px;padding:14px 18px;background:rgb(255,251,248);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)">
@@ -1528,9 +1532,9 @@
               <table class="bo-table" style="width:100%;border-collapse:collapse;min-width:680px">
                 <thead>
                   <tr style="text-align:left">
-                    <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Collaborateur</th>
-                    <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Rôle</th>
-                    <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Statut</th>
+                    <th style="padding:14px 18px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Collaborateur</th>
+                    <th style="padding:14px 18px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Rôle</th>
+                    <th style="padding:14px 18px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Statut</th>
                     <th style="padding:14px 18px;border-bottom:1px solid rgba(0,0,0,.1)"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Actions</span></th>
                   </tr>
                 </thead>
@@ -1548,7 +1552,7 @@
                       </td>
                       <td data-label="Rôle" title="{{ t.roleHint }}" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)">{{ t.roleLabel }}</td>
                       <td data-label="Statut" style="padding:14px 18px;border-bottom:1px solid rgba(0,0,0,.06)">
-                        <span style="display:inline-block;white-space:nowrap;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ t.statutBg }};color:{{ t.statutFg }};box-shadow:{{ t.statutShadow }}">{{ t.statutLabel }}</span>
+                        <span style="display:inline-block;white-space:nowrap;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ t.statutBg }};color:{{ t.statutFg }};box-shadow:{{ t.statutShadow }}">{{ t.statutLabel }}</span>
                       </td>
                       <td style="padding:14px 18px;text-align:right;border-bottom:1px solid rgba(0,0,0,.06)">
                         <sc-if value="{{ t.isInvite }}">
@@ -1582,11 +1586,11 @@
                     <span style="flex:0 0 auto;font-size:12px;color:rgb(94,94,94)">{{ r.countLabel }}</span>
                   </div>
                   <div>
-                    <p style="margin:0 0 4px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">Voit</p>
+                    <p style="margin:0 0 4px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">Voit</p>
                     <p style="margin:0;font-size:13px;color:rgb(0,0,0)">{{ r.acces }}</p>
                   </div>
                   <div>
-                    <p style="margin:0 0 4px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">Ne voit pas</p>
+                    <p style="margin:0 0 4px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">Ne voit pas</p>
                     <p style="margin:0;font-size:13px;color:rgb(70,70,70)">{{ r.neVoitPas }}</p>
                   </div>
                 </div>
@@ -1608,9 +1612,9 @@
               <table class="bo-table" style="width:100%;border-collapse:collapse;min-width:680px">
                 <thead>
                   <tr style="text-align:left">
-                    <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Action</th>
-                    <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Collaborateur</th>
-                    <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Date</th>
+                    <th style="padding:14px 18px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Action</th>
+                    <th style="padding:14px 18px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Collaborateur</th>
+                    <th style="padding:14px 18px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Date</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1639,12 +1643,12 @@
             <table class="bo-table" style="width:100%;border-collapse:collapse;min-width:860px">
               <thead>
                 <tr style="text-align:left">
-                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Propriétaire</th>
-                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Pièce</th>
-                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Pays</th>
-                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Association</th>
-                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Après-vente</th>
-                  <th style="padding:14px 18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Actions</span></th>
+                  <th style="padding:14px 18px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Propriétaire</th>
+                  <th style="padding:14px 18px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Pièce</th>
+                  <th style="padding:14px 18px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Pays</th>
+                  <th style="padding:14px 18px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Association</th>
+                  <th style="padding:14px 18px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)">Après-vente</th>
+                  <th style="padding:14px 18px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94);border-bottom:1px solid rgba(0,0,0,.1)"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Actions</span></th>
                 </tr>
               </thead>
               <tbody>
@@ -1662,7 +1666,7 @@
                     <td data-label="Pays" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)">{{ o.pays }}</td>
                     <td data-label="Association" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);font-variant-numeric:tabular-nums">{{ o.date }}</td>
                     <td data-label="Après-vente" style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06)">
-                      <sc-if value="{{ o.hasSav }}"><span style="display:inline-block;white-space:nowrap;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ o.sav.statutBg }};color:{{ o.sav.statutFg }};box-shadow:{{ o.sav.statutShadow }}">{{ o.sav.statutLabel }}</span></sc-if>
+                      <sc-if value="{{ o.hasSav }}"><span style="display:inline-block;white-space:nowrap;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ o.sav.statutBg }};color:{{ o.sav.statutFg }};box-shadow:{{ o.sav.statutShadow }}">{{ o.sav.statutLabel }}</span></sc-if>
                       <sc-if value="{{ o.noSav }}"><span style="color:rgb(94,94,94)">—</span></sc-if>
                     </td>
                     <td style="padding:14px 18px;font-size:13px;color:rgb(70,70,70);border-bottom:1px solid rgba(0,0,0,.06);text-align:right">
@@ -1765,7 +1769,7 @@
                 <sc-for list="{{ ownerSav }}" as="e" hint-placeholder-count="2">
                   <div style="padding:14px 0;border-top:1px solid rgba(0,0,0,.1)">
                     <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
-                      <span style="display:inline-block;white-space:nowrap;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ e.statutBg }};color:{{ e.statutFg }};box-shadow:{{ e.statutShadow }}">{{ e.statutLabel }}</span>
+                      <span style="display:inline-block;white-space:nowrap;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ e.statutBg }};color:{{ e.statutFg }};box-shadow:{{ e.statutShadow }}">{{ e.statutLabel }}</span>
                       <span style="font-size:12px;color:rgb(94,94,94)">{{ e.dateLabel }}</span>
                     </div>
                     <sc-if value="{{ e.note }}"><p style="margin:10px 0 0;font-size:14px;line-height:21px;color:rgb(0,0,0)">{{ e.note }}</p></sc-if>
@@ -2722,7 +2726,7 @@ class Component extends DCLogic {
         dateExpeditionLabel: o.dateExpedition ? fmtIsoDate(o.dateExpedition) : '',
         clientLabel: o.client || 'Client non renseigné',
         clientLine: (o.client || 'Client non renseigné') + ' · ' + canalLabel,
-        totalLabel: fmtFcfa(o.total), dateLabel: fmtIsoDate(o.dateIso),
+        totalLabel: fmtFcfa(o.total), dateLabel: fmtIsoDate(o.dateIso), dateShort: o.dateIso ? (([y,mo,d]) => new Date(y, mo-1, d).toLocaleDateString('fr-FR', {day:'numeric', month:'short', year:'numeric'}))(o.dateIso.split('-').map(Number)) : '—',
         paiementLabel: o.paiement || '—', paysLabel: paysOf(o) || '—', provenance: canalLabel + (paysOf(o) ? ' · ' + paysOf(o) : ''),
         trackingLabel: o.tracking || '—',
         detailLabel: 'Détail de la commande ' + o.no,
@@ -2843,7 +2847,7 @@ class Component extends DCLogic {
     const demTab = s.demTab==='alertes' ? 'alertes' : 'messages';
 
     // Stock : calculé depuis le registre, une ligne par modèle et couleur
-    const DEFAULT_SEUIL = 2;
+    const DEFAULT_SEUIL = 1;
     const stockMap = {};
     const seuilOf = (key, lieu) => {
       const sm = s.seuils || {};
@@ -2875,7 +2879,7 @@ class Component extends DCLogic {
       const level = r.dispo===0 ? 'rupture' : (lowLieux.length ? 'bas' : 'ok');
       const b = BADGE[level==='ok' ? 'doneFilled' : level==='bas' ? 'offsale' : 'alert'];
       return {...r, ...b, lieux, level, fabLabel: r.fab ? String(r.fab) : '—', bientotLabel: r.bientot ? String(r.bientot) : '—',
-        levelLabel: level==='ok' ? 'En stock' : level==='bas' ? [lieux.filter(x => x.low && x.n===0).map(x => x.lieu).join(', ') && 'Rupture ' + lieux.filter(x => x.low && x.n===0).map(x => x.lieu).join(', '), lieux.filter(x => x.low && x.n>0).map(x => x.lieu).join(', ') && 'Bas ' + lieux.filter(x => x.low && x.n>0).map(x => x.lieu).join(', ')].filter(Boolean).join(' · ') : (r.fab ? 'Rupture · en fabrication' : 'Rupture'),
+        levelLabel: level==='ok' ? 'En stock' : level==='bas' ? [lieux.filter(x => x.low && x.n===0).map(x => x.lieu).join(', ') && 'Manque : ' + lieux.filter(x => x.low && x.n===0).map(x => x.lieu).join(', '), lieux.filter(x => x.low && x.n>0).map(x => x.lieu).join(', ') && 'Bas : ' + lieux.filter(x => x.low && x.n>0).map(x => x.lieu).join(', ')].filter(Boolean).join(' · ') : (r.fab ? 'Rupture · en fabrication' : 'Rupture'),
         dispoColor: level==='rupture' ? 'rgb(155,24,33)' : 'rgb(0,0,0)',
         makeLot: () => this.go('lot-form', {lotForm:(() => { const c = r.couleur === 'Sans couleur précisée' ? '' : r.couleur; return Object.assign(this._emptyLot(), {modele:r.modele, couleur:c, variants:[{couleur:c, quantite:'', prix:''}]}); })(), lotErr:{}, lotSource:''})};
     }).sort((a,b) => ({rupture:0, bas:1, ok:2})[a.level] - ({rupture:0, bas:1, ok:2})[b.level] || a.modele.localeCompare(b.modele) || a.couleur.localeCompare(b.couleur));
@@ -3074,6 +3078,7 @@ class Component extends DCLogic {
       goAlertes: () => this.go('demandes', {demTab:'alertes'}),
       viewReq, filteredReq, hasReq: filteredReq.length>0, alertGroups, hasAlerts: alertGroups.length>0,
       newReqCount, alertWaiting, hasTodo: newReqCount>0 || alertWaiting>0 || stockToWatch>0,
+      todoItems: [newReqCount ? {label: newReqCount + (newReqCount>1 ? ' nouveaux messages' : ' nouveau message'), go: () => this.go('demandes')} : null, alertWaiting ? {label: alertWaiting + (alertWaiting>1 ? ' abonnés à prévenir' : ' abonné à prévenir'), go: () => this.go('demandes', {demTab:'alertes'})} : null, stockRupture ? {label: stockRupture + (stockRupture>1 ? ' ruptures de stock' : ' rupture de stock'), go: () => this.go('stock', {stockTab:'stock', stockFilter:'alertes'})} : null, stockBas ? {label: stockBas + ' en stock bas', go: () => this.go('stock', {stockTab:'stock', stockFilter:'alertes'})} : null].filter(Boolean),
       todoLabel: [newReqCount ? newReqCount + (newReqCount>1 ? ' nouveaux messages' : ' nouveau message') : '', alertWaiting ? alertWaiting + (alertWaiting>1 ? ' abonnés en attente d\'une alerte' : ' abonné en attente d\'une alerte') : '', stockRupture ? stockRupture + (stockRupture>1 ? ' ruptures de stock' : ' rupture de stock') : '', stockBas ? stockBas + ' en stock bas' : ''].filter(Boolean).join(' · '),
       newReqLabel: newReqCount + (newReqCount>1 ? ' nouveaux messages' : ' nouveau message'),
       alertWaitingLabel: alertWaiting + (alertWaiting>1 ? ' abonnés en attente d\'une alerte' : ' abonné en attente d\'une alerte'),
@@ -3503,7 +3508,7 @@ class Component extends DCLogic {
         return [
           {label:"Chiffre d'affaires", value: fmtNumber(ca), unit:'FCFA', hint: paidOrders.length + ' ventes · panier moyen ' + fmtNumber(panierMoyen) + ' FCFA'},
           {label:'Pièces vendues', value:String(vendues.length), unit:'', hint: vHors ? 'Dont ' + vHors + ' hors site (' + fmtNumber(caHors) + ' FCFA)' : 'Toutes en ligne'},
-          {label:'Disponibles à la vente', value:String(dispo.length), unit:'', hint:'Sur ' + s.pieces.length + ' pièces au registre'},
+          {label:'Stock disponible', value:String(dispo.length), unit:'', hint:'Sur ' + s.pieces.length + ' pièces au registre'},
           {label:'Activations passeport', value:String(s.owners.length), unit:'', hint:'Pièces associées à un propriétaire'}
         ];
       })(),
