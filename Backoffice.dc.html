@@ -178,6 +178,8 @@
 <sc-if value="{{ isApp }}">
   <div class="bo-shell" style="min-height:100vh;display:grid;grid-template-columns:{{ sidebarCols }};background:rgb(252,249,248);font-family:var(--font-body);color:rgb(0,0,0)">
 
+    <datalist id="bo-modeles-list"><sc-for list="{{ modeleNomsOpts }}" as="mo"><option value="{{ mo.value }}"></option></sc-for></datalist>
+
     <sc-if value="{{ navOpen }}">
       <div class="bo-scrim" onClick="{{ closeNav }}"></div>
     </sc-if>
@@ -389,6 +391,182 @@
           </div>
         </sc-if>
 
+        <sc-if value="{{ isModeles }}">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:20px">
+            <input type="search" aria-label="Rechercher un modèle" value="{{ modeleSearch }}" onChange="{{ setModeleSearch }}" placeholder="Rechercher un modèle, une collection…" style="flex:1 1 320px;min-width:0;height:46px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);color:rgb(0,0,0);font-size:14px">
+            <x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="primary" onClick="{{ openModeleNew }}" dc-props="{{ btnUpperSm }}" hint-size="auto,46px">Ajouter un modèle</x-import>
+          </div>
+          <p style="margin:0 0 10px;font-size:13px;color:rgb(94,94,94)">{{ modelesCount }}</p>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:18px">
+            <sc-for list="{{ filteredModeles }}" as="m" hint-placeholder-count="3">
+              <button type="button" onClick="{{ m.open }}" style="display:block;width:100%;text-align:left;background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:0;cursor:pointer;font-family:inherit" style-hover="box-shadow:inset 0 0 0 1px rgba(71,29,27,.4)">
+                <div style="position:relative;aspect-ratio:1.2;overflow:hidden;background:rgb(252,249,248);display:flex;align-items:center;justify-content:center">
+                  <sc-if value="{{ m.hasPhoto }}"><img src="{{ m.photoSrc }}" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></sc-if>
+                  <sc-if value="{{ m.noPhoto }}"><svg aria-hidden="true" viewBox="0 0 24 24" style="width:30%;height:30%;opacity:.3" fill="none" stroke="rgb(164,164,164)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h12l1 12H5L6 8Z"></path><path d="M9 8V6a3 3 0 0 1 6 0v2"></path></svg></sc-if>
+                </div>
+                <div style="padding:16px 18px">
+                  <p style="margin:0;font-size:15px;color:rgb(0,0,0)">{{ m.nom }}</p>
+                  <p style="margin:4px 0 0;font-size:12px;color:rgb(94,94,94)">{{ m.collection }} {{ m.categorie }}</p>
+                  <p style="margin:10px 0 0;font-size:12px;line-height:17px;color:rgb(94,94,94)">{{ m.variantesLabel }}</p>
+                  <p style="margin:8px 0 0;font-size:12px;color:rgb(94,94,94)">{{ m.nPiecesLabel }}</p>
+                </div>
+              </button>
+            </sc-for>
+          </div>
+          <sc-if value="{{ noModeles }}">
+            <div style="margin:0;padding:40px;text-align:center;background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)">
+              <p style="margin:0;font-size:14px;color:rgb(94,94,94)">Aucun modèle pour l'instant.</p>
+              <button type="button" onClick="{{ openModeleNew }}" style="margin-top:14px;background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center;justify-content:center;margin-left:auto;margin-right:auto">Ajouter un modèle</button>
+            </div>
+          </sc-if>
+        </sc-if>
+
+        <sc-if value="{{ isModeleForm }}">
+          <button type="button" onClick="{{ goModeles }}" style="background:none;border:0;padding:0;margin-bottom:22px;color:rgb(94,94,94);cursor:pointer;font-size:13px;min-height:44px;display:inline-flex;align-items:center">← Retour aux modèles</button>
+          <div class="bo-split">
+            <form onSubmit="{{ saveModele }}" noValidate style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:clamp(22px,3vw,32px);display:flex;flex-direction:column;gap:18px">
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:16px">
+                <label style="display:block;font-size:13px;color:rgb(70,70,70)">Nom du modèle
+                  <input value="{{ modeleForm.nom }}" onChange="{{ setModele.nom }}" aria-invalid="{{ modeleInvalid.nom }}" aria-describedby="err-modele-nom" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:{{ modeleShadow.nom }};color:rgb(0,0,0)">
+                  <sc-if value="{{ modeleFieldErr.nom }}"><span id="err-modele-nom" style="display:block;margin-top:6px;font-size:12px;color:rgb(155,24,33)">{{ modeleFieldErr.nom }}</span></sc-if>
+                </label>
+                <label style="display:block;font-size:13px;color:rgb(70,70,70)">Référence article <span style="color:rgb(94,94,94)">(facultatif)</span>
+                  <input value="{{ modeleForm.reference }}" onChange="{{ setModele.reference }}" placeholder="{{ modeleRefPlaceholder }}" autocomplete="off" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0);text-transform:uppercase;letter-spacing:.06em">
+                </label>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:16px">
+                <label style="display:block;font-size:13px;color:rgb(70,70,70)">Collection <span style="color:rgb(94,94,94)">(facultatif)</span>
+                  <input value="{{ modeleForm.collection }}" onChange="{{ setModele.collection }}" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+                </label>
+                <label style="display:block;font-size:13px;color:rgb(70,70,70)">Catégorie <span style="color:rgb(94,94,94)">(facultatif)</span>
+                  <input value="{{ modeleForm.categorie }}" onChange="{{ setModele.categorie }}" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+                </label>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:16px">
+                <label style="display:block;font-size:13px;color:rgb(70,70,70)">Prix par défaut (FCFA)
+                  <input type="number" min="0" step="1000" inputMode="numeric" value="{{ modeleForm.prixDefaut }}" onChange="{{ setModele.prixDefaut }}" aria-invalid="{{ modeleInvalid.prixDefaut }}" aria-describedby="err-modele-prix" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:{{ modeleShadow.prixDefaut }};color:rgb(0,0,0);font-variant-numeric:tabular-nums">
+                  <sc-if value="{{ modeleFieldErr.prixDefaut }}"><span id="err-modele-prix" style="display:block;margin-top:6px;font-size:12px;color:rgb(155,24,33)">{{ modeleFieldErr.prixDefaut }}</span></sc-if>
+                </label>
+                <label style="display:block;font-size:13px;color:rgb(70,70,70)">Matière par défaut <span style="color:rgb(94,94,94)">(facultatif)</span>
+                  <input value="{{ modeleForm.matiereDefaut }}" onChange="{{ setModele.matiereDefaut }}" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+                </label>
+              </div>
+
+              <div>
+                <p style="margin:0 0 4px;font-size:13px;color:rgb(70,70,70)">Couleurs proposées</p>
+                <p style="margin:0 0 10px;font-size:12px;line-height:18px;color:rgb(94,94,94)">Une ligne par couleur : chacune peut avoir son propre prix, sinon le prix par défaut s'applique.</p>
+                <div style="display:flex;flex-direction:column;gap:10px">
+                  <sc-for list="{{ modeleVariantsView }}" as="v" hint-placeholder-count="1">
+                    <div style="display:grid;grid-template-columns:1fr 160px auto;gap:10px;align-items:end">
+                      <label style="display:block;font-size:12px;color:rgb(94,94,94)">Couleur
+                        <input value="{{ v.couleur }}" onChange="{{ v.onCouleur }}" style="margin-top:6px;width:100%;height:48px;padding:0 14px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+                      </label>
+                      <label style="display:block;font-size:12px;color:rgb(94,94,94)">Prix (FCFA) <span style="color:rgb(94,94,94)">— si différent</span>
+                        <input type="number" min="0" step="1000" inputMode="numeric" value="{{ v.prix }}" onChange="{{ v.onPrix }}" placeholder="{{ modeleForm.prixDefaut }}" style="margin-top:6px;width:100%;height:48px;padding:0 14px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0);font-variant-numeric:tabular-nums">
+                      </label>
+                      <sc-if value="{{ v.canRemove }}"><button type="button" onClick="{{ v.remove }}" aria-label="Retirer cette couleur" style="height:48px;padding:0 14px;background:none;border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(155,24,33);cursor:pointer;font-size:13px">Retirer</button></sc-if>
+                    </div>
+                    <sc-if value="{{ v.err }}"><p role="alert" style="margin:0;font-size:12px;color:rgb(155,24,33)">{{ v.err }}</p></sc-if>
+                  </sc-for>
+                </div>
+                <button type="button" onClick="{{ addModeleVariant }}" style="margin-top:12px;background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center">+ Ajouter une couleur</button>
+              </div>
+
+              <label style="display:block;font-size:13px;color:rgb(70,70,70)">Description <span style="color:rgb(94,94,94)">(facultatif)</span>
+                <textarea value="{{ modeleForm.description }}" rows="4" onChange="{{ setModele.description }}" style="margin-top:8px;width:100%;padding:12px 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0);font-family:inherit;resize:vertical"></textarea>
+              </label>
+              <label style="display:block;font-size:13px;color:rgb(70,70,70)">Caractéristiques <span style="color:rgb(94,94,94)">(facultatif)</span>
+                <textarea value="{{ modeleForm.caracteristiques }}" rows="4" onChange="{{ setModele.caracteristiques }}" style="margin-top:8px;width:100%;padding:12px 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0);font-family:inherit;resize:vertical"></textarea>
+              </label>
+              <label style="display:block;font-size:13px;color:rgb(70,70,70)">Conseils d'entretien <span style="color:rgb(94,94,94)">(facultatif)</span>
+                <textarea value="{{ modeleForm.entretien }}" rows="4" onChange="{{ setModele.entretien }}" style="margin-top:8px;width:100%;padding:12px 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0);font-family:inherit;resize:vertical"></textarea>
+              </label>
+
+              <sc-if value="{{ hasModeleFieldErr }}">
+                <p role="alert" style="margin:0;font-size:13px;color:rgb(155,24,33)">Le modèle n'a pas été enregistré : corrigez les champs signalés.</p>
+              </sc-if>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding-top:14px;border-top:1px solid rgba(0,0,0,.08)">
+                <x-import component-from-global-scope="CaroleSessegnonDesignSystem_d86b2c.Button" variant="primary" dc-props="{{ btnUpperSm }}" hint-size="auto,46px">Enregistrer le modèle</x-import>
+                <sc-if value="{{ isEditingModele }}">
+                  <button type="button" onClick="{{ deleteModeleCur }}" style="background:none;border:0;padding:0;color:rgb(155,24,33);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(155,24,33);min-height:44px;display:inline-flex;align-items:center">Supprimer ce modèle</button>
+                </sc-if>
+              </div>
+            </form>
+
+            <div style="display:flex;flex-direction:column;gap:20px">
+              <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:clamp(22px,3vw,32px)">
+                <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:6px">
+                  <p style="margin:0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">Photos du modèle</p>
+                  <span style="font-size:12px;color:rgb(94,94,94);font-variant-numeric:tabular-nums">{{ modelePhotosCount }}</span>
+                </div>
+                <p style="margin:0 0 16px;font-size:12px;line-height:18px;color:rgb(94,94,94)">Cliquez sur une photo pour en faire la photo principale : c'est elle qui apparaît dans le catalogue et sur le portail client.</p>
+                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:14px">
+                  <sc-for list="{{ modeleFormPhotos }}" as="ph" hint-placeholder-count="2">
+                    <div class="ph-thumb" style="position:relative;aspect-ratio:1;overflow:hidden;background:rgb(252,249,248);box-shadow:{{ ph.frame }}">
+                      <img src="{{ ph.src }}" alt="{{ ph.alt }}" style="width:100%;height:100%;object-fit:cover;display:block">
+                      <sc-if value="{{ ph.isMain }}"><span style="position:absolute;left:0;bottom:0;padding:4px 8px;background:rgb(71,29,27);color:rgb(255,255,255);font-size:10px;letter-spacing:.08em;text-transform:uppercase;pointer-events:none">Principale</span></sc-if>
+                      <sc-if value="{{ ph.notMain }}">
+                        <button type="button" class="ph-promote" onClick="{{ ph.makeMain }}" aria-label="{{ ph.promoteAria }}"></button>
+                        <span class="ph-hint">Choisir comme principale</span>
+                      </sc-if>
+                      <button type="button" class="ph-x" onClick="{{ ph.remove }}" aria-label="{{ ph.removeAria }}" title="Retirer"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9"></path></svg></button>
+                    </div>
+                  </sc-for>
+                  <sc-if value="{{ canAddModelePhoto }}">
+                    <div>
+                      <button type="button" onClick="{{ pickModelePhotos }}" onDragOver="{{ modelePhotoDragOver }}" onDrop="{{ modelePhotoDrop }}" aria-label="Ajouter des photos" style="width:100%;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:rgb(255,251,248);border:0;box-shadow:inset 0 0 0 1px rgba(71,29,27,.45);color:rgb(71,29,27);cursor:pointer;font-family:inherit;font-size:12px;line-height:16px;padding:8px;text-align:center" style-hover="background:rgb(250,241,235)">
+                        <svg aria-hidden="true" width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1"><path d="M11 3v16M3 11h16"></path></svg>
+                        <span>{{ addModelePhotoLabel }}</span>
+                      </button>
+                    </div>
+                  </sc-if>
+                </div>
+                <sc-if value="{{ modelePhotoNoticeText }}">
+                  <div role="status" style="margin-top:14px;min-height:44px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px 14px;background:rgb(255,251,248);box-shadow:inset 3px 0 0 rgb(71,29,27),inset 0 0 0 1px rgba(0,0,0,.08);font-size:13px;line-height:19px;color:rgb(71,29,27);animation:bo-in .18s ease">
+                    <span>{{ modelePhotoNoticeText }}</span>
+                    <sc-if value="{{ modelePhotoCanUndo }}"><button type="button" onClick="{{ undoModelePhoto }}" style="flex:0 0 auto;min-height:44px;padding:0 4px;background:none;border:0;color:rgb(71,29,27);font-weight:700;cursor:pointer;text-decoration:underline;font-family:inherit">Annuler</button></sc-if>
+                  </div>
+                </sc-if>
+                <input id="bo-modele-photo-input" type="file" accept="image/jpeg,image/png,image/webp" multiple="{{ modelePhotoMultiple }}" onChange="{{ onModelePhotoFiles }}" tabindex="-1" aria-hidden="true" style="display:none">
+                <sc-if value="{{ modelePhotoBusy }}"><p role="status" style="margin:14px 0 0;font-size:12px;color:rgb(94,94,94)">Traitement des photos…</p></sc-if>
+                <sc-if value="{{ modelePhotoErr }}"><p role="alert" style="margin:14px 0 0;font-size:12px;line-height:18px;color:rgb(155,24,33)">{{ modelePhotoErr }}</p></sc-if>
+                <p style="margin:14px 0 0;font-size:12px;line-height:18px;color:rgb(94,94,94)">JPEG, PNG ou WebP, jusqu'à {{ modelePhotoMax }} photos. Démonstration : les photos sont gardées dans le navigateur le temps de la session.</p>
+              </div>
+
+              <div style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:clamp(22px,3vw,32px)">
+                <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:6px">
+                  <p style="margin:0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">Vidéos du modèle</p>
+                  <span style="font-size:12px;color:rgb(94,94,94)">Facultatif</span>
+                </div>
+                <p style="margin:0 0 16px;font-size:12px;line-height:18px;color:rgb(94,94,94)">Des vidéos de présentation pour le portail client, jusqu'à 4 par modèle.</p>
+                <sc-if value="{{ hasModeleVideos }}">
+                  <div style="display:flex;flex-direction:column;gap:14px">
+                    <sc-for list="{{ modeleFormVideos }}" as="v" hint-placeholder-count="1">
+                      <div>
+                        <video src="{{ v.src }}" controls preload="metadata" style="width:100%;max-height:220px;display:block;background:rgb(0,0,0)"></video>
+                        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:8px">
+                          <span style="font-size:12px;color:rgb(94,94,94);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ v.name }} · {{ v.sizeLabel }}</span>
+                          <button type="button" onClick="{{ v.remove }}" aria-label="{{ v.removeAria }}" style="background:none;border:0;padding:0;color:rgb(155,24,33);cursor:pointer;font-size:12px;border-bottom:1px solid rgb(155,24,33);min-height:44px;display:inline-flex;align-items:center;flex:0 0 auto">Retirer</button>
+                        </div>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ canAddModeleVideo }}">
+                  <button type="button" onClick="{{ pickModeleVideo }}" onDragOver="{{ modeleVideoDragOver }}" onDrop="{{ modeleVideoDrop }}" aria-label="Ajouter une vidéo" style="margin-top:14px;width:100%;min-height:104px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:rgb(255,251,248);border:0;box-shadow:inset 0 0 0 1px rgba(71,29,27,.45);color:rgb(71,29,27);cursor:pointer;font-family:inherit;font-size:13px;line-height:18px;padding:16px;text-align:center" style-hover="background:rgb(250,241,235)">
+                    <svg aria-hidden="true" width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1"><path d="M3 5.5h12v11H3z"></path><path d="M15 9.5l4-2.5v8l-4-2.5"></path></svg>
+                    <span>{{ addModeleVideoLabel }}</span>
+                  </button>
+                </sc-if>
+                <input id="bo-modele-video-input" type="file" accept="video/mp4,video/webm,video/quicktime" onChange="{{ onModeleVideoFile }}" tabindex="-1" aria-hidden="true" style="display:none">
+                <sc-if value="{{ modeleVideoBusy }}"><p role="status" style="margin:14px 0 0;font-size:12px;color:rgb(94,94,94)">Traitement de la vidéo…</p></sc-if>
+                <sc-if value="{{ modeleVideoErr }}"><p role="alert" style="margin:14px 0 0;font-size:12px;line-height:18px;color:rgb(155,24,33)">{{ modeleVideoErr }}</p></sc-if>
+                <p style="margin:14px 0 0;font-size:12px;line-height:18px;color:rgb(94,94,94)">MP4, WebM ou MOV, jusqu'à {{ modeleVideoMaxLabel }} chacune. Démonstration : les vidéos sont gardées dans le navigateur le temps de la session.</p>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
         <sc-if value="{{ isPieces }}">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:20px">
             <div style="display:flex;gap:10px;flex-wrap:wrap;flex:1 1 420px;min-width:0">
@@ -506,11 +684,12 @@
             <form onSubmit="{{ savePiece }}" noValidate style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:clamp(22px,3vw,32px);display:flex;flex-direction:column;gap:18px">
               <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:16px">
                 <label style="display:block;font-size:13px;color:rgb(70,70,70)">Modèle
-                  <input value="{{ form.modele }}" onChange="{{ setF.modele }}" aria-invalid="{{ fieldInvalid.modele }}" aria-describedby="err-modele" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:{{ fieldShadow.modele }};color:rgb(0,0,0)">
+                  <input list="bo-modeles-list" value="{{ form.modele }}" onChange="{{ setF.modele }}" aria-invalid="{{ fieldInvalid.modele }}" aria-describedby="err-modele" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:{{ fieldShadow.modele }};color:rgb(0,0,0)">
                   <sc-if value="{{ fieldErr.modele }}"><span id="err-modele" style="display:block;margin-top:6px;font-size:12px;color:rgb(155,24,33)">{{ fieldErr.modele }}</span></sc-if>
                 </label>
                 <label style="display:block;font-size:13px;color:rgb(70,70,70)">Couleur
-                  <input value="{{ form.couleur }}" onChange="{{ setF.couleur }}" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+                  <input list="bo-couleurs-form-list" value="{{ form.couleur }}" onChange="{{ setF.couleur }}" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+                  <datalist id="bo-couleurs-form-list"><sc-for list="{{ couleurOptsForForm }}" as="co"><option value="{{ co.value }}"></option></sc-for></datalist>
                 </label>
               </div>
               <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:16px">
@@ -816,7 +995,7 @@
             </label>
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:16px">
               <label style="display:block;font-size:13px;color:rgb(70,70,70)">Modèle
-                <input value="{{ lotForm.modele }}" onChange="{{ setLot.modele }}" aria-invalid="{{ lotInvalid.modele }}" aria-describedby="err-lot-modele" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:{{ lotShadow.modele }};color:rgb(0,0,0)">
+                <input list="bo-modeles-list" value="{{ lotForm.modele }}" onChange="{{ setLot.modele }}" aria-invalid="{{ lotInvalid.modele }}" aria-describedby="err-lot-modele" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:{{ lotShadow.modele }};color:rgb(0,0,0)">
                 <sc-if value="{{ lotErr.modele }}"><span id="err-lot-modele" style="display:block;margin-top:6px;font-size:12px;color:rgb(155,24,33)">{{ lotErr.modele }}</span></sc-if>
               </label>
               <label style="display:block;font-size:13px;color:rgb(70,70,70)">Référence article <span style="color:rgb(94,94,94)">(facultatif)</span>
@@ -844,13 +1023,14 @@
             </label>
 
             <div>
+              <datalist id="bo-couleurs-lot-list"><sc-for list="{{ couleurOptsForLot }}" as="co"><option value="{{ co.value }}"></option></sc-for></datalist>
               <p style="margin:0 0 4px;font-size:13px;color:rgb(70,70,70)">Couleurs et quantités</p>
               <p style="margin:0 0 10px;font-size:12px;line-height:18px;color:rgb(94,94,94)">Une ligne par couleur : chacune a sa propre quantité, et son propre prix si vous voulez l'écarter du prix par défaut.</p>
               <div style="display:flex;flex-direction:column;gap:10px">
                 <sc-for list="{{ lotVariantsView }}" as="v" hint-placeholder-count="1">
                   <div style="display:grid;grid-template-columns:1fr 120px 160px auto;gap:10px;align-items:end">
                     <label style="display:block;font-size:12px;color:rgb(94,94,94)">Couleur <span style="color:rgb(94,94,94)">(facultatif)</span>
-                      <input value="{{ v.couleur }}" onChange="{{ v.onCouleur }}" style="margin-top:6px;width:100%;height:48px;padding:0 14px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+                      <input list="bo-couleurs-lot-list" value="{{ v.couleur }}" onChange="{{ v.onCouleur }}" style="margin-top:6px;width:100%;height:48px;padding:0 14px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
                     </label>
                     <label style="display:block;font-size:12px;color:rgb(94,94,94)">Quantité
                       <input type="number" min="1" step="1" inputMode="numeric" value="{{ v.quantite }}" onChange="{{ v.onQuantite }}" style="margin-top:6px;width:100%;height:48px;padding:0 14px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0);font-variant-numeric:tabular-nums">
@@ -1974,7 +2154,8 @@ const ICONS = {
   orders: '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1"><path d="M2 6h16l-1.4 11H3.4L2 6Z"></path><path d="M6.5 6V4a3.5 3.5 0 0 1 7 0v2"></path></svg>',
   stock: '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1"><path d="M2.5 6.5 10 3l7.5 3.5v7L10 17l-7.5-3.5v-7Z"></path><path d="M2.5 6.5 10 10l7.5-3.5M10 10v7"></path></svg>',
   inbox: '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1"><path d="M2 11h4.5l1 2h5l1-2H18"></path><path d="M4.2 4h11.6L18 11v5H2v-5l2.2-7Z"></path></svg>',
-  team: '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1"><circle cx="7" cy="6" r="3"></circle><circle cx="15" cy="7" r="2.4"></circle><path d="M1.5 17c0-3.3 2.5-5.2 5.5-5.2s5.5 1.9 5.5 5.2M13 12.5c2.4.2 4 1.7 4 4.5"></path></svg>'
+  team: '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1"><circle cx="7" cy="6" r="3"></circle><circle cx="15" cy="7" r="2.4"></circle><path d="M1.5 17c0-3.3 2.5-5.2 5.5-5.2s5.5 1.9 5.5 5.2M13 12.5c2.4.2 4 1.7 4 4.5"></path></svg>',
+  modeles: '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1"><rect x="2.5" y="2.5" width="6.5" height="6.5"></rect><rect x="11" y="2.5" width="6.5" height="6.5"></rect><rect x="2.5" y="11" width="6.5" height="6.5"></rect><rect x="11" y="11" width="6.5" height="6.5"></rect></svg>'
 };
 // Le statut stocké ne contient jamais « vendue » pour une pièce passée par une vente :
 // « Vendue » est calculé à partir des commandes non annulées (voir effStatut).
@@ -1994,6 +2175,30 @@ const SEED_PIECES = [
   {id:'p10', reference:'RAD', modele:'Radah', couleur:'Bordeaux', serie:'RA260001', code:'G4FT-8WKE', matiere:'Cuir bordeaux, doublure daim', dateFab:'2026-02-14', prix:380000, statut:'offerte', sav:[]},
   // Même modèle, autre couleur : chaque variante a son propre stock et son propre prix (voir « Stock disponible à la vente »).
   {id:'p11', lieu:'France', reference:'HUP', modele:'Huperano', couleur:'Noir Ébène', serie:'HU260003', code:'N3BE-7HKM', matiere:'Cuir de vachette, tannage végétal', dateFab:'2026-06-08', prix:450000, statut:'disponible', sav:[]}
+];
+// Catalogue des modèles : le contenu présenté côté client (description, caractéristiques, entretien,
+// photos, vidéos) et les couleurs proposées, chacune avec son propre prix. Indépendant du registre des
+// pièces physiques ci-dessus — une pièce garde son modèle et sa couleur en texte libre, le registre
+// n'est pas modifié par ce catalogue, pour ne rien casser de ce qui existe déjà.
+const SEED_MODELES = [
+  {id:'md1', nom:'Huperano', reference:'HUP', collection:'', categorie:'', matiereDefaut:'Cuir de vachette, tannage végétal', prixDefaut:420000,
+   description:'', caracteristiques:'', entretien:'', photos:[], videos:[],
+   variantes:[{id:'v1', couleur:'Cuir naturel & bordeaux', prix:420000}, {id:'v2', couleur:'Noir Ébène', prix:450000}]},
+  {id:'md2', nom:'Radah', reference:'RAD', collection:'', categorie:'', matiereDefaut:'Cuir bordeaux, doublure daim', prixDefaut:380000,
+   description:'', caracteristiques:'', entretien:'', photos:[], videos:[],
+   variantes:[{id:'v3', couleur:'Bordeaux', prix:380000}]},
+  {id:'md3', nom:'Nafi', reference:'NAF', collection:'', categorie:'', matiereDefaut:'Cuir naturel patiné à la main', prixDefaut:300000,
+   description:'', caracteristiques:'', entretien:'', photos:[], videos:[],
+   variantes:[{id:'v4', couleur:'Cuir naturel', prix:300000}]},
+  {id:'md4', nom:'Sikadi', reference:'SIK', collection:'', categorie:'', matiereDefaut:'Cuir grainé, ferrures bronze', prixDefaut:510000,
+   description:'', caracteristiques:'', entretien:'', photos:[], videos:[],
+   variantes:[{id:'v5', couleur:'Cuir grainé', prix:510000}]},
+  {id:'md5', nom:'Ayaba', reference:'AYA', collection:'', categorie:'', matiereDefaut:'Cuir tressé, pièce d\'atelier', prixDefaut:450000,
+   description:'', caracteristiques:'', entretien:'', photos:[], videos:[],
+   variantes:[{id:'v6', couleur:'Cuir tressé', prix:450000}]},
+  {id:'md6', nom:'Wèlè', reference:'WEL', collection:'', categorie:'', matiereDefaut:'Cuir souple, fermoir aimanté', prixDefaut:340000,
+   description:'', caracteristiques:'', entretien:'', photos:[], videos:[],
+   variantes:[{id:'v7', couleur:'Cuir souple', prix:340000}]}
 ];
 // Chaque commande, en ligne ou hors site, désigne les pièces vendues par leur id.
 const SEED_ORDERS = [
@@ -2293,7 +2498,8 @@ class Component extends DCLogic {
   state = {
     authed:false, loginErr:'', loginInfo:'', route:'dashboard',
     caPeriod:'tout', stockTab:'stock', mouvements:[], trCombo:'', trFrom:LIEUX[0], trTo:LIEUX[1] || LIEUX[0], trCount:'', trSel:null, retourOpen:false, retourMotif:MOTIFS_RETOUR[0], retourNote:'', retourLieux:{}, invCombo:'', invLieu:LIEU_DEFAUT, invCount:'', invSel:null, invMotif:MOTIFS_RETRAIT[0], invNote:'', sidebarWide:true, isMobile:false, navOpen:false,
-    pieces:SEED_PIECES, owners:SEED_OWNERS, orders:SEED_ORDERS, team:SEED_TEAM, audit:SEED_AUDIT,
+    pieces:SEED_PIECES, owners:SEED_OWNERS, orders:SEED_ORDERS, team:SEED_TEAM, audit:SEED_AUDIT, modeles:SEED_MODELES,
+    editModeleId:null, modeleForm:this._emptyModele(), modeleFieldErr:{}, modelePhotoBusy:false, modelePhotoErr:'', modelePhotoNotice:null, modeleVideoBusy:false, modeleVideoErr:'', modeleSearch:'',
     search:'', statutFilter:'tous', lieuFilter:'tous', sortBy:'recent', registreOpen:false,
     ownerSearch:'', orderSearch:'', orderStatutFilter:'tous', canalFilter:'tous', paysFilter:'tous',
     vente:null, venteErr:{}, venteSearch:'', venteStep:0, venteMax:0,
@@ -2335,7 +2541,13 @@ class Component extends DCLogic {
           return out;
         }),
         orders:this.state.orders, owners:this.state.owners, serieMax:this.state.serieMax,
-        requests:this.state.requests, alerts:this.state.alerts, seuils:this.state.seuils, mouvements:this.state.mouvements
+        requests:this.state.requests, alerts:this.state.alerts, seuils:this.state.seuils, mouvements:this.state.mouvements,
+        modeles:this.state.modeles.map(m => {
+          let out = m;
+          if (m.photos && m.photos.length) out = Object.assign({}, out, {photos:m.photos.map(ph => ({id:ph.id, name:ph.name}))});
+          if (m.videos && m.videos.length) out = Object.assign({}, out, {videos:m.videos.map(v => ({id:v.id, name:v.name, type:v.type, size:v.size}))});
+          return out;
+        })
       }));
     } catch(e) { ok = false; }
     this.phSync();
@@ -2346,6 +2558,7 @@ class Component extends DCLogic {
   phSync(){
     const cur = new Map();
     this.state.pieces.forEach(p => (p.photos || []).forEach(ph => { if (ph.src) cur.set(ph.id, ph.src); }));
+    this.state.modeles.forEach(m => (m.photos || []).forEach(ph => { if (ph.src) cur.set(ph.id, ph.src); }));
     cur.forEach((src, id) => {
       this._phCache[id] = src;
       if (this._phStored.has(id)) return;
@@ -2361,6 +2574,7 @@ class Component extends DCLogic {
   vidSync(){
     const cur = new Map();
     this.state.pieces.forEach(p => { if (p.video && p.video.blob) cur.set(p.video.id, p.video.blob); });
+    this.state.modeles.forEach(m => (m.videos || []).forEach(v => { if (v.blob) cur.set(v.id, v.blob); }));
     cur.forEach((blob, id) => {
       this._vidCache[id] = blob;
       if (this._vidStored.has(id)) return;
@@ -2389,11 +2603,16 @@ class Component extends DCLogic {
     const finish = () => { this._loaded = true; if (this._persistPending) { this._persistPending = false; this.persist(); } };
     if (!(saved && Array.isArray(saved.team))) { finish(); return; }
     const pieces = (Array.isArray(saved.pieces) ? saved.pieces : SEED_PIECES).map(migratePiece);
+    const modeles = Array.isArray(saved.modeles) ? saved.modeles : SEED_MODELES;
     const needPhotos = [];
     const needVideos = [];
     pieces.forEach(p => {
       (p.photos || []).forEach(ph => { if (!ph.src && !this._phCache[ph.id]) needPhotos.push(ph.id); });
       if (p.video && !p.video.blob && !this._vidCache[p.video.id]) needVideos.push(p.video.id);
+    });
+    modeles.forEach(m => {
+      (m.photos || []).forEach(ph => { if (!ph.src && !this._phCache[ph.id]) needPhotos.push(ph.id); });
+      (m.videos || []).forEach(v => { if (!v.blob && !this._vidCache[v.id]) needVideos.push(v.id); });
     });
     const apply = (found, foundVideos) => {
       const restored = pieces.map(p => {
@@ -2408,12 +2627,25 @@ class Component extends DCLogic {
         }
         return out;
       });
+      const restoredModeles = modeles.map(m => {
+        let out = m;
+        if (m.photos && m.photos.length) out = Object.assign({}, out, {photos:m.photos.map(ph => {
+          const src = ph.src || this._phCache[ph.id] || found[ph.id];
+          return src ? Object.assign({}, ph, {src}) : null;
+        }).filter(Boolean)});
+        if (m.videos && m.videos.length) out = Object.assign({}, out, {videos:m.videos.map(v => {
+          const blob = v.blob || this._vidCache[v.id] || foundVideos[v.id];
+          return blob ? Object.assign({}, v, {blob}) : null;
+        }).filter(Boolean)});
+        return out;
+      });
       Object.keys(found).forEach(id => { this._phStored.add(id); this._phCache[id] = found[id]; });
       Object.keys(foundVideos).forEach(id => { this._vidStored.add(id); this._vidCache[id] = foundVideos[id]; });
       const conv = convertSeries(restored, Array.isArray(saved.audit) ? saved.audit : SEED_AUDIT);
       this.setState({
         team:saved.team, audit:conv.audit,
         pieces:conv.pieces,
+        modeles:restoredModeles,
         orders:Array.isArray(saved.orders) ? saved.orders : SEED_ORDERS,
         owners:Array.isArray(saved.owners) ? saved.owners : SEED_OWNERS,
         requests:Array.isArray(saved.requests) ? saved.requests : SEED_REQUESTS,
@@ -2425,6 +2657,7 @@ class Component extends DCLogic {
       finish();
       const keep = new Set(); const keepVid = new Set();
       restored.forEach(p => { (p.photos || []).forEach(ph => keep.add(ph.id)); if (p.video) keepVid.add(p.video.id); });
+      restoredModeles.forEach(m => { (m.photos || []).forEach(ph => keep.add(ph.id)); (m.videos || []).forEach(v => keepVid.add(v.id)); });
       phPrune(keep);
       vidPrune(keepVid);
     };
@@ -2504,6 +2737,8 @@ class Component extends DCLogic {
   _emptyLot(){ return {modele:'', reference:'', prix:'', matiere:'', lieu:LIEU_DEFAUT, annee:String(new Date().getFullYear()),
     variants:[{couleur:'', quantite:'', prix:''}]}; }
   _emptySav(){ return {type:'en_reparation', date:isoToday(), note:'', replacementId:''}; }
+  _emptyModele(){ return {nom:'', reference:'', collection:'', categorie:'', prixDefaut:'', matiereDefaut:'',
+    description:'', caracteristiques:'', entretien:'', photos:[], videos:[], variantes:[{couleur:'', prix:''}]}; }
   _emptyVente(){ return {canal:'popup', date:isoToday(), evenement:'', pays:LIEU_DEFAUT, pieceIds:[], client:'', email:'', telephone:'', montant:'', paiement:'Espèces', note:''}; }
 
   noticePhoto(text, undo){
@@ -2552,8 +2787,56 @@ class Component extends DCLogic {
     this.setState(st => ({form:Object.assign({}, st.form, {video:null}), videoErr:''}));
   }
 
+  // Même mécanique que pour une pièce, pour le formulaire modèle (plusieurs vidéos possibles, pas qu'une seule).
+  noticeModelePhoto(text, undo){
+    clearTimeout(this._modelePhotoT);
+    this.setState({modelePhotoNotice:{text, undo:undo || null}});
+    this._modelePhotoT = setTimeout(() => this.setState({modelePhotoNotice:null}), 8000);
+  }
+  undoModelePhoto(){
+    const u = this.state.modelePhotoNotice && this.state.modelePhotoNotice.undo;
+    if (!u) return;
+    if ((this.state.modeleForm.photos || []).length >= PHOTO_MAX) { this.noticeModelePhoto('Maximum ' + PHOTO_MAX + ' photos : impossible de rétablir celle-ci.', null); return; }
+    this.setState(st => { const l = (st.modeleForm.photos || []).slice(); l.splice(Math.min(u.index, l.length), 0, u.photo); return {modeleForm:Object.assign({}, st.modeleForm, {photos:l})}; });
+    this.noticeModelePhoto('Photo rétablie.', null);
+  }
+  async addModelePhotos(fileList){
+    const files = Array.from(fileList || []);
+    if (!files.length) return;
+    const room = PHOTO_MAX - ((this.state.modeleForm.photos || []).length);
+    if (room <= 0) { this.setState({modelePhotoErr:'Maximum ' + PHOTO_MAX + ' photos par modèle : retirez-en une avant d\'en ajouter.'}); return; }
+    this.setState({modelePhotoBusy:true, modelePhotoErr:''});
+    const added = []; const issues = {format:0, taille:0, lecture:0};
+    for (const f of files.slice(0, room)) {
+      try { added.push(await readPhoto(f)); } catch (e) { issues[e] = (issues[e] || 0) + 1; }
+    }
+    const msgs = [];
+    if (issues.format) msgs.push(issues.format + (issues.format > 1 ? ' fichiers ignorés' : ' fichier ignoré') + ' : seuls JPEG, PNG et WebP sont acceptés.');
+    if (issues.taille) msgs.push(issues.taille + (issues.taille > 1 ? ' fichiers ignorés' : ' fichier ignoré') + ' : plus de 25 Mo.');
+    if (issues.lecture) msgs.push(issues.lecture + (issues.lecture > 1 ? ' fichiers illisibles.' : ' fichier illisible.'));
+    if (files.length > room) msgs.push('Maximum ' + PHOTO_MAX + ' photos : ' + (files.length - room) + (files.length - room > 1 ? ' photos n\'ont' : ' photo n\'a') + ' pas été ajoutée' + (files.length - room > 1 ? 's' : '') + '.');
+    this.setState(st => ({modeleForm:Object.assign({}, st.modeleForm, {photos:(st.modeleForm.photos || []).concat(added)}), modelePhotoBusy:false, modelePhotoErr:msgs.join(' ')}));
+  }
+  async addModeleVideo(file){
+    if (!file) return;
+    const room = 4 - ((this.state.modeleForm.videos || []).length);
+    if (room <= 0) { this.setState({modeleVideoErr:'Maximum 4 vidéos par modèle : retirez-en une avant d\'en ajouter.'}); return; }
+    this.setState({modeleVideoBusy:true, modeleVideoErr:''});
+    try {
+      const v = await readVideo(file);
+      this.setState(st => ({modeleForm:Object.assign({}, st.modeleForm, {videos:(st.modeleForm.videos || []).concat([v])}), modeleVideoBusy:false, modeleVideoErr:''}));
+    } catch (e) {
+      const msg = e==='format' ? 'Format non pris en charge : seuls MP4, WebM et MOV sont acceptés.' : 'Vidéo trop lourde : ' + VIDEO_MAX_LABEL + ' maximum.';
+      this.setState({modeleVideoBusy:false, modeleVideoErr:msg});
+    }
+  }
+  removeModeleVideo(id){
+    this.setState(st => ({modeleForm:Object.assign({}, st.modeleForm, {videos:(st.modeleForm.videos || []).filter(v => v.id!==id)}), modeleVideoErr:''}));
+  }
+
   go(route, extra){
-    this.setState(Object.assign({route, navOpen:false, registreOpen:false, filtersOpen:false, photoErr:'', photoBusy:false, photoNotice:null, videoErr:'', videoBusy:false, lotFocus:null}, extra||{}));
+    this.setState(Object.assign({route, navOpen:false, registreOpen:false, filtersOpen:false, photoErr:'', photoBusy:false, photoNotice:null, videoErr:'', videoBusy:false, lotFocus:null,
+      modelePhotoErr:'', modelePhotoBusy:false, modelePhotoNotice:null, modeleVideoErr:'', modeleVideoBusy:false}, extra||{}));
     try{window.scrollTo(0,0);}catch(e){}
   }
 
@@ -2588,13 +2871,105 @@ class Component extends DCLogic {
     return Object.assign(this._emptyLot(), {modele:p.modele || '', reference:p.reference || '', matiere:p.matiere || '', lieu:lieuOf(p), prix:p.prix===undefined ? '' : p.prix, couleur:c,
       variants:[{couleur:c, quantite:'', prix:''}]});
   }
+  lotFromVariante(m, v){
+    return Object.assign(this._emptyLot(), {modele:m.nom, reference:m.reference || '', matiere:m.matiereDefaut || '',
+      prix: v.prix===undefined || v.prix==='' ? (m.prixDefaut===undefined ? '' : m.prixDefaut) : v.prix,
+      variants:[{couleur:v.couleur || '', quantite:'', prix:''}]});
+  }
+
+  // Catalogue des modèles : contenu du portail client, indépendant du registre des pièces physiques.
+  openModeleNew(){
+    this.go('modele-form', {editModeleId:null, modeleForm:this._emptyModele(), modeleFieldErr:{}});
+  }
+  openModeleEdit(m){
+    this.go('modele-form', {editModeleId:m.id, modeleForm:{
+      nom:m.nom, reference:m.reference || '', collection:m.collection || '', categorie:m.categorie || '',
+      prixDefaut: m.prixDefaut===undefined ? '' : m.prixDefaut, matiereDefaut: m.matiereDefaut || '',
+      description:m.description || '', caracteristiques:m.caracteristiques || '', entretien:m.entretien || '',
+      photos:(m.photos || []).slice(), videos:(m.videos || []).slice(),
+      variantes:(m.variantes && m.variantes.length) ? m.variantes.map(v => ({id:v.id, couleur:v.couleur, prix:v.prix})) : [{couleur:'', prix:''}]
+    }, modeleFieldErr:{}});
+  }
+  validateModele(f){
+    const err = {};
+    if (!f.nom.trim()) err.nom = 'Indiquez le nom du modèle.';
+    if (String(f.prixDefaut).trim()!=='' && !(Number(f.prixDefaut) >= 0)) err.prixDefaut = 'Indiquez un montant en FCFA (chiffres uniquement).';
+    f.variantes.forEach((v, i) => {
+      if (String(v.prix).trim()!=='' && !(Number(v.prix) >= 0)) err['variante' + i] = 'Prix de couleur invalide.';
+    });
+    return err;
+  }
+  saveModele(e){
+    e.preventDefault();
+    const f = this.state.modeleForm;
+    const err = this.validateModele(f);
+    if (Object.keys(err).length) { this.setState({modeleFieldErr:err}, () => this.focusFirstInvalid()); return; }
+    const nom = f.nom.trim();
+    const reference = (f.reference.trim() || refFromModele(nom)).toUpperCase();
+    const variantes = f.variantes.filter(v => v.couleur.trim()).map((v, i) => ({id:v.id || ('v' + Date.now().toString(36) + i), couleur:v.couleur.trim(), prix: String(v.prix).trim()==='' ? '' : Number(v.prix)}));
+    const data = {nom, reference, collection:f.collection.trim(), categorie:f.categorie.trim(),
+      prixDefaut: String(f.prixDefaut).trim()==='' ? '' : Number(f.prixDefaut), matiereDefaut:f.matiereDefaut.trim(),
+      description:f.description.trim(), caracteristiques:f.caracteristiques.trim(), entretien:f.entretien.trim(),
+      photos:f.photos || [], videos:f.videos || [], variantes};
+    const editing = !!this.state.editModeleId;
+    this.setState(st => ({
+      modeles: editing ? st.modeles.map(m => m.id===st.editModeleId ? Object.assign({}, m, data) : m)
+        : st.modeles.concat([Object.assign({id:'md' + Date.now().toString(36)}, data)]),
+      route:'modeles', modeleFieldErr:{}
+    }), () => this.persist());
+    this.logAudit((editing ? 'Modèle modifié — ' : 'Modèle créé — ') + nom + (variantes.length ? ' · ' + variantes.length + (variantes.length>1 ? ' couleurs' : ' couleur') : ''));
+    this.showFlash('Modèle « ' + nom + ' » ' + (editing ? 'enregistré.' : 'ajouté au catalogue.'));
+  }
+  deleteModeleConfirm(m){
+    const used = this.state.pieces.filter(p => p.modele===m.nom).length;
+    if (used) {
+      this.askConfirm({title:'Suppression impossible', cancelLabel:'Compris',
+        body:'« ' + m.nom + ' » est le modèle de ' + used + (used>1 ? ' pièces du registre' : ' pièce du registre') + '. Retirez-le du registre, ou laissez le modèle au catalogue même sans fiche active.'});
+      return;
+    }
+    this.askConfirm({
+      title:'Supprimer « ' + m.nom + ' » ?',
+      body:'Le contenu, les photos, les vidéos et les couleurs de ce modèle seront définitivement retirés du catalogue.',
+      okLabel:'Supprimer le modèle',
+      onOk: () => {
+        this.setState(st => ({modeles: st.modeles.filter(x => x.id!==m.id), route:'modeles'}), () => this.persist());
+        this.logAudit('Modèle supprimé — ' + m.nom);
+        this.showFlash('Modèle « ' + m.nom + ' » supprimé du catalogue.');
+      }
+    });
+  }
+  setModeleVariant(i, field){
+    return e => {
+      const v = e.target.value;
+      this.setState(st => {
+        const variantes = st.modeleForm.variantes.map((row, j) => j===i ? Object.assign({}, row, {[field]:v}) : row);
+        const fe = Object.assign({}, st.modeleFieldErr); delete fe['variante' + i];
+        return {modeleForm:Object.assign({}, st.modeleForm, {variantes}), modeleFieldErr:fe};
+      });
+    };
+  }
+  addModeleVariant(){
+    this.setState(st => ({modeleForm:Object.assign({}, st.modeleForm, {variantes:st.modeleForm.variantes.concat([{couleur:'', prix:''}])})}));
+  }
+  removeModeleVariant(i){
+    this.setState(st => ({modeleForm:Object.assign({}, st.modeleForm, {variantes:st.modeleForm.variantes.filter((_,j) => j!==i)})}));
+  }
 
   // Plusieurs couleurs dans le même lot : une ligne par variante, sa propre quantité, son propre prix si besoin.
   setLotVariant(i, field){
     return e => {
       const v = e.target.value;
       this.setState(st => {
-        const variants = st.lotForm.variants.map((row, j) => j===i ? Object.assign({}, row, {[field]:v}) : row);
+        const variants = st.lotForm.variants.map((row, j) => {
+          if (j!==i) return row;
+          const next = Object.assign({}, row, {[field]:v});
+          if (field==='couleur' && String(row.prix||'').trim()==='') {
+            const cat = st.modeles.find(m => m.nom.trim().toLowerCase()===st.lotForm.modele.trim().toLowerCase());
+            const variant = cat && (cat.variantes || []).find(x => (x.couleur || '').trim().toLowerCase()===v.trim().toLowerCase());
+            if (variant && variant.prix!==undefined && variant.prix!=='') next.prix = variant.prix;
+          }
+          return next;
+        });
         const le = Object.assign({}, st.lotErr); delete le.variants;
         return {lotForm:Object.assign({}, st.lotForm, {variants}), lotErr:le};
       });
@@ -2764,6 +3139,7 @@ class Component extends DCLogic {
       (b.dateFab||'').localeCompare(a.dateFab||''));
 
     const isEditing = !!s.editId;
+    const isEditingModele = !!s.editModeleId;
     const ownerForForm = isEditing ? ownerOf(s.editId) : null;
     const fieldErr = s.fieldErr || {};
     const fieldKeys = ['modele','serie','code','prix'];
@@ -3100,6 +3476,7 @@ class Component extends DCLogic {
 
     const navKeys = [
       {key:'dashboard', label:'Tableau de bord', icon:'dashboard'},
+      {key:'modeles', label:'Modèles', icon:'modeles'},
       {key:'pieces', label:'Pièces', icon:'pieces'},
       {key:'stock', label:'Stock', icon:'stock'},
       {key:'commandes', label:'Commandes', icon:'orders'},
@@ -3107,7 +3484,7 @@ class Component extends DCLogic {
       {key:'proprietaires', label:'Propriétaires', icon:'owners'},
       {key:'equipe', label:'Équipe', icon:'team'}
     ];
-    const NAV_PARENT = {'piece-form':'pieces', 'piece-detail':'pieces', 'lot-form':'pieces', 'qr-sheet':'pieces', 'commande-detail':'commandes', 'vente-form':'commandes', 'demande-detail':'demandes', 'proprietaire':'proprietaires'};
+    const NAV_PARENT = {'piece-form':'pieces', 'piece-detail':'pieces', 'lot-form':'pieces', 'qr-sheet':'pieces', 'commande-detail':'commandes', 'vente-form':'commandes', 'demande-detail':'demandes', 'proprietaire':'proprietaires', 'modele-form':'modeles'};
     const activeNav = NAV_PARENT[s.route] || s.route;
 
     const activeDirection = s.team.filter(t => t.role==='direction' && t.statut==='actif').length;
@@ -3191,6 +3568,8 @@ class Component extends DCLogic {
       stopClick: e => e.stopPropagation(),
 
       isDashboard: s.route==='dashboard',
+      isModeles: s.route==='modeles',
+      isModeleForm: s.route==='modele-form',
       isPieces: s.route==='pieces',
       isPieceForm: s.route==='piece-form',
       isPieceDetail: s.route==='piece-detail' && !!pieceById(s.viewPieceId),
@@ -3203,6 +3582,7 @@ class Component extends DCLogic {
       isVenteForm: s.route==='vente-form',
       isProprietaire: s.route==='proprietaire' && !!viewOwnerRaw,
       goPieces: () => this.go('pieces'),
+      goModeles: () => this.go('modeles'),
       goCommandes: () => this.go('commandes'),
       isStock: s.route==='stock', goStock: () => this.go('stock'),
       stockTotal, stockTotalLabel: 'Total : ' + stockTotal + (stockTotal>1 ? ' pièces disponibles' : ' pièce disponible'),
@@ -3262,10 +3642,11 @@ class Component extends DCLogic {
       ordersFiltersLabel: (n => 'Filtres' + (n ? ' (' + n + ')' : ''))((s.canalFilter!=='tous' ? 1 : 0) + (s.paysFilter!=='tous' ? 1 : 0) + (s.orderStatutFilter!=='tous' ? 1 : 0)),
       piecesFiltersLabel: (n => 'Filtres' + (n ? ' (' + n + ')' : ''))((s.statutFilter!=='tous' ? 1 : 0) + (s.lieuFilter!=='tous' ? 1 : 0) + (s.sortBy!=='recent' ? 1 : 0)),
 
-      crumb: ({'piece-form':'Pièces', 'piece-detail':'Pièces', 'lot-form':'Pièces', 'qr-sheet':'Pièces', 'commande-detail':'Commandes', 'vente-form':'Commandes', 'demande-detail':'Demandes', 'proprietaire':'Propriétaires'})[s.route] || '',
+      crumb: ({'piece-form':'Pièces', 'piece-detail':'Pièces', 'lot-form':'Pièces', 'qr-sheet':'Pièces', 'commande-detail':'Commandes', 'vente-form':'Commandes', 'demande-detail':'Demandes', 'proprietaire':'Propriétaires', 'modele-form':'Modèles'})[s.route] || '',
       crumbGo: () => this.go(NAV_PARENT[s.route] || 'dashboard'),
       pageTitle: ({
-        dashboard:'Tableau de bord', pieces:'Pièces', commandes:'Commandes', demandes:'Demandes', stock:'Stock', equipe:'Équipe et accès', proprietaires:'Propriétaires',
+        dashboard:'Tableau de bord', pieces:'Pièces', commandes:'Commandes', demandes:'Demandes', stock:'Stock', equipe:'Équipe et accès', proprietaires:'Propriétaires', modeles:'Modèles',
+        'modele-form': isEditingModele ? 'Modifier le modèle' : 'Ajouter un modèle',
         'piece-form': isEditing ? 'Modifier la pièce' : 'Ajouter une pièce',
         'piece-detail': pieceById(s.viewPieceId) ? pieceById(s.viewPieceId).modele : 'Pièce',
         'lot-form': 'Générer un lot de pièces',
@@ -3738,6 +4119,9 @@ class Component extends DCLogic {
       },
       lieuFilter: s.lieuFilter, setLieuFilter: e => this.setState({lieuFilter:e.target.value}),
       lieuxOpts: LIEUX.map(l => ({value:l, label:l})), paysSuggestions: PAYS_SUGGESTIONS.map(p => ({value:p})),
+      modeleNomsOpts: s.modeles.map(m => ({value:m.nom})),
+      couleurOptsForForm: (s.modeles.find(m => m.nom.trim().toLowerCase()===s.form.modele.trim().toLowerCase())?.variantes || []).map(v => ({value:v.couleur})),
+      couleurOptsForLot: (s.modeles.find(m => m.nom.trim().toLowerCase()===(s.lotForm||this._emptyLot()).modele.trim().toLowerCase())?.variantes || []).map(v => ({value:v.couleur})),
       sortBy: s.sortBy, setSortBy: e => this.setState({sortBy:e.target.value}),
       filteredPieces, noPieces: filteredPieces.length===0,
       registreEmpty: s.pieces.length===0,
@@ -3901,6 +4285,23 @@ class Component extends DCLogic {
           const patch = {[key]: v};
           // En génération automatique, l'année du n° de série suit la date de fabrication.
           if ((key==='dateFab' || key==='modele') && st.form.autoIds && !st.editId) patch.serie = nextSerie(st.pieces, key==='modele' ? v : st.form.modele, key==='dateFab' ? v : st.form.dateFab, st.serieMax);
+          // Modèle/couleur choisis dans le catalogue : on pré-remplit les champs encore vides, sans écraser une saisie existante.
+          if (key==='modele' || key==='couleur') {
+            const modeleNom = (key==='modele' ? v : st.form.modele).trim().toLowerCase();
+            const cat = st.modeles.find(m => m.nom.trim().toLowerCase()===modeleNom);
+            if (cat) {
+              if (key==='modele') {
+                if (String(st.form.matiere||'').trim()==='') patch.matiere = cat.matiereDefaut || '';
+                if (String(st.form.reference||'').trim()==='') patch.reference = cat.reference || '';
+              }
+              const couleurVal = (key==='couleur' ? v : st.form.couleur).trim().toLowerCase();
+              const variant = couleurVal ? (cat.variantes || []).find(x => (x.couleur || '').trim().toLowerCase()===couleurVal) : null;
+              // Si le modèle propose des couleurs, on attend que la couleur soit choisie avant de figer un prix.
+              const matchPrix = variant && variant.prix!==undefined && variant.prix!=='' ? variant.prix
+                : (!couleurVal && (cat.variantes || []).length ? '' : (cat.prixDefaut!==undefined ? cat.prixDefaut : ''));
+              if (String(st.form.prix||'').trim()==='' && matchPrix!=='') patch.prix = matchPrix;
+            }
+          }
           return {form: Object.assign({}, st.form, patch), fieldErr: fe};
         });
       }])),
@@ -3976,6 +4377,92 @@ class Component extends DCLogic {
           remove: () => this.deletePieceConfirm(p)};
       })(),
 
+      // Catalogue des modèles : contenu présenté côté client, indépendant du registre des pièces physiques.
+      ...(() => {
+        const mq = s.modeleSearch.trim().toLowerCase();
+        const decModeles = s.modeles.map(m => {
+          const mainPh = (m.photos || [])[0];
+          const nPieces = s.pieces.filter(p => p.modele===m.nom).length;
+          const variantes = (m.variantes && m.variantes.length) ? m.variantes : [];
+          return {...m, hasPhoto:!!mainPh, noPhoto:!mainPh, photoSrc: mainPh ? mainPh.src : '',
+            nPieces, nPiecesLabel: nPieces + (nPieces>1 ? ' pièces au registre' : ' pièce au registre'),
+            nVariantes: variantes.length,
+            variantesLabel: variantes.length ? variantes.map(v => v.couleur).join(', ') : 'Aucune couleur déclarée',
+            open: () => this.openModeleEdit(m)};
+        }).sort((a,b) => a.nom.localeCompare(b.nom));
+        const filteredModeles = decModeles.filter(m => !mq || (m.nom+' '+m.collection+' '+m.categorie+' '+m.reference).toLowerCase().includes(mq));
+        return {
+          modeleSearch: s.modeleSearch, setModeleSearch: e => this.setState({modeleSearch:e.target.value}),
+          filteredModeles, noModeles: filteredModeles.length===0,
+          modelesCount: filteredModeles.length===s.modeles.length ? s.modeles.length + (s.modeles.length>1 ? ' modèles au catalogue' : ' modèle au catalogue')
+            : filteredModeles.length + ' sur ' + s.modeles.length + ' modèles',
+          openModeleNew: () => this.openModeleNew()
+        };
+      })(),
+      ...(() => {
+        const f = s.modeleForm;
+        const photos = f.photos || [];
+        const videos = f.videos || [];
+        const name = f.nom || 'ce modèle';
+        const fe = s.modeleFieldErr || {};
+        return {
+          modeleForm: f, modeleFieldErr: fe, hasModeleFieldErr: Object.keys(fe).length>0, isEditingModele,
+          modeleInvalid: {nom:!!fe.nom, prixDefaut:!!fe.prixDefaut},
+          modeleShadow: {nom: fe.nom ? FIELD_ERR : FIELD_OK, prixDefaut: fe.prixDefaut ? FIELD_ERR : FIELD_OK},
+          modeleRefPlaceholder: refFromModele(f.nom) ? 'Ex. ' + refFromModele(f.nom) : 'Ex. HUP',
+          setModele: Object.fromEntries(['nom','reference','collection','categorie','prixDefaut','matiereDefaut','description','caracteristiques','entretien'].map(key => [key, e => {
+            const v = e.target.value;
+            this.setState(st => {
+              const err = Object.assign({}, st.modeleFieldErr); delete err[key];
+              return {modeleForm:Object.assign({}, st.modeleForm, {[key]:v}), modeleFieldErr:err};
+            });
+          }])),
+          modeleVariantsView: f.variantes.map((row, i) => ({
+            couleur:row.couleur, prix:row.prix, err: fe['variante' + i] || '',
+            onCouleur: this.setModeleVariant(i, 'couleur'), onPrix: this.setModeleVariant(i, 'prix'),
+            canRemove: f.variantes.length>1, remove: () => this.removeModeleVariant(i)
+          })),
+          addModeleVariant: () => this.addModeleVariant(),
+          saveModele: e => this.saveModele(e),
+          deleteModeleCur: () => { const m = s.modeles.find(x => x.id===s.editModeleId); if (m) this.deleteModeleConfirm(m); },
+          // Photos (même principe que pour une pièce : plusieurs, l'une d'elles devient la principale).
+          modeleFormPhotos: photos.map((ph, i) => ({...ph, isMain:i===0, notMain:i>0,
+            alt: (i===0 ? 'Photo principale de ' : 'Photo ' + (i+1) + ' de ') + name,
+            frame: i===0 ? 'inset 0 0 0 2px rgb(71,29,27)' : 'inset 0 0 0 1px rgba(0,0,0,.12)',
+            promoteAria: 'Choisir la photo ' + (i+1) + ' comme photo principale',
+            removeAria: 'Retirer la photo ' + (i+1),
+            makeMain: () => {
+              this.setState(st => { const l = st.modeleForm.photos || []; return {modeleForm:Object.assign({}, st.modeleForm, {photos:[ph].concat(l.filter(x => x.id!==ph.id))})}; });
+              this.noticeModelePhoto('Photo principale mise à jour.', null);
+            },
+            remove: () => {
+              const nextIsMain = i===0 && photos.length>1;
+              this.setState(st => ({modeleForm:Object.assign({}, st.modeleForm, {photos:(st.modeleForm.photos || []).filter(x => x.id!==ph.id)}), modelePhotoErr:''}));
+              this.noticeModelePhoto('Photo retirée.' + (nextIsMain ? ' La photo suivante devient la photo principale.' : ''), {photo:ph, index:i});
+            }})),
+          modelePhotoNoticeText: s.modelePhotoNotice ? s.modelePhotoNotice.text : '', modelePhotoCanUndo: !!(s.modelePhotoNotice && s.modelePhotoNotice.undo),
+          undoModelePhoto: () => this.undoModelePhoto(),
+          modelePhotosCount: photos.length + ' / ' + PHOTO_MAX,
+          canAddModelePhoto: photos.length < PHOTO_MAX,
+          addModelePhotoLabel: photos.length ? 'Ajouter' : 'Ajouter des photos',
+          modelePhotoMax: PHOTO_MAX, modelePhotoBusy: s.modelePhotoBusy, modelePhotoErr: s.modelePhotoErr, modelePhotoMultiple: true,
+          pickModelePhotos: () => { try { document.getElementById('bo-modele-photo-input').click(); } catch(e) {} },
+          onModelePhotoFiles: e => { const t = e.target; const files = Array.from(t.files || []); try { t.value = ''; } catch(err) {} this.addModelePhotos(files); },
+          modelePhotoDragOver: e => { if (e && e.preventDefault) e.preventDefault(); },
+          modelePhotoDrop: e => { if (e && e.preventDefault) e.preventDefault(); this.addModelePhotos((e && e.dataTransfer && e.dataTransfer.files) || []); },
+          // Vidéos (plusieurs par modèle, contrairement à la pièce qui n'en a qu'une).
+          modeleFormVideos: videos.map((v, i) => ({id:v.id, name:v.name, sizeLabel: fmtMo(v.size), src: this.videoUrl(v.id, v.blob),
+            removeAria: 'Retirer la vidéo ' + (i+1), remove: () => this.removeModeleVideo(v.id)})),
+          hasModeleVideos: videos.length>0, canAddModeleVideo: videos.length < 4,
+          addModeleVideoLabel: videos.length ? 'Ajouter une autre vidéo' : 'Ajouter une vidéo',
+          modeleVideoMaxLabel: VIDEO_MAX_LABEL, modeleVideoBusy: s.modeleVideoBusy, modeleVideoErr: s.modeleVideoErr,
+          pickModeleVideo: () => { try { document.getElementById('bo-modele-video-input').click(); } catch(e) {} },
+          onModeleVideoFile: e => { const t = e.target; const file = (t.files || [])[0]; try { t.value = ''; } catch(err) {} this.addModeleVideo(file); },
+          modeleVideoDragOver: e => { if (e && e.preventDefault) e.preventDefault(); },
+          modeleVideoDrop: e => { if (e && e.preventDefault) e.preventDefault(); const file = e && e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]; if (file) this.addModeleVideo(file); }
+        };
+      })(),
+
       // Lot de pièces (identifiants préparés en amont de la fabrication)
       lotForm: s.lotForm || this._emptyLot(),
       lotSource: s.lotSource || '',
@@ -4021,7 +4508,16 @@ class Component extends DCLogic {
         const v = e.target.value;
         this.setState(st => {
           const le = Object.assign({}, st.lotErr); delete le[key];
-          return {lotForm:Object.assign({}, st.lotForm, {[key]:v}), lotErr:le};
+          const patch = {[key]: v};
+          if (key==='modele') {
+            const cat = st.modeles.find(m => m.nom.trim().toLowerCase()===v.trim().toLowerCase());
+            if (cat) {
+              if (String(st.lotForm.matiere||'').trim()==='') patch.matiere = cat.matiereDefaut || '';
+              if (String(st.lotForm.reference||'').trim()==='') patch.reference = cat.reference || '';
+              if (String(st.lotForm.prix||'').trim()==='' && cat.prixDefaut!==undefined && cat.prixDefaut!=='') patch.prix = cat.prixDefaut;
+            }
+          }
+          return {lotForm:Object.assign({}, st.lotForm, patch), lotErr:le};
         });
       }])),
       lotErr: s.lotErr || {}, hasLotErr: Object.keys(s.lotErr || {}).length>0,
