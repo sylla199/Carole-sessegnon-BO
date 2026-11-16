@@ -64,6 +64,10 @@
   .ph-x svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.2;stroke-linecap:round}
   @media (hover:none){.ph-thumb .ph-hint{opacity:1;transform:none}}
   @media (pointer:coarse){.ph-x{width:44px;height:44px}}
+  /* Champ relié au catalogue (datalist) : chevron toujours visible, pas seulement au survol/focus */
+  .bo-combo{position:relative}
+  .bo-combo input{padding-right:40px !important}
+  .bo-combo-arrow{position:absolute;right:16px;top:50%;transform:translateY(-50%);pointer-events:none;color:rgb(94,94,94)}
   .bo-split{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);gap:24px;align-items:start;max-width:1180px}
   @media (max-width:1100px){.bo-split{grid-template-columns:minmax(0,1fr)}}
   @media (max-width:900px){
@@ -685,12 +689,18 @@
             <form onSubmit="{{ savePiece }}" noValidate style="background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);padding:clamp(22px,3vw,32px);display:flex;flex-direction:column;gap:18px">
               <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:16px">
                 <label style="display:block;font-size:13px;color:rgb(70,70,70)">Modèle
-                  <input list="bo-modeles-list" value="{{ form.modele }}" onChange="{{ setF.modele }}" aria-invalid="{{ fieldInvalid.modele }}" aria-describedby="err-modele" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:{{ fieldShadow.modele }};color:rgb(0,0,0)">
+                  <div class="bo-combo" style="margin-top:8px">
+                    <input list="bo-modeles-list" value="{{ form.modele }}" onChange="{{ setF.modele }}" aria-invalid="{{ fieldInvalid.modele }}" aria-describedby="err-modele" style="width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:{{ fieldShadow.modele }};color:rgb(0,0,0)">
+                    <svg class="bo-combo-arrow" aria-hidden="true" width="10" height="6" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M1 1l4 4 4-4"></path></svg>
+                  </div>
                   <sc-if value="{{ fieldErr.modele }}"><span id="err-modele" style="display:block;margin-top:6px;font-size:12px;color:rgb(155,24,33)">{{ fieldErr.modele }}</span></sc-if>
                   <sc-if value="{{ hasCatalogModeleForPiece }}"><button type="button" onClick="{{ openCatalogModeleForPiece }}" style="display:block;margin-top:6px;background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:12px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center;font-family:inherit">Voir la fiche modèle au catalogue</button></sc-if>
                 </label>
                 <label style="display:block;font-size:13px;color:rgb(70,70,70)">Couleur
-                  <input list="bo-couleurs-form-list" value="{{ form.couleur }}" onChange="{{ setF.couleur }}" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+                  <div class="bo-combo" style="margin-top:8px">
+                    <input list="bo-couleurs-form-list" value="{{ form.couleur }}" onChange="{{ setF.couleur }}" style="width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+                    <svg class="bo-combo-arrow" aria-hidden="true" width="10" height="6" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M1 1l4 4 4-4"></path></svg>
+                  </div>
                   <datalist id="bo-couleurs-form-list"><sc-for list="{{ couleurOptsForForm }}" as="co"><option value="{{ co.value }}"></option></sc-for></datalist>
                 </label>
               </div>
@@ -998,7 +1008,10 @@
             </label>
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:16px">
               <label style="display:block;font-size:13px;color:rgb(70,70,70)">Modèle
-                <input list="bo-modeles-list" value="{{ lotForm.modele }}" onChange="{{ setLot.modele }}" aria-invalid="{{ lotInvalid.modele }}" aria-describedby="err-lot-modele" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:{{ lotShadow.modele }};color:rgb(0,0,0)">
+                <div class="bo-combo" style="margin-top:8px">
+                  <input list="bo-modeles-list" value="{{ lotForm.modele }}" onChange="{{ setLot.modele }}" aria-invalid="{{ lotInvalid.modele }}" aria-describedby="err-lot-modele" style="width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:{{ lotShadow.modele }};color:rgb(0,0,0)">
+                  <svg class="bo-combo-arrow" aria-hidden="true" width="10" height="6" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M1 1l4 4 4-4"></path></svg>
+                </div>
                 <sc-if value="{{ lotErr.modele }}"><span id="err-lot-modele" style="display:block;margin-top:6px;font-size:12px;color:rgb(155,24,33)">{{ lotErr.modele }}</span></sc-if>
                 <sc-if value="{{ hasCatalogModeleForLot }}"><button type="button" onClick="{{ openCatalogModeleForLot }}" style="display:block;margin-top:6px;background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:12px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center;font-family:inherit">Voir la fiche modèle au catalogue</button></sc-if>
               </label>
@@ -1034,7 +1047,10 @@
                 <sc-for list="{{ lotVariantsView }}" as="v" hint-placeholder-count="1">
                   <div style="display:grid;grid-template-columns:1fr 120px 160px auto;gap:10px;align-items:end">
                     <label style="display:block;font-size:12px;color:rgb(94,94,94)">Couleur <span style="color:rgb(94,94,94)">(facultatif)</span>
-                      <input list="bo-couleurs-lot-list" value="{{ v.couleur }}" onChange="{{ v.onCouleur }}" style="margin-top:6px;width:100%;height:48px;padding:0 14px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+                      <div class="bo-combo" style="margin-top:6px">
+                        <input list="bo-couleurs-lot-list" value="{{ v.couleur }}" onChange="{{ v.onCouleur }}" style="width:100%;height:48px;padding:0 14px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
+                        <svg class="bo-combo-arrow" aria-hidden="true" width="10" height="6" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M1 1l4 4 4-4"></path></svg>
+                      </div>
                     </label>
                     <label style="display:block;font-size:12px;color:rgb(94,94,94)">Quantité
                       <input type="number" min="1" step="1" inputMode="numeric" value="{{ v.quantite }}" onChange="{{ v.onQuantite }}" style="margin-top:6px;width:100%;height:48px;padding:0 14px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0);font-variant-numeric:tabular-nums">
