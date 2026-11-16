@@ -467,6 +467,7 @@
                       <sc-if value="{{ v.canRemove }}"><button type="button" onClick="{{ v.remove }}" aria-label="Retirer cette couleur" style="height:48px;padding:0 14px;background:none;border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(155,24,33);cursor:pointer;font-size:13px">Retirer</button></sc-if>
                     </div>
                     <sc-if value="{{ v.err }}"><p role="alert" style="margin:0;font-size:12px;color:rgb(155,24,33)">{{ v.err }}</p></sc-if>
+                    <sc-if value="{{ v.canGenLot }}"><button type="button" onClick="{{ v.genLot }}" style="background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:12px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center;font-family:inherit">Générer un lot avec cette couleur →</button></sc-if>
                   </sc-for>
                 </div>
                 <button type="button" onClick="{{ addModeleVariant }}" style="margin-top:12px;background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:13px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center">+ Ajouter une couleur</button>
@@ -686,6 +687,7 @@
                 <label style="display:block;font-size:13px;color:rgb(70,70,70)">Modèle
                   <input list="bo-modeles-list" value="{{ form.modele }}" onChange="{{ setF.modele }}" aria-invalid="{{ fieldInvalid.modele }}" aria-describedby="err-modele" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:{{ fieldShadow.modele }};color:rgb(0,0,0)">
                   <sc-if value="{{ fieldErr.modele }}"><span id="err-modele" style="display:block;margin-top:6px;font-size:12px;color:rgb(155,24,33)">{{ fieldErr.modele }}</span></sc-if>
+                  <sc-if value="{{ hasCatalogModeleForPiece }}"><button type="button" onClick="{{ openCatalogModeleForPiece }}" style="display:block;margin-top:6px;background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:12px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center;font-family:inherit">Voir la fiche modèle au catalogue</button></sc-if>
                 </label>
                 <label style="display:block;font-size:13px;color:rgb(70,70,70)">Couleur
                   <input list="bo-couleurs-form-list" value="{{ form.couleur }}" onChange="{{ setF.couleur }}" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0)">
@@ -905,6 +907,7 @@
                   <p style="margin:0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgb(94,94,94)">{{ viewPiece.refLabel }}</p>
                   <p style="margin:2px 0 0;font-family:var(--font-display);font-size:24px;color:rgb(71,29,27)">{{ viewPiece.modele }}</p>
                   <span style="display:inline-block;margin-top:6px;white-space:nowrap;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:{{ viewPiece.statutBg }};color:{{ viewPiece.statutFg }};box-shadow:{{ viewPiece.statutShadow }}">{{ viewPiece.statutLabel }}</span>
+                  <sc-if value="{{ viewPiece.hasCatalogModele }}"><button type="button" onClick="{{ viewPiece.openCatalogModele }}" style="display:block;margin-top:8px;background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:12px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center;font-family:inherit">Voir la fiche modèle au catalogue</button></sc-if>
                 </div>
               </div>
 
@@ -997,6 +1000,7 @@
               <label style="display:block;font-size:13px;color:rgb(70,70,70)">Modèle
                 <input list="bo-modeles-list" value="{{ lotForm.modele }}" onChange="{{ setLot.modele }}" aria-invalid="{{ lotInvalid.modele }}" aria-describedby="err-lot-modele" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:{{ lotShadow.modele }};color:rgb(0,0,0)">
                 <sc-if value="{{ lotErr.modele }}"><span id="err-lot-modele" style="display:block;margin-top:6px;font-size:12px;color:rgb(155,24,33)">{{ lotErr.modele }}</span></sc-if>
+                <sc-if value="{{ hasCatalogModeleForLot }}"><button type="button" onClick="{{ openCatalogModeleForLot }}" style="display:block;margin-top:6px;background:none;border:0;padding:0;color:rgb(71,29,27);cursor:pointer;font-size:12px;border-bottom:1px solid rgb(71,29,27);min-height:44px;display:inline-flex;align-items:center;font-family:inherit">Voir la fiche modèle au catalogue</button></sc-if>
               </label>
               <label style="display:block;font-size:13px;color:rgb(70,70,70)">Référence article <span style="color:rgb(94,94,94)">(facultatif)</span>
                 <input value="{{ lotForm.reference }}" onChange="{{ setLot.reference }}" placeholder="{{ lotRefPlaceholder }}" autocomplete="off" style="margin-top:8px;width:100%;height:52px;padding:0 16px;background:rgb(255,255,255);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:rgb(0,0,0);text-transform:uppercase;letter-spacing:.06em">
@@ -2912,13 +2916,19 @@ class Component extends DCLogic {
       description:f.description.trim(), caracteristiques:f.caracteristiques.trim(), entretien:f.entretien.trim(),
       photos:f.photos || [], videos:f.videos || [], variantes};
     const editing = !!this.state.editModeleId;
+    // Avertissement non bloquant : un même nom utilisé deux fois rendrait le second modèle invisible pour les suggestions automatiques sur les pièces et les lots.
+    const duplicate = this.state.modeles.find(m => m.id!==this.state.editModeleId && m.nom.trim().toLowerCase()===nom.toLowerCase());
     this.setState(st => ({
       modeles: editing ? st.modeles.map(m => m.id===st.editModeleId ? Object.assign({}, m, data) : m)
         : st.modeles.concat([Object.assign({id:'md' + Date.now().toString(36)}, data)]),
       route:'modeles', modeleFieldErr:{}
     }), () => this.persist());
     this.logAudit((editing ? 'Modèle modifié — ' : 'Modèle créé — ') + nom + (variantes.length ? ' · ' + variantes.length + (variantes.length>1 ? ' couleurs' : ' couleur') : ''));
-    this.showFlash('Modèle « ' + nom + ' » ' + (editing ? 'enregistré.' : 'ajouté au catalogue.'));
+    if (duplicate) {
+      this.showFlash('Modèle « ' + nom + ' » ' + (editing ? 'enregistré.' : 'ajouté au catalogue.') + ' Attention : un autre modèle porte déjà ce nom — un seul des deux sera proposé automatiquement sur les pièces et les lots.', 9000);
+    } else {
+      this.showFlash('Modèle « ' + nom + ' » ' + (editing ? 'enregistré.' : 'ajouté au catalogue.'));
+    }
   }
   deleteModeleConfirm(m){
     const used = this.state.pieces.filter(p => p.modele===m.nom).length;
@@ -4197,6 +4207,9 @@ class Component extends DCLogic {
       form: s.form, isEditing,
       fieldErr, fieldShadow, fieldInvalid, hasFieldErr: Object.keys(fieldErr).length>0,
       refPlaceholder: refFromModele(s.form.modele) ? 'Ex. ' + refFromModele(s.form.modele) : 'Ex. HUP',
+      catalogModeleForPiece: s.modeles.find(m => m.nom.trim().toLowerCase()===s.form.modele.trim().toLowerCase()) || null,
+      hasCatalogModeleForPiece: !!s.modeles.find(m => m.nom.trim().toLowerCase()===s.form.modele.trim().toLowerCase()),
+      openCatalogModeleForPiece: () => { const m = s.modeles.find(x => x.nom.trim().toLowerCase()===s.form.modele.trim().toLowerCase()); if (m) this.openModeleEdit(m); },
       idsLocked: isEditing || !!s.form.autoIds,
       idsBg: (isEditing || s.form.autoIds) ? 'rgb(252,249,248)' : 'rgb(255,255,255)',
       canToggleAuto: !isEditing,
@@ -4310,8 +4323,10 @@ class Component extends DCLogic {
       savePiece: e => {
         e.preventDefault();
         const raw = this.state.form;
+        // On aligne la casse sur celle du catalogue (s'il existe) pour qu'une même pièce ne se retrouve jamais scindée en deux groupes ailleurs dans l'appli (ex. stock du tableau de bord).
+        const catMatchPiece = this.state.modeles.find(m => m.nom.trim().toLowerCase()===raw.modele.trim().toLowerCase());
         const f = Object.assign({}, raw, {
-          modele: raw.modele.trim(), serie: raw.serie.trim(), code: raw.code.trim().toUpperCase(),
+          modele: catMatchPiece ? catMatchPiece.nom : raw.modele.trim(), serie: raw.serie.trim(), code: raw.code.trim().toUpperCase(),
           reference: (raw.reference.trim() || refFromModele(raw.modele)).toUpperCase(),
           prix: String(raw.prix).trim()==='' ? '' : Number(raw.prix)
         });
@@ -4339,8 +4354,10 @@ class Component extends DCLogic {
         const owner = ownerOf(p.id);
         const photos = p.photos || [];
         const activeIdx = Math.min(s.viewPhotoIndex || 0, Math.max(photos.length - 1, 0));
+        const catalogModele = s.modeles.find(m => m.nom.trim().toLowerCase()===(p.modele||'').trim().toLowerCase());
         return {...p, eff,
           statutLabel:STATUT_LABEL[eff] || eff, ...BADGE[STATUT_KIND[eff] || 'neutral'],
+          hasCatalogModele: !!catalogModele, openCatalogModele: () => { if (catalogModele) this.openModeleEdit(catalogModele); },
           refLabel: [p.reference, p.couleur, lieuOf(p)].filter(Boolean).join(' · '), lieuLabel: lieuOf(p),
           canReturn: eff==='vendue' && !!sale,
           hasRetour: !!p.retour && (eff==='retournee' || eff==='disponible'),
@@ -4420,7 +4437,8 @@ class Component extends DCLogic {
           modeleVariantsView: f.variantes.map((row, i) => ({
             couleur:row.couleur, prix:row.prix, err: fe['variante' + i] || '',
             onCouleur: this.setModeleVariant(i, 'couleur'), onPrix: this.setModeleVariant(i, 'prix'),
-            canRemove: f.variantes.length>1, remove: () => this.removeModeleVariant(i)
+            canRemove: f.variantes.length>1, remove: () => this.removeModeleVariant(i),
+            canGenLot: !!f.nom.trim(), genLot: () => this.go('lot-form', {lotForm:this.lotFromVariante(f, row), lotErr:{}, lotSource:''})
           })),
           addModeleVariant: () => this.addModeleVariant(),
           saveModele: e => this.saveModele(e),
@@ -4479,6 +4497,8 @@ class Component extends DCLogic {
       },
       lotSourceNote: (() => { const p = s.pieces.slice().reverse().find(x => x.modele + '|' + (x.couleur || '')===s.lotSource); return p ? 'Repris de « ' + p.modele + (p.couleur ? ' · ' + p.couleur : '') + ' » : modèle, couleur, référence, matière et prix. Les numéros de série, codes d\'activation, photos et vidéo ne sont pas repris.' : ''; })(),
       lotRefPlaceholder: refFromModele((s.lotForm || this._emptyLot()).modele) ? 'Ex. ' + refFromModele((s.lotForm || this._emptyLot()).modele) : 'Ex. HUP',
+      hasCatalogModeleForLot: !!s.modeles.find(m => m.nom.trim().toLowerCase()===(s.lotForm||this._emptyLot()).modele.trim().toLowerCase()),
+      openCatalogModeleForLot: () => { const m = s.modeles.find(x => x.nom.trim().toLowerCase()===(s.lotForm||this._emptyLot()).modele.trim().toLowerCase()); if (m) this.openModeleEdit(m); },
       lotVariantsView: (s.lotForm || this._emptyLot()).variants.map((row, i) => ({
         couleur:row.couleur, quantite:row.quantite, prix:row.prix,
         onCouleur: this.setLotVariant(i, 'couleur'), onQuantite: this.setLotVariant(i, 'quantite'), onPrix: this.setLotVariant(i, 'prix'),
@@ -4530,7 +4550,9 @@ class Component extends DCLogic {
       generateLot: e => {
         e.preventDefault();
         const raw = s.lotForm || this._emptyLot();
-        const modele = raw.modele.trim();
+        // Même alignement de casse que pour une pièce : le lot reprend le nom du catalogue s'il correspond.
+        const catMatchLot = s.modeles.find(m => m.nom.trim().toLowerCase()===raw.modele.trim().toLowerCase());
+        const modele = catMatchLot ? catMatchLot.nom : raw.modele.trim();
         const rows = raw.variants.filter(v => String(v.quantite).trim()!=='' || v.couleur.trim() || String(v.prix).trim()!=='');
         const err = {};
         if (!modele) err.modele = 'Indiquez le modèle à préparer.';
